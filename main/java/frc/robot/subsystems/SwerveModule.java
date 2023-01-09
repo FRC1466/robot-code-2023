@@ -20,9 +20,7 @@ import frc.robot.Constants.PIDConstants;
 public class SwerveModule {
     private WPI_TalonFX[] motors;
     private WPI_CANCoder cancoder;
-    private int m_cancoderPort;
-    private int m_rotationPort;
-    private boolean m_isRotationOffset;
+    private double m_cancoderOffset;
     private boolean m_RotInverted;
     private boolean m_driveInverted;
     private PIDController rotPID = new PIDController(
@@ -50,13 +48,11 @@ public class SwerveModule {
 
         cancoder = new WPI_CANCoder(cancoderPort);
 
-        m_cancoderPort = cancoderPort;
-        m_isRotationOffset = isRotationOffset;
-        m_rotationPort = rotationPort;
         m_RotInverted = rotInverted;
         m_driveInverted = driveInverted;
+        m_cancoderOffset = cancoderOffset;
 
-        rotPID.enableContinuousInput(-ConversionConstants.CTRE_TICKS_PER_REV, ConversionConstants.CTRE_TICKS_PER_REV);
+        rotPID.enableContinuousInput(-ConversionConstants.CTRE_TICKS_PER_REV/2, ConversionConstants.CTRE_TICKS_PER_REV/2);
 
 
         initializeMotors();
@@ -103,8 +99,10 @@ public class SwerveModule {
     }
 
     public Rotation2d getCancoderAngle() {
-        //- return Rotation2d.fromDegrees(cancoder.getPosition());
-        return Rotation2d.fromDegrees(0);
+        return Rotation2d.fromDegrees(
+            wrapCancoderOutput(
+                cancoder.getAbsolutePosition() + m_cancoderOffset
+            ));
     }
 
     /**
@@ -135,6 +133,24 @@ public class SwerveModule {
         }
 
         return adjustedAngleSetpoint;
+
+    }
+
+     /**
+     * @param position        position in degrees
+     * @return adjusted degree
+     */
+    private double wrapCancoderOutput(double position) {
+        double m = Math.floor(Math.abs(position / 360));
+
+        if (position > 180.0) {
+            position =- 360.0 * (m + 1);
+        }
+        if (position < -180.0) {
+            position += 360.0 * (m + 1);
+        }
+
+        return position;
 
     }
 
@@ -181,6 +197,28 @@ public class SwerveModule {
 
         SmartDashboard.putNumber("SETPOINT", setpoint);
         double pidOutput = MathUtil.clamp(rotPID.calculate(getRotationPosition(), setpoint), -0.8, 0.8);
+        SmartDashboard.putNumber("PID OUTPUT", pidOutput);
+        motors[1].set(TalonFXControlMode.PercentOutput, 
+            pidOutput);  
+    }
+
+    public void setDesiredStateCancoder(SwerveModuleState desiredState) {
+        double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
+        motors[0].set(TalonFXControlMode.Velocity, unitsVel);
+
+        SmartDashboard.putNumber("ANGLESTATE", desiredState.angle.getRadians());
+
+        double ticks = ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
+
+        double setpoint =
+            desiredState.angle.getRadians() / (2*Math.PI) * ticks;
+        // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
+
+        double current =
+            getCancoderAngle().getRadians() / (2*Math.PI) * ticks;
+
+        SmartDashboard.putNumber("SETPOINT", setpoint);
+        double pidOutput = MathUtil.clamp(rotPID.calculate(current, setpoint), -0.8, 0.8);
         SmartDashboard.putNumber("PID OUTPUT", pidOutput);
         motors[1].set(TalonFXControlMode.PercentOutput, 
             pidOutput);  
@@ -293,7 +331,7 @@ public class SwerveModule {
 
     }
     private void initializeCancoder() {
-        cancoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        cancoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
         cancoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         cancoder.setPositionToAbsolute();
         cancoder.configSensorDirection(true);
