@@ -89,7 +89,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Rotation2d getGyroHeading() {
     SmartDashboard.putNumber("gyro rotation degrees", gyro.getRotation2d().getDegrees());
-    SmartDashboard.putNumber("gyro pitch", gyro.getPitch());
+    SmartDashboard.putNumber("gyro pitch (degrees?)", gyro.getPitch());
     return gyro.getRotation2d();
   }
 
