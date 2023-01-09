@@ -77,7 +77,7 @@ public class TelemetrySubsystem {
 
     private void initializeEncoderUpdates() {
         ShuffleboardLayout Encoders = tuningTab
-            .getLayout("Encoders")
+            .getLayout("Encoders", BuiltInLayouts.kList)
             .withSize(2, 4);
         
         frontLeftCancoder = Encoders.add("frontLeftCancoder", DriveConstants.FRONTLEFT_OFFSET).getEntry();
