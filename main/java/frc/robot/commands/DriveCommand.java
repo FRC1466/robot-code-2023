@@ -113,12 +113,12 @@ public class DriveCommand extends CommandBase {
 
     @Override
     public void execute() {
+        m_tele.updateDriveLimits();
         m_drive();
         updateSmartDashboard();
         if (PID_iter*20 > 5000) { // 5000ms PID update time
             updatePID();
             debuggingUpdate();
-            m_tele.updateDriveLimits();
             m_tele.setModuleInversion();
             m_drive.updateModuleInversion();
             m_tele.setCodeDebugStates();
