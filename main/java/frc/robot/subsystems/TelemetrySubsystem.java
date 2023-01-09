@@ -126,8 +126,8 @@ public class TelemetrySubsystem {
 
     private void initializeModuleInversion() {
         ShuffleboardLayout driveInvert = tuningTab
-            .getLayout("driveInvert")
-            .withSize(2, 4);
+            .getLayout("driveInvert", BuiltInLayouts.kList)
+            .withSize(1, 4);
         
         frontLeftDriveInvert = driveInvert.add("frontLeftDriveInvert", DriveConstants.FRONTLEFT_DRIVEINVERT).getEntry();
         frontRightDriveInvert = driveInvert.add("frontRightDriveInvert", DriveConstants.FRONTRIGHT_DRIVEINVERT).getEntry();
@@ -135,8 +135,8 @@ public class TelemetrySubsystem {
         backRightDriveInvert = driveInvert.add("backRightDriveInvert", DriveConstants.BACKRIGHT_DRIVEINVERT).getEntry();
 
         ShuffleboardLayout rotInvert = tuningTab
-            .getLayout("rotInvert")
-            .withSize(2, 4);
+            .getLayout("rotInvert", BuiltInLayouts.kList)
+            .withSize(1, 4);
         
         frontLeftRotInvert = rotInvert.add("frontLeftDriveInvert", DriveConstants.FRONTLEFT_ROTINVERT).getEntry();
         frontRightRotInvert = rotInvert.add("frontRightDriveInvert", DriveConstants.FRONTRIGHT_ROTINVERT).getEntry();
