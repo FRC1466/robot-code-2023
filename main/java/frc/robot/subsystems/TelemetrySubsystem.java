@@ -80,10 +80,10 @@ public class TelemetrySubsystem {
             .getLayout("Encoders", BuiltInLayouts.kList)
             .withSize(2, 4);
         
-        frontLeftCancoder = Encoders.add("frontLeftCancoder", DriveConstants.FRONTLEFT_OFFSET).getEntry();
-        frontRightCancoder = Encoders.add("frontRightCancoder", DriveConstants.FRONTRIGHT_OFFSET).getEntry();
-        backLeftCancoder = Encoders.add("backLeftCancoder", DriveConstants.BACKLEFT_OFFSET).getEntry();
-        backRightCancoder = Encoders.add("backRightCancoder", DriveConstants.BACKRIGHT_OFFSET).getEntry();
+        frontLeftCancoder = Encoders.add("frontLeftCancoderOffset", DriveConstants.FRONTLEFT_OFFSET).getEntry();
+        frontRightCancoder = Encoders.add("frontRightCancoderOffset", DriveConstants.FRONTRIGHT_OFFSET).getEntry();
+        backLeftCancoder = Encoders.add("backLeftCancoderOffset", DriveConstants.BACKLEFT_OFFSET).getEntry();
+        backRightCancoder = Encoders.add("backRightCancoderOffset", DriveConstants.BACKRIGHT_OFFSET).getEntry();
         integratedFalconFullRotation = Encoders.add("integratedFalconFullRotation", ConversionConstants.CTRE_TICKS_PER_REV).getEntry();
     }
 
