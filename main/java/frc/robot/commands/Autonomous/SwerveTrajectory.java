@@ -38,18 +38,17 @@ public class SwerveTrajectory {
                 DriveConstants.KINEMATICS,
                 // Position controllers
                 new PIDController(
-                    AutoConstants.X_CONTROLLER.P,
-                    AutoConstants.X_CONTROLLER.I, 
-                    AutoConstants.X_CONTROLLER.D),
+                    AutoConstants.TRANSLATION_CONTROLLER.P,
+                    AutoConstants.TRANSLATION_CONTROLLER.I, 
+                    AutoConstants.TRANSLATION_CONTROLLER.D),
                 new PIDController(
-                    AutoConstants.Y_CONTROLLER.P, 
-                    AutoConstants.X_CONTROLLER.I, 
-                    AutoConstants.X_CONTROLLER.D),
+                    AutoConstants.TRANSLATION_CONTROLLER.P, 
+                    AutoConstants.TRANSLATION_CONTROLLER.I, 
+                    AutoConstants.TRANSLATION_CONTROLLER.D),
                 new PIDController(
                     AutoConstants.THETA_CONTROLLER.P,
                     AutoConstants.THETA_CONTROLLER.I, 
-                    AutoConstants.THETA_CONTROLLER.D 
-                ),
+                    AutoConstants.THETA_CONTROLLER.D),
                 m_drive::driveFromModuleStates,
                 m_drive);
     

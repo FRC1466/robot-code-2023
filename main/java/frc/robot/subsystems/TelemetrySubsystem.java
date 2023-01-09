@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ConversionConstants;
+import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.PIDConstants;
 
 public class TelemetrySubsystem {
@@ -27,6 +28,7 @@ public class TelemetrySubsystem {
         initializeEncoderUpdates();
         initializeDriveLimits();
         initializeModuleInversion();
+        initializeCodeDebugStates();
     }
 
 
@@ -151,6 +153,20 @@ public class TelemetrySubsystem {
         DriveConstants.FRONTRIGHT_ROTINVERT = frontRightRotInvert.getBoolean(DriveConstants.FRONTRIGHT_ROTINVERT);
         DriveConstants.BACKLEFT_ROTINVERT = backLeftRotInvert.getBoolean(DriveConstants.BACKLEFT_ROTINVERT);
         DriveConstants.BACKRIGHT_ROTINVERT = backRightRotInvert.getBoolean(DriveConstants.BACKRIGHT_ROTINVERT);
+    }
+
+    private GenericEntry usingWPIPID;
+
+    private void initializeCodeDebugStates() {
+        ShuffleboardLayout debug = tuningTab
+            .getLayout("debug")
+            .withSize(2, 1);
+
+        usingWPIPID = debug.add("isUsingWPIPID", DebugConstants.isUsingWPIPID).getEntry();
+    }
+
+    public void setCodeDebugStates() {
+        DebugConstants.isUsingWPIPID = usingWPIPID.getBoolean(DebugConstants.isUsingWPIPID);
     }
 
 }

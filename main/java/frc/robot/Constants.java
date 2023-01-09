@@ -105,8 +105,7 @@ public final class Constants {
 
     public static final Gains
       THETA_CONTROLLER = new Gains(1, 0, 0, 0, 0, 1),
-      X_CONTROLLER = new Gains(1, 0, 0, 0, 0, 1),
-      Y_CONTROLLER = new Gains(1, 0, 0, 0, 0, 1);
+      TRANSLATION_CONTROLLER = new Gains(1, 0, 0, 0, 0, 1);
 
       public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
       new TrapezoidProfile.Constraints(
@@ -127,6 +126,11 @@ public final class Constants {
     public static final Gains 
       DRIVE_GAINS_VELOCITY  = new Gains(0.198, 0.00085, 4.0, 0,  0,  0.8),
       DRIVE_GAINS_POSITION  = new Gains(0.05, 0.00001, 0, 0,  0,  0.6);
+  }
+
+  public static final class DebugConstants {
+    public static boolean
+      isUsingWPIPID = false;
   }
 
 }

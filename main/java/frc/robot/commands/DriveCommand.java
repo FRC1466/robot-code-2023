@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.TelemetrySubsystem;
@@ -75,8 +76,14 @@ public class DriveCommand extends CommandBase {
         } else {
             m_drive.updateSpeeds(rot, vx, vy);
         }
+        
         m_drive.updateModuleStates();
-        m_drive.drive();
+
+        if(DebugConstants.isUsingWPIPID) {
+            m_drive.driveAlternate();
+        } else {
+            m_drive.drive();
+        }
         
     }
 
@@ -114,6 +121,7 @@ public class DriveCommand extends CommandBase {
             m_tele.updateDriveLimits();
             m_tele.setModuleInversion();
             m_drive.updateModuleInversion();
+            m_tele.setCodeDebugStates();
             PID_iter = 0;
         }
         PID_iter++;

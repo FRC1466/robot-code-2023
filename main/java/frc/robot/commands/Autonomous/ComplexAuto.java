@@ -5,8 +5,10 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class ComplexAuto extends SequentialCommandGroup {
     public ComplexAuto(DriveSubsystem m_drive) {
+        SwerveTrajectory m_swerveTraj = new SwerveTrajectory(m_drive);
+        
         addCommands(
-            new TrajectoryTest(m_drive)
+            m_swerveTraj.getCommand()
         );
     }
 }

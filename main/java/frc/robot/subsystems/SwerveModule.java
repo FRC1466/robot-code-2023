@@ -9,9 +9,10 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.PIDConstants;
@@ -24,6 +25,11 @@ public class SwerveModule {
     private boolean m_isRotationOffset;
     private boolean m_RotInverted;
     private boolean m_driveInverted;
+    private PIDController rotPID = new PIDController(
+        PIDConstants.DRIVE_GAINS_POSITION.P,
+        PIDConstants.DRIVE_GAINS_POSITION.I,
+        PIDConstants.DRIVE_GAINS_POSITION.D);
+    
     
     /**
      * Initialize a Swerve Module
@@ -49,6 +55,8 @@ public class SwerveModule {
         m_rotationPort = rotationPort;
         m_RotInverted = rotInverted;
         m_driveInverted = driveInverted;
+
+        rotPID.enableContinuousInput(-ConversionConstants.CTRE_TICKS_PER_REV, ConversionConstants.CTRE_TICKS_PER_REV);
 
 
         initializeMotors();
@@ -86,6 +94,10 @@ public class SwerveModule {
         return motors[0].getSelectedSensorPosition();
     }
 
+    /**
+     * 
+     * @return position of rotation motor in raw ctre units
+     */
     public double getRotationPosition() {
         return motors[1].getSelectedSensorPosition();
     }
@@ -127,7 +139,7 @@ public class SwerveModule {
     }
 
     /**
-     * set motor velocity and position from a state
+     * set motor velocity and position from a state using PID from Talons
      * @param desiredState SwerveModuleState, unoptimized, that corresponds to the swerve module
      */
     public void setDesiredState(SwerveModuleState desiredState) {
@@ -153,19 +165,45 @@ public class SwerveModule {
     }
 
     /**
-     * reset encoders, setting both positions to 0
+     * set motor velocity and position from a state using inbuilt PID with wpilib (for position only)
+     */
+    public void setDesiredStatePID(SwerveModuleState desiredState) {
+        double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
+        motors[0].set(TalonFXControlMode.Velocity, unitsVel);
+
+        SmartDashboard.putNumber("ANGLESTATE", desiredState.angle.getRadians());
+
+        double ticks = ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
+
+        double setpoint =
+            desiredState.angle.getRadians() / (2*Math.PI) * ticks;
+        // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
+
+        SmartDashboard.putNumber("SETPOINT", setpoint);
+        double pidOutput = MathUtil.clamp(rotPID.calculate(getRotationPosition(), setpoint), -0.8, 0.8);
+        SmartDashboard.putNumber("PID OUTPUT", pidOutput);
+        motors[1].set(TalonFXControlMode.PercentOutput, 
+            pidOutput);  
+    }
+
+    /**
+     * set angle encoder to a double
+     * @param i set position to this
      */
     public void resetAngleEncoder(double i) {
         motors[1].setSelectedSensorPosition(i);
     }
 
-    public void resetAngleByCancoderOffset(double i) {
+    public void resetTalonAngleByCancoderOffset(double i) {
         SmartDashboard.putNumber("abspos", cancoder.getAbsolutePosition());
         System.out.println(cancoder.getAbsolutePosition());
-        resetAngleEncoder((cancoder.getAbsolutePosition()));
-        cancoder.setPosition(cancoder.getAbsolutePosition());
+        resetAngleEncoder(i+cancoder.getAbsolutePosition());
     }
 
+    /**
+     * set drive sensor position to a double
+     * @param i set position to this (raw ctre)
+     */
     public void resetDriveEncoder(double i) {
         motors[0].setSelectedSensorPosition(i);
     }
@@ -184,13 +222,14 @@ public class SwerveModule {
         motors[1].config_kP(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.P, PIDConstants.TIMEOUT_MS);
         motors[1].config_kI(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.I, PIDConstants.TIMEOUT_MS);
         motors[1].config_kD(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.D, PIDConstants.TIMEOUT_MS);
-        motors[0].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.IZONE, PIDConstants.TIMEOUT_MS);
+        motors[1].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.IZONE, PIDConstants.TIMEOUT_MS);
     }
 
-    public void changeDriveMotorInversion(boolean i) {
-        motors[1].setInverted(i);
-    }
-
+    /**
+     * change motor inversion from two booleans
+     * @param drive inversion of drive motor
+     * @param rot inversion of rotation motor
+     */
     public void changeMotorInversion(boolean drive, boolean rot) {
         motors[0].setInverted(drive);
         motors[1].setInverted(rot);

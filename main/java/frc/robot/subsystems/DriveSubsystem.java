@@ -4,14 +4,12 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -85,6 +83,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Rotation2d getGyroHeading() {
     SmartDashboard.putNumber("gyro rotation degrees", gyro.getRotation2d().getDegrees());
+    SmartDashboard.putNumber("gyro pitch", gyro.getPitch());
     return gyro.getRotation2d();
   }
 
@@ -123,21 +122,9 @@ public class DriveSubsystem extends SubsystemBase {
       getGyroHeading(),
       getCalculatedSwervePositions()
       );
-  }
-
-  public void changeMotorInversion(boolean[] i) {
-      frontLeftModule.changeDriveMotorInversion(i[0]);
-      frontRightModule.changeDriveMotorInversion(i[1]);
-      backLeftModule.changeDriveMotorInversion(i[2]);
-      backRightModule.changeDriveMotorInversion(i[3]);
-  }
-
-  /**
-   * set ChassisSpeeds from a time in the Trajectory
-   * @param time time in seconds in the Trajectory
-   */
-  public void updateSpeedsTrajectory(double time, RamseteController ramsete, Trajectory trajectory) {
-    speeds = ramsete.calculate(m_odometry.getPoseMeters(), trajectory.sample(time));
+    SmartDashboard.putNumber("odometry x", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("odometry y", m_odometry.getPoseMeters().getY());
+    SmartDashboard.putNumber("odometry rad", m_odometry.getPoseMeters().getRotation().getRadians());
   }
 
   public void resetAngleByCancoderOffset(double[] list) {
@@ -155,6 +142,13 @@ public class DriveSubsystem extends SubsystemBase {
     frontRightModule.setDesiredState(moduleStates[1]);
     backLeftModule.setDesiredState(moduleStates[2]);
     backRightModule.setDesiredState(moduleStates[3]);
+  }
+
+  public void driveAlternate() {
+    frontLeftModule.setDesiredStatePID(moduleStates[0]);
+    frontRightModule.setDesiredStatePID(moduleStates[1]);
+    backLeftModule.setDesiredStatePID(moduleStates[2]);
+    backRightModule.setDesiredStatePID(moduleStates[3]);
   }
 
   /**
