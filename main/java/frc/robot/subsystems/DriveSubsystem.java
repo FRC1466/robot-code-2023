@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -75,6 +76,11 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     gyro.reset();
+
+    SmartDashboard.putData("reset front left pos", new InstantCommand(() -> frontLeftModule.resetAngleEncoder(0)));
+    SmartDashboard.putData("reset front right pos", new InstantCommand(() -> frontRightModule.resetAngleEncoder(0)));
+    SmartDashboard.putData("reset back left pos", new InstantCommand(() -> backLeftModule.resetAngleEncoder(0)));
+    SmartDashboard.putData("reset back right pos", new InstantCommand(() -> backRightModule.resetAngleEncoder(0)));
   }
   
   /**
