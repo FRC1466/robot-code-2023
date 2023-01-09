@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -48,7 +49,7 @@ public class TelemetrySubsystem {
     
     private void initializePIDUpdate() {
         ShuffleboardLayout positionPID = tuningTab
-            .getLayout("Position PID")
+            .getLayout("Position PID", BuiltInLayouts.kList)
             .withSize(2, 5);
 
         m_P_pos = positionPID.add("P_pos", PIDConstants.DRIVE_GAINS_POSITION.P).getEntry();
@@ -58,7 +59,7 @@ public class TelemetrySubsystem {
         m_Izone_pos = positionPID.add("Izone_pos", PIDConstants.DRIVE_GAINS_POSITION.IZONE).getEntry();
 
         ShuffleboardLayout velocityPID = tuningTab
-            .getLayout("Position PID")
+            .getLayout("Position PID", BuiltInLayouts.kList)
             .withSize(2, 5);
 
         m_P_vel = velocityPID.add("P_vel", PIDConstants.DRIVE_GAINS_VELOCITY.P).getEntry();
@@ -100,7 +101,7 @@ public class TelemetrySubsystem {
 
     private void initializeDriveLimits() {
         ShuffleboardLayout driveLimits = tuningTab
-            .getLayout("Drive Limits")
+            .getLayout("Drive Limits", BuiltInLayouts.kList)
             .withSize(2, 3);
         
         vxLimit = driveLimits.add("vxLimit", DriveConstants.LIMIT_VX).getEntry();
@@ -159,8 +160,8 @@ public class TelemetrySubsystem {
 
     private void initializeCodeDebugStates() {
         ShuffleboardLayout debug = tuningTab
-            .getLayout("debug")
-            .withSize(2, 1);
+            .getLayout("debug", BuiltInLayouts.kList)
+            .withSize(1, 4);
 
         usingWPIPID = debug.add("isUsingWPIPID", DebugConstants.isUsingWPIPID).getEntry();
     }
