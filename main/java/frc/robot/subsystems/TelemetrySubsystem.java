@@ -157,6 +157,7 @@ public class TelemetrySubsystem {
     }
 
     private GenericEntry usingWPIPID;
+    
 
     private void initializeCodeDebugStates() {
         ShuffleboardLayout debug = tuningTab
@@ -164,6 +165,7 @@ public class TelemetrySubsystem {
             .withSize(1, 4);
 
         usingWPIPID = debug.add("isUsingWPIPID", DebugConstants.isUsingWPIPID).getEntry();
+
     }
 
     public void setCodeDebugStates() {
