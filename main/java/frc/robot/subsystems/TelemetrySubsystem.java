@@ -6,12 +6,21 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.PIDConstants;
 
 public class TelemetrySubsystem {
     private ShuffleboardTab tuningTab = Shuffleboard.getTab("Tuning");
+
+    public TelemetrySubsystem() {
+        initializePIDUpdate();
+        initializeEncoderUpdates();
+        initializeDriveLimits();
+        initializeModuleInversion();
+        initializeCodeDebugStates();
+    }
 
     private GenericEntry m_P_pos;
     private GenericEntry m_I_pos;
@@ -23,15 +32,12 @@ public class TelemetrySubsystem {
     private GenericEntry m_D_vel;
     private GenericEntry m_F_vel;
     private GenericEntry m_Izone_vel;
-
-    public TelemetrySubsystem() {
-        initializePIDUpdate();
-        initializeEncoderUpdates();
-        initializeDriveLimits();
-        initializeModuleInversion();
-        initializeCodeDebugStates();
-    }
-
+    private GenericEntry m_P_translation;
+    private GenericEntry m_I_translation;
+    private GenericEntry m_D_translation;
+    private GenericEntry m_P_theta;
+    private GenericEntry m_I_theta;
+    private GenericEntry m_D_theta;
 
     public void updatePIDConstants() {
         PIDConstants.DRIVE_GAINS_POSITION.P = m_P_pos.getDouble(0);
@@ -45,6 +51,14 @@ public class TelemetrySubsystem {
         PIDConstants.DRIVE_GAINS_VELOCITY.D = m_D_vel.getDouble(0);
         PIDConstants.DRIVE_GAINS_VELOCITY.F = m_F_vel.getDouble(0);
         PIDConstants.DRIVE_GAINS_VELOCITY.IZONE = m_Izone_vel.getDouble(0);
+
+        AutoConstants.TRANSLATION_CONTROLLER.P = m_P_translation.getDouble(0);
+        AutoConstants.TRANSLATION_CONTROLLER.I = m_I_translation.getDouble(0);
+        AutoConstants.TRANSLATION_CONTROLLER.D = m_D_translation.getDouble(0);
+
+        AutoConstants.THETA_CONTROLLER.P = m_P_theta.getDouble(0);
+        AutoConstants.THETA_CONTROLLER.I = m_I_theta.getDouble(0);
+        AutoConstants.THETA_CONTROLLER.D = m_D_theta.getDouble(0);
     }
     
     private void initializePIDUpdate() {
@@ -67,6 +81,17 @@ public class TelemetrySubsystem {
         m_D_vel = velocityPID.add("D_vel", PIDConstants.DRIVE_GAINS_VELOCITY.D).getEntry();
         m_F_vel = velocityPID.add("F_vel", PIDConstants.DRIVE_GAINS_VELOCITY.F).getEntry();
         m_Izone_vel = velocityPID.add("Izone_vel", PIDConstants.DRIVE_GAINS_VELOCITY.IZONE).getEntry();
+
+        ShuffleboardLayout autoPID = tuningTab
+            .getLayout("Auto PID", BuiltInLayouts.kList)
+            .withSize(2, 6);
+
+        m_P_translation = autoPID.add("P_translation", AutoConstants.TRANSLATION_CONTROLLER.P).getEntry();
+        m_I_translation = autoPID.add("I_translation", AutoConstants.TRANSLATION_CONTROLLER.I).getEntry();
+        m_D_translation = autoPID.add("D_translation", AutoConstants.TRANSLATION_CONTROLLER.D).getEntry();
+        m_P_theta = autoPID.add("P_theta", AutoConstants.THETA_CONTROLLER.P).getEntry();
+        m_I_theta = autoPID.add("I_theta", AutoConstants.THETA_CONTROLLER.I).getEntry();
+        m_D_theta = autoPID.add("D_theta", AutoConstants.THETA_CONTROLLER.D).getEntry();
     } 
 
     private GenericEntry frontLeftCancoder;

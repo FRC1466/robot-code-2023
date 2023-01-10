@@ -75,7 +75,7 @@ public class RobotContainer {
 
 
   public Command getAuto() {
-    return new ComplexAuto(m_drive);
+    return new ComplexAuto(m_drive, m_tele);
   }
 
 
