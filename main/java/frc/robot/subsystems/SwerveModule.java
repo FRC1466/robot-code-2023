@@ -137,11 +137,11 @@ public class SwerveModule {
     }
 
      /**
-     * @param position        position in degrees
-     * @return adjusted degree
+     * @param position position of cancoder in degrees
+     * @return         adjusted degree within a [-180, 180] wrapped output
      */
     private double wrapCancoderOutput(double position) {
-        double m = Math.floor(Math.abs(position / 360));
+        double m = Math.floor((Math.abs(position)-180) / 360);
 
         if (position > 180.0) {
             position =- 360.0 * (m + 1);
@@ -151,7 +151,6 @@ public class SwerveModule {
         }
 
         return position;
-
     }
 
     /**
@@ -203,6 +202,11 @@ public class SwerveModule {
     }
 
     public void setDesiredStateCancoder(SwerveModuleState desiredState) {
+        SwerveModuleState state =
+            SwerveModuleState.optimize(
+                desiredState, 
+                getCancoderAngle());
+
         double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
         motors[0].set(TalonFXControlMode.Velocity, unitsVel);
 
