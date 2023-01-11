@@ -209,6 +209,13 @@ public class DriveSubsystem extends SubsystemBase {
     backRightModule.updatePID();
   }
 
+  public void setModulePositionPID(double p, double i, double d) {
+    frontLeftModule.setRotationPID(p, i, d);
+    frontRightModule.setRotationPID(p, i, d);
+    backLeftModule.setRotationPID(p, i, d);
+    backRightModule.setRotationPID(p, i, d);
+  }
+
   /**
    * @return length of module states list
    */

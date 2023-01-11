@@ -267,6 +267,12 @@ public class SwerveModule {
         motors[1].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.IZONE, PIDConstants.TIMEOUT_MS);
     }
 
+    public void setRotationPID(double p, double i, double d) {
+        rotPID.setP(p);
+        rotPID.setI(i);
+        rotPID.setD(d);
+    }
+
     /**
      * change motor inversion from two booleans
      * @param drive inversion of drive motor

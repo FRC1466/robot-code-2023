@@ -5,10 +5,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PIDConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.TelemetrySubsystem;
 
 import java.lang.Math;
+
 
 public class DriveCommand extends CommandBase {
     private final DriveSubsystem m_drive;
@@ -93,10 +95,17 @@ public class DriveCommand extends CommandBase {
     private void updatePID() {
         m_tele.updatePIDConstants();
         m_drive.updatePIDConfigs();
+        m_drive.setModulePositionPID(
+            PIDConstants.DRIVE_GAINS_POSITION.P,
+            PIDConstants.DRIVE_GAINS_POSITION.I,
+            PIDConstants.DRIVE_GAINS_POSITION.D);
     }
 
     private void debuggingUpdate() {
         m_tele.updateEncoders();
+        m_tele.setModuleInversion();
+        m_drive.updateModuleInversion();
+        m_tele.setCodeDebugStates();
     }
 
     private void updateSmartDashboard() {
@@ -119,9 +128,6 @@ public class DriveCommand extends CommandBase {
         if (PID_iter*20 > 5000) { // 5000ms PID update time
             updatePID();
             debuggingUpdate();
-            m_tele.setModuleInversion();
-            m_drive.updateModuleInversion();
-            m_tele.setCodeDebugStates();
             PID_iter = 0;
         }
         PID_iter++;
