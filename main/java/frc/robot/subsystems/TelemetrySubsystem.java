@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -154,19 +155,40 @@ public class TelemetrySubsystem {
             .getLayout("driveInvert", BuiltInLayouts.kList)
             .withSize(1, 4);
         
-        frontLeftDriveInvert = driveInvert.add("frontLeftDriveInvert", DriveConstants.FRONTLEFT_DRIVEINVERT).getEntry();
-        frontRightDriveInvert = driveInvert.add("frontRightDriveInvert", DriveConstants.FRONTRIGHT_DRIVEINVERT).getEntry();
-        backLeftDriveInvert = driveInvert.add("backLeftDriveInvert", DriveConstants.BACKLEFT_DRIVEINVERT).getEntry();
-        backRightDriveInvert = driveInvert.add("backRightDriveInvert", DriveConstants.BACKRIGHT_DRIVEINVERT).getEntry();
+        frontLeftDriveInvert = 
+            driveInvert.add("frontLeftDriveInvert", DriveConstants.FRONTLEFT_DRIVEINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
+        frontRightDriveInvert = 
+            driveInvert.add("frontRightDriveInvert", DriveConstants.FRONTRIGHT_DRIVEINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
+        backLeftDriveInvert = 
+            driveInvert.add("backLeftDriveInvert", DriveConstants.BACKLEFT_DRIVEINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
+        backRightDriveInvert = 
+            driveInvert.add("backRightDriveInvert", DriveConstants.BACKRIGHT_DRIVEINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
 
         ShuffleboardLayout rotInvert = tuningTab
             .getLayout("rotInvert", BuiltInLayouts.kList)
             .withSize(1, 4);
         
-        frontLeftRotInvert = rotInvert.add("frontLeftDriveInvert", DriveConstants.FRONTLEFT_ROTINVERT).getEntry();
-        frontRightRotInvert = rotInvert.add("frontRightDriveInvert", DriveConstants.FRONTRIGHT_ROTINVERT).getEntry();
-        backLeftRotInvert = rotInvert.add("backLeftDriveInvert", DriveConstants.BACKLEFT_ROTINVERT).getEntry();
-        backRightRotInvert = rotInvert.add("backRightDriveInvert", DriveConstants.BACKRIGHT_ROTINVERT).getEntry();
+        frontLeftRotInvert = 
+            rotInvert.add("frontLeftDriveInvert", DriveConstants.FRONTLEFT_ROTINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
+        frontRightRotInvert = rotInvert.add("frontRightDriveInvert", DriveConstants.FRONTRIGHT_ROTINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
+        backLeftRotInvert = rotInvert.add("backLeftDriveInvert", DriveConstants.BACKLEFT_ROTINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
+        backRightRotInvert = rotInvert.add("backRightDriveInvert", DriveConstants.BACKRIGHT_ROTINVERT)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
     }
 
     public void setModuleInversion() {
@@ -181,7 +203,7 @@ public class TelemetrySubsystem {
         DriveConstants.BACKRIGHT_ROTINVERT = backRightRotInvert.getBoolean(DriveConstants.BACKRIGHT_ROTINVERT);
     }
 
-    private GenericEntry usingWPIPID;
+    private GenericEntry usingCancoderPID;
     
 
     private void initializeCodeDebugStates() {
@@ -189,12 +211,15 @@ public class TelemetrySubsystem {
             .getLayout("debug", BuiltInLayouts.kList)
             .withSize(1, 4);
 
-        usingWPIPID = debug.add("isUsingWPIPID", DebugConstants.isUsingWPIPID).getEntry();
+        usingCancoderPID = 
+            debug.add("isUsingCancoderPID", DebugConstants.isUsingCancoderPID)
+            .withWidget(BuiltInWidgets.kToggleButton)
+            .getEntry();
 
     }
 
     public void setCodeDebugStates() {
-        DebugConstants.isUsingWPIPID = usingWPIPID.getBoolean(DebugConstants.isUsingWPIPID);
+        DebugConstants.isUsingCancoderPID = usingCancoderPID.getBoolean(DebugConstants.isUsingCancoderPID);
     }
 
 }
