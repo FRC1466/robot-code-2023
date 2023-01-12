@@ -81,6 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putData("reset front right pos", new InstantCommand(() -> frontRightModule.resetAngleEncoder(0)));
     SmartDashboard.putData("reset back left pos", new InstantCommand(() -> backLeftModule.resetAngleEncoder(0)));
     SmartDashboard.putData("reset back right pos", new InstantCommand(() -> backRightModule.resetAngleEncoder(0)));
+    SmartDashboard.putData("reset gyro position", new InstantCommand(() -> gyro.reset()));
   }
   
   /**
