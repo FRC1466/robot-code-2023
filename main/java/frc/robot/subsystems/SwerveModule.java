@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.ConversionConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PIDConstants;
 
 public class SwerveModule {
@@ -222,10 +223,14 @@ public class SwerveModule {
             getCancoderAngle().getRadians() / (2*Math.PI) * ticks;
 
         SmartDashboard.putNumber("SETPOINT", setpoint);
-        double pidOutput = MathUtil.clamp(rotPID.calculate(current, setpoint), -0.8, 0.8);
+
+        double pidOutput = rotPID.calculate(current, setpoint);
         SmartDashboard.putNumber("PID OUTPUT", pidOutput);
-        motors[1].set(TalonFXControlMode.PercentOutput, 
-            pidOutput);  
+
+        pidOutput = MathUtil.clamp(pidOutput, -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
+
+        SmartDashboard.putNumber("PID OUTPUT CLAMP", pidOutput);
+        motors[1].set(TalonFXControlMode.PercentOutput, pidOutput);  
     }
 
     /**

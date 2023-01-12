@@ -87,7 +87,8 @@ public final class Constants {
     public static double 
       LIMIT_VX = 1.5,
       LIMIT_VY = 1.5,
-      LIMIT_ROT = 4.0;
+      LIMIT_ROT = 4.0,
+      LIMIT_PID_CLAMP = 0.8;
 
 
   }

@@ -123,21 +123,24 @@ public class TelemetrySubsystem {
     private GenericEntry vxLimit;
     private GenericEntry vyLimit;
     private GenericEntry rotLimit;
+    private GenericEntry clampLimit;
 
     private void initializeDriveLimits() {
         ShuffleboardLayout driveLimits = tuningTab
             .getLayout("Drive Limits", BuiltInLayouts.kList)
-            .withSize(2, 3);
+            .withSize(2, 4);
         
         vxLimit = driveLimits.add("vxLimit", DriveConstants.LIMIT_VX).getEntry();
         vyLimit = driveLimits.add("vyLimit", DriveConstants.LIMIT_VY).getEntry();
         rotLimit = driveLimits.add("rotLimit", DriveConstants.LIMIT_ROT).getEntry();
+        clampLimit = driveLimits.add("clampLimit", DriveConstants.LIMIT_PID_CLAMP).getEntry();
     }
 
     public void updateDriveLimits() {
         DriveConstants.LIMIT_VX = vxLimit.getDouble(DriveConstants.LIMIT_VX);
         DriveConstants.LIMIT_VY = vyLimit.getDouble(DriveConstants.LIMIT_VY);
         DriveConstants.LIMIT_ROT = rotLimit.getDouble(DriveConstants.LIMIT_ROT);
+        DriveConstants.LIMIT_PID_CLAMP = clampLimit.getDouble((DriveConstants.LIMIT_PID_CLAMP));
     }
 
     private GenericEntry frontLeftDriveInvert;
