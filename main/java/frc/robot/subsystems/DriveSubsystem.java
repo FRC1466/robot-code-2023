@@ -255,6 +255,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return list of all velocities of the motors
    */
   public double[][] getVelocities() {
+
     return new double[][] {
       frontLeftModule.getVelocity(),
       frontRightModule.getVelocity(),
