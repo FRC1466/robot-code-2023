@@ -152,10 +152,10 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void driveAlternate() {
-    frontLeftModule.setDesiredStatePID(moduleStates[0]);
-    frontRightModule.setDesiredStatePID(moduleStates[1]);
-    backLeftModule.setDesiredStatePID(moduleStates[2]);
-    backRightModule.setDesiredStatePID(moduleStates[3]);
+    frontLeftModule.setDesiredStateCancoder(moduleStates[0]);
+    frontRightModule.setDesiredStateCancoder(moduleStates[1]);
+    backLeftModule.setDesiredStateCancoder(moduleStates[2]);
+    backRightModule.setDesiredStateCancoder(moduleStates[3]);
   }
 
   /**

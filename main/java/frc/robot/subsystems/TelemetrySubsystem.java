@@ -63,9 +63,22 @@ public class TelemetrySubsystem {
     }
     
     private void initializePIDUpdate() {
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+        System.out.println("ASJDGKASJDGHELPPSWORK");
+
         ShuffleboardLayout positionPID = tuningTab
             .getLayout("Position PID", BuiltInLayouts.kList)
-            .withSize(2, 5);
+            .withSize(1, 5);
 
         m_P_pos = positionPID.add("P_pos", PIDConstants.DRIVE_GAINS_POSITION.P).getEntry();
         m_I_pos = positionPID.add("I_pos", PIDConstants.DRIVE_GAINS_POSITION.I).getEntry();
@@ -74,8 +87,8 @@ public class TelemetrySubsystem {
         m_Izone_pos = positionPID.add("Izone_pos", PIDConstants.DRIVE_GAINS_POSITION.IZONE).getEntry();
 
         ShuffleboardLayout velocityPID = tuningTab
-            .getLayout("Position PID", BuiltInLayouts.kList)
-            .withSize(2, 5);
+            .getLayout("Velocity PID", BuiltInLayouts.kList)
+            .withSize(1, 5);
 
         m_P_vel = velocityPID.add("P_vel", PIDConstants.DRIVE_GAINS_VELOCITY.P).getEntry();
         m_I_vel = velocityPID.add("I_vel", PIDConstants.DRIVE_GAINS_VELOCITY.I).getEntry();
@@ -85,7 +98,7 @@ public class TelemetrySubsystem {
 
         ShuffleboardLayout autoPID = tuningTab
             .getLayout("Auto PID", BuiltInLayouts.kList)
-            .withSize(2, 6);
+            .withSize(1, 6);
 
         m_P_translation = autoPID.add("P_translation", AutoConstants.TRANSLATION_CONTROLLER.P).getEntry();
         m_I_translation = autoPID.add("I_translation", AutoConstants.TRANSLATION_CONTROLLER.I).getEntry();
@@ -104,7 +117,7 @@ public class TelemetrySubsystem {
     private void initializeEncoderUpdates() {
         ShuffleboardLayout Encoders = tuningTab
             .getLayout("Encoders", BuiltInLayouts.kList)
-            .withSize(2, 4);
+            .withSize(1, 4);
         
         frontLeftCancoder = Encoders.add("frontLeftCancoderOffset", DriveConstants.FRONTLEFT_OFFSET).getEntry();
         frontRightCancoder = Encoders.add("frontRightCancoderOffset", DriveConstants.FRONTRIGHT_OFFSET).getEntry();
@@ -129,7 +142,7 @@ public class TelemetrySubsystem {
     private void initializeDriveLimits() {
         ShuffleboardLayout driveLimits = tuningTab
             .getLayout("Drive Limits", BuiltInLayouts.kList)
-            .withSize(2, 4);
+            .withSize(1, 4);
         
         vxLimit = driveLimits.add("vxLimit", DriveConstants.LIMIT_VX).getEntry();
         vyLimit = driveLimits.add("vyLimit", DriveConstants.LIMIT_VY).getEntry();

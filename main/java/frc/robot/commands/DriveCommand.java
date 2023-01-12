@@ -81,11 +81,7 @@ public class DriveCommand extends CommandBase {
         
         m_drive.updateModuleStates();
 
-        if(DebugConstants.isUsingCancoderPID) {
-            m_drive.driveAlternate();
-        } else {
-            m_drive.drive();
-        }
+        m_drive.drive();
         
     }
 

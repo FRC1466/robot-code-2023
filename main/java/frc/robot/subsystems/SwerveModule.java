@@ -53,7 +53,7 @@ public class SwerveModule {
         m_driveInverted = driveInverted;
         m_cancoderOffset = cancoderOffset;
 
-        rotPID.enableContinuousInput(-ConversionConstants.CTRE_TICKS_PER_REV/2, ConversionConstants.CTRE_TICKS_PER_REV/2);
+        // rotPID.enableContinuousInput(-Math.PI, Math.PI);
 
 
         initializeMotors();
@@ -180,27 +180,6 @@ public class SwerveModule {
         motors[1].set(TalonFXControlMode.Position, setpoint);
     }
 
-    /**
-     * set motor velocity and position from a state using inbuilt PID with wpilib (for position only)
-     */
-    public void setDesiredStatePID(SwerveModuleState desiredState) {
-        double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
-        motors[0].set(TalonFXControlMode.Velocity, unitsVel);
-
-        SmartDashboard.putNumber("ANGLESTATE", desiredState.angle.getRadians());
-
-        double ticks = ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
-
-        double setpoint =
-            desiredState.angle.getRadians() / (2*Math.PI) * ticks;
-        // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
-
-        SmartDashboard.putNumber("SETPOINT", setpoint);
-        double pidOutput = MathUtil.clamp(rotPID.calculate(getRotationPosition(), setpoint), -0.8, 0.8);
-        SmartDashboard.putNumber("PID OUTPUT", pidOutput);
-        motors[1].set(TalonFXControlMode.PercentOutput, 
-            pidOutput);  
-    }
 
     public void setDesiredStateCancoder(SwerveModuleState desiredState) {
         SwerveModuleState state =
@@ -211,25 +190,27 @@ public class SwerveModule {
         double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
         motors[0].set(TalonFXControlMode.Velocity, unitsVel);
 
-        SmartDashboard.putNumber("ANGLESTATE", desiredState.angle.getRadians());
-
-        double ticks = ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
-
         double setpoint =
-            desiredState.angle.getRadians() / (2*Math.PI) * ticks;
+            desiredState.angle.getRadians() / (2*Math.PI);
         // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
 
         double current =
-            getCancoderAngle().getRadians() / (2*Math.PI) * ticks;
+            getCancoderAngle().getRadians() / (2*Math.PI);
 
         SmartDashboard.putNumber("SETPOINT", setpoint);
+        // System.out.println("SETPOINT " + setpoint);
+        
+        SmartDashboard.putNumber("ANGLESTATE", current);
+        // System.out.println("CURRENT ANGLE " + current);
 
         double pidOutput = rotPID.calculate(current, setpoint);
         SmartDashboard.putNumber("PID OUTPUT", pidOutput);
+        // System.out.println("PID OUTPUT " + pidOutput);
 
         pidOutput = MathUtil.clamp(pidOutput, -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
 
         SmartDashboard.putNumber("PID OUTPUT CLAMP", pidOutput);
+
         motors[1].set(TalonFXControlMode.PercentOutput, pidOutput);  
     }
 

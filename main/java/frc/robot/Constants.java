@@ -66,10 +66,10 @@ public final class Constants {
       BACKRIGHT_DRIVEINVERT = true,
       BACKLEFT_DRIVEINVERT = false,
       
-      FRONTRIGHT_ROTINVERT = false,
-      FRONTLEFT_ROTINVERT = false,
-      BACKRIGHT_ROTINVERT = false,
-      BACKLEFT_ROTINVERT = false;
+      FRONTRIGHT_ROTINVERT = true,
+      FRONTLEFT_ROTINVERT = true,
+      BACKRIGHT_ROTINVERT = true,
+      BACKLEFT_ROTINVERT = true;
     
     public static final int
       GYRO_PORT = 20;
@@ -126,7 +126,7 @@ public final class Constants {
 
     public static final Gains 
       DRIVE_GAINS_VELOCITY  = new Gains(0.198, 0.00085, 4.0, 0,  0,  0.8),
-      DRIVE_GAINS_POSITION  = new Gains(0.05, 0.00001, 0, 0,  0,  0.6);
+      DRIVE_GAINS_POSITION  = new Gains(0.1, 0.0001, 0, 0,  0,  0.6);
   }
 
   public static final class DebugConstants {
