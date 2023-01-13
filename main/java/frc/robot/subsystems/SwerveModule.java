@@ -24,6 +24,7 @@ public class SwerveModule {
     private double m_cancoderOffset;
     private boolean m_RotInverted;
     private boolean m_driveInverted;
+    private int m_rotationPort;
     private PIDController rotPID = new PIDController(
         PIDConstants.DRIVE_GAINS_POSITION.P,
         PIDConstants.DRIVE_GAINS_POSITION.I,
@@ -52,6 +53,7 @@ public class SwerveModule {
         m_RotInverted = rotInverted;
         m_driveInverted = driveInverted;
         m_cancoderOffset = cancoderOffset;
+        m_rotationPort = rotationPort;
 
         // rotPID.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -167,7 +169,7 @@ public class SwerveModule {
         double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
         motors[0].set(TalonFXControlMode.Velocity, unitsVel);
 
-        SmartDashboard.putNumber("ANGLESTATE", desiredState.angle.getRadians());
+        SmartDashboard.putNumber("ANGLESTATE " + m_rotationPort, desiredState.angle.getRadians());
 
         double ticks = ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
 
@@ -176,7 +178,7 @@ public class SwerveModule {
             desiredState.angle.getRadians()) / (2*Math.PI) * ticks;
         // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
 
-        SmartDashboard.putNumber("SETPOINT", setpoint);
+        SmartDashboard.putNumber("SETPOINT " + m_rotationPort, setpoint);
         motors[1].set(TalonFXControlMode.Position, setpoint);
     }
 
@@ -197,19 +199,19 @@ public class SwerveModule {
         double current =
             getCancoderAngle().getRadians() / (2*Math.PI);
 
-        SmartDashboard.putNumber("SETPOINT", setpoint);
+        SmartDashboard.putNumber("SETPOINT " + m_rotationPort, setpoint);
         // System.out.println("SETPOINT " + setpoint);
         
-        SmartDashboard.putNumber("ANGLESTATE", current);
+        SmartDashboard.putNumber("ANGLESTATE " + m_rotationPort, current);
         // System.out.println("CURRENT ANGLE " + current);
 
         double pidOutput = rotPID.calculate(current, setpoint);
-        SmartDashboard.putNumber("PID OUTPUT", pidOutput);
+        SmartDashboard.putNumber("PID OUTPUT " + m_rotationPort, pidOutput);
         // System.out.println("PID OUTPUT " + pidOutput);
 
         pidOutput = MathUtil.clamp(pidOutput, -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
 
-        SmartDashboard.putNumber("PID OUTPUT CLAMP", pidOutput);
+        SmartDashboard.putNumber("PID OUTPUT CLAMP " + m_rotationPort, pidOutput);
 
         motors[1].set(TalonFXControlMode.PercentOutput, pidOutput);  
     }
@@ -223,7 +225,7 @@ public class SwerveModule {
     }
 
     public void resetTalonAngleByCancoderOffset(double i) {
-        SmartDashboard.putNumber("abspos", cancoder.getAbsolutePosition());
+        SmartDashboard.putNumber("abspos" + m_rotationPort, cancoder.getAbsolutePosition());
         System.out.println(cancoder.getAbsolutePosition());
         resetAngleEncoder(i+cancoder.getAbsolutePosition());
     }
