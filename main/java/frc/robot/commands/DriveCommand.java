@@ -92,7 +92,11 @@ public class DriveCommand extends CommandBase {
         m_drive.updateModuleStates();
         switch (m_toggleModule) {
             case 0:
-            m_drive.drive();
+                if (m_controller.getLeftTriggerAxis() > 0.8) {
+                    m_drive.driveFromStopped();
+                } else {
+                    m_drive.drive();
+                }
                 break;
             case 1:
             m_drive.driveSpecificModule(1);
@@ -127,8 +131,6 @@ public class DriveCommand extends CommandBase {
                 default:
                     break;
             }}
-
-
         
     }
 

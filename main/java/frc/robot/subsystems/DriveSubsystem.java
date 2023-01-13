@@ -181,6 +181,13 @@ public class DriveSubsystem extends SubsystemBase {
       }
   }
 
+  public void driveFromStopped() {
+    frontLeftModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
+    frontRightModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
+    backLeftModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
+    backRightModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
+  }
+
   public void resetSpecificAngleEncoder(int i) {
     switch (i) {
       case 1:
