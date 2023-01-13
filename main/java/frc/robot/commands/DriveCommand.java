@@ -62,7 +62,7 @@ public class DriveCommand extends CommandBase {
         vy = -m_controller.getLeftY() * DriveConstants.LIMIT_VY;
         rot = -m_controller.getRightX() * DriveConstants.LIMIT_ROT;
 
-        if (m_controller.getAButtonPressed()) {
+        if (m_controller.getYButtonPressed()) {
             if(m_toggleModule >=4) {
                 m_toggleModule = 0;
             } else {
@@ -110,7 +110,7 @@ public class DriveCommand extends CommandBase {
                 break;
         }
 
-        if (m_controller.getBButtonPressed()) {
+        if (m_controller.getLeftBumperPressed()) {
             switch (m_toggleModule) {
                 case 1:
                 m_drive.resetSpecificAngleEncoder(1);
