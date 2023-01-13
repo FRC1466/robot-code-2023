@@ -158,6 +158,44 @@ public class DriveSubsystem extends SubsystemBase {
     backRightModule.setDesiredStateCancoder(moduleStates[3]);
   }
 
+  public void driveSpecificModule(int i) {
+    switch (i) {
+      case 1:
+        frontLeftModule.setDesiredState(new SwerveModuleState(0, moduleStates[0].angle));
+        break;
+      case 2:
+        frontRightModule.setDesiredState(new SwerveModuleState(0, moduleStates[1].angle));
+        break;
+      case 3:
+        backLeftModule.setDesiredState(new SwerveModuleState(0, moduleStates[2].angle));
+        break;
+      case 4:
+        backRightModule.setDesiredState(new SwerveModuleState(0, moduleStates[3].angle));
+        break;
+      default:
+        break;
+      }
+  }
+
+  public void resetSpecificAngleEncoder(int i) {
+    switch (i) {
+      case 1:
+        frontLeftModule.resetAngleEncoder(0);
+        break;
+      case 2:
+        frontRightModule.resetAngleEncoder(0);
+        break;
+      case 3:
+        backLeftModule.resetAngleEncoder(0);
+        break;
+      case 4:
+        backRightModule.resetAngleEncoder(0);
+        break;
+      default:
+        break;
+      }
+  }
+
   /**
    * update speeds kinematics class 
    * @param rad rad/s speed of robot

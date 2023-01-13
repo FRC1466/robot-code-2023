@@ -21,6 +21,7 @@ public class DriveCommand extends CommandBase {
     private double vy = 0;
     private double rot = 0;
     private int PID_iter = 0;
+    private int m_toggleModule = 0;
     
     /**
      * Default command for driving
@@ -61,7 +62,15 @@ public class DriveCommand extends CommandBase {
         vy = -m_controller.getLeftY() * DriveConstants.LIMIT_VY;
         rot = -m_controller.getRightX() * DriveConstants.LIMIT_ROT;
 
-        if (!(Math.abs(vx) > 0.15)) {
+        if (m_controller.getAButtonPressed()) {
+            if(m_toggleModule >=4) {
+                m_toggleModule = 0;
+            } else {
+                m_toggleModule++;
+            }
+            SmartDashboard.putNumber("togglemodule", m_toggleModule);
+        }
+
             vx = 0;
         }
 
@@ -80,8 +89,45 @@ public class DriveCommand extends CommandBase {
         }
         
         m_drive.updateModuleStates();
+        switch (m_toggleModule) {
+            case 0:
+            m_drive.drive();
+                break;
+            case 1:
+            m_drive.driveSpecificModule(1);
+                break;
+            case 2:
+            m_drive.driveSpecificModule(2);
+                break;
+            case 3:
+            m_drive.driveSpecificModule(3);
+                break;
+            case 4:
+            m_drive.driveSpecificModule(4);
+                break;
+            default:
+                break;
+        }
 
-        m_drive.drive();
+        if (m_controller.getBButtonPressed()) {
+            switch (m_toggleModule) {
+                case 1:
+                m_drive.resetSpecificAngleEncoder(1);
+                    break;
+                case 2:
+                m_drive.resetSpecificAngleEncoder(2);
+                    break;
+                case 3:
+                m_drive.resetSpecificAngleEncoder(3);
+                    break;
+                case 4:
+                m_drive.resetSpecificAngleEncoder(4);
+                    break;
+                default:
+                    break;
+            }}
+
+
         
     }
 
