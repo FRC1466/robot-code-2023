@@ -53,13 +53,13 @@ public class TelemetrySubsystem {
         PIDConstants.DRIVE_GAINS_VELOCITY.F = m_F_vel.getDouble(0);
         PIDConstants.DRIVE_GAINS_VELOCITY.IZONE = m_Izone_vel.getDouble(0);
 
-        AutoConstants.TRANSLATION_CONTROLLER.P = m_P_translation.getDouble(0);
-        AutoConstants.TRANSLATION_CONTROLLER.I = m_I_translation.getDouble(0);
-        AutoConstants.TRANSLATION_CONTROLLER.D = m_D_translation.getDouble(0);
+        // AutoConstants.TRANSLATION_CONTROLLER.P = m_P_translation.getDouble(0);
+        // AutoConstants.TRANSLATION_CONTROLLER.I = m_I_translation.getDouble(0);
+        // AutoConstants.TRANSLATION_CONTROLLER.D = m_D_translation.getDouble(0);
 
-        AutoConstants.THETA_CONTROLLER.P = m_P_theta.getDouble(0);
-        AutoConstants.THETA_CONTROLLER.I = m_I_theta.getDouble(0);
-        AutoConstants.THETA_CONTROLLER.D = m_D_theta.getDouble(0);
+        // AutoConstants.THETA_CONTROLLER.P = m_P_theta.getDouble(0);
+        // AutoConstants.THETA_CONTROLLER.I = m_I_theta.getDouble(0);
+        // AutoConstants.THETA_CONTROLLER.D = m_D_theta.getDouble(0);
     }
     
     private void initializePIDUpdate() {
@@ -78,6 +78,7 @@ public class TelemetrySubsystem {
 
         ShuffleboardLayout positionPID = tuningTab
             .getLayout("Position PID", BuiltInLayouts.kList)
+            .withPosition(0, 0)
             .withSize(1, 5);
 
         m_P_pos = positionPID.add("P_pos", PIDConstants.DRIVE_GAINS_POSITION.P).getEntry();
@@ -88,6 +89,7 @@ public class TelemetrySubsystem {
 
         ShuffleboardLayout velocityPID = tuningTab
             .getLayout("Velocity PID", BuiltInLayouts.kList)
+            .withPosition(1, 0)
             .withSize(1, 5);
 
         m_P_vel = velocityPID.add("P_vel", PIDConstants.DRIVE_GAINS_VELOCITY.P).getEntry();
@@ -96,16 +98,16 @@ public class TelemetrySubsystem {
         m_F_vel = velocityPID.add("F_vel", PIDConstants.DRIVE_GAINS_VELOCITY.F).getEntry();
         m_Izone_vel = velocityPID.add("Izone_vel", PIDConstants.DRIVE_GAINS_VELOCITY.IZONE).getEntry();
 
-        ShuffleboardLayout autoPID = tuningTab
-            .getLayout("Auto PID", BuiltInLayouts.kList)
-            .withSize(1, 6);
+        // ShuffleboardLayout autoPID = tuningTab
+        //     .getLayout("Auto PID", BuiltInLayouts.kList)
+        //     .withSize(1, 6);
 
-        m_P_translation = autoPID.add("P_translation", AutoConstants.TRANSLATION_CONTROLLER.P).getEntry();
-        m_I_translation = autoPID.add("I_translation", AutoConstants.TRANSLATION_CONTROLLER.I).getEntry();
-        m_D_translation = autoPID.add("D_translation", AutoConstants.TRANSLATION_CONTROLLER.D).getEntry();
-        m_P_theta = autoPID.add("P_theta", AutoConstants.THETA_CONTROLLER.P).getEntry();
-        m_I_theta = autoPID.add("I_theta", AutoConstants.THETA_CONTROLLER.I).getEntry();
-        m_D_theta = autoPID.add("D_theta", AutoConstants.THETA_CONTROLLER.D).getEntry();
+        // m_P_translation = autoPID.add("P_translation", AutoConstants.TRANSLATION_CONTROLLER.P).getEntry();
+        // m_I_translation = autoPID.add("I_translation", AutoConstants.TRANSLATION_CONTROLLER.I).getEntry();
+        // m_D_translation = autoPID.add("D_translation", AutoConstants.TRANSLATION_CONTROLLER.D).getEntry();
+        // m_P_theta = autoPID.add("P_theta", AutoConstants.THETA_CONTROLLER.P).getEntry();
+        // m_I_theta = autoPID.add("I_theta", AutoConstants.THETA_CONTROLLER.I).getEntry();
+        // m_D_theta = autoPID.add("D_theta", AutoConstants.THETA_CONTROLLER.D).getEntry();
     } 
 
     private GenericEntry frontLeftCancoder;
