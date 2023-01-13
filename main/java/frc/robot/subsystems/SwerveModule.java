@@ -142,7 +142,7 @@ public class SwerveModule {
      * @return         adjusted degree within a [-180, 180] wrapped output
      */
     private double wrapCancoderOutput(double position) {
-        double m = Math.floor((Math.abs(position)-180) / 360);
+        double m = Math.floor(Math.abs((Math.abs(position)-180) / 360));
 
         if (position > 180.0) {
             position =- 360.0 * (m + 1);
