@@ -71,6 +71,7 @@ public class DriveCommand extends CommandBase {
             SmartDashboard.putNumber("togglemodule", m_toggleModule);
         }
 
+        if (!(Math.abs(vx) > 0.15)) { // this can be done better with inbuilt stuff
             vx = 0;
         }
 
