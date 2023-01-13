@@ -110,6 +110,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry.resetPosition(getGyroHeading(), getCalculatedSwervePositions(), pose);
   }
 
+  public void resetGyro() {
+    gyro.reset();
+  }
+
   /**
    * drive from module states list
    * @param states list of SwerveModuleStates that correspond to the robot
