@@ -59,7 +59,7 @@ public class DriveCommand extends CommandBase {
      */
     private void m_drive() {
         vx = m_controller.getLeftX() * DriveConstants.LIMIT_VX;
-        vy = -m_controller.getLeftY() * DriveConstants.LIMIT_VY;
+        vy = m_controller.getLeftY() * DriveConstants.LIMIT_VY;
         rot = -m_controller.getRightX() * DriveConstants.LIMIT_ROT;
 
         if (m_controller.getYButtonPressed()) {
@@ -95,7 +95,7 @@ public class DriveCommand extends CommandBase {
                 if (m_controller.getLeftTriggerAxis() > 0.8) {
                     m_drive.driveFromStopped();
                 } else {
-                    m_drive.drive();
+                    m_drive.driveAlternate();
                 }
                 break;
             case 1:

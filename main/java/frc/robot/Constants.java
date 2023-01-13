@@ -55,10 +55,10 @@ public final class Constants {
       BACKLEFT_PORT_CANCODER = 12;
 
     public static double
-      FRONTRIGHT_OFFSET = 135,
-      FRONTLEFT_OFFSET = 45,
-      BACKRIGHT_OFFSET = -10,
-      BACKLEFT_OFFSET = -45;
+      FRONTRIGHT_OFFSET = -195-10.283,
+      FRONTLEFT_OFFSET = -160+2.373,
+      BACKRIGHT_OFFSET = -100-10.283,
+      BACKLEFT_OFFSET = -250+7.558;
 
     public static boolean
       FRONTRIGHT_DRIVEINVERT = false,
@@ -79,8 +79,8 @@ public final class Constants {
 
     public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
       new Translation2d(DriveConstants.TRACKWIDTH_METERS/2, DriveConstants.TRACKWIDTH_METERS/2), //frontleft
-      new Translation2d(DriveConstants.TRACKWIDTH_METERS/2, -DriveConstants.TRACKWIDTH_METERS/2), //frontright
-      new Translation2d(-DriveConstants.TRACKWIDTH_METERS/2, DriveConstants.TRACKWIDTH_METERS/2), //backleft
+      new Translation2d(-DriveConstants.TRACKWIDTH_METERS/2, DriveConstants.TRACKWIDTH_METERS/2), //frontright
+      new Translation2d(DriveConstants.TRACKWIDTH_METERS/2, -DriveConstants.TRACKWIDTH_METERS/2), //backleft
       new Translation2d(-DriveConstants.TRACKWIDTH_METERS/2, -DriveConstants.TRACKWIDTH_METERS/2)); //backright
     // Drive limiters
 
@@ -126,7 +126,7 @@ public final class Constants {
 
     public static final Gains 
       DRIVE_GAINS_VELOCITY  = new Gains(0.198, 0.00085, 4.0, 0,  0,  0.8),
-      DRIVE_GAINS_POSITION  = new Gains(0.1, 0.0001, 0, 0,  0,  0.6);
+      DRIVE_GAINS_POSITION  = new Gains(0.9, 0.0001, 0, 0,  0,  0.6);
   }
 
   public static final class DebugConstants {

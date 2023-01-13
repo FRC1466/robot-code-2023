@@ -55,7 +55,7 @@ public class SwerveModule {
         m_cancoderOffset = cancoderOffset;
         m_rotationPort = rotationPort;
 
-        // rotPID.enableContinuousInput(-Math.PI, Math.PI);
+        rotPID.enableContinuousInput(-0.51, 0.51);
 
 
         initializeMotors();
@@ -101,10 +101,30 @@ public class SwerveModule {
         return motors[1].getSelectedSensorPosition();
     }
 
-    public Rotation2d getCancoderAngle() {
+    public Rotation2d getCancoderAngle() 
+    {
+        double a;
+        switch (m_rotationPort) {
+            case 4:
+                a = DriveConstants.FRONTRIGHT_OFFSET;
+                break;
+            case 2:
+                a = DriveConstants.FRONTLEFT_OFFSET;
+                break;
+            case 6:
+                a = DriveConstants.BACKRIGHT_OFFSET;
+                break;
+            case 8:
+                a = DriveConstants.BACKLEFT_OFFSET;
+                break;
+            default:
+                a = m_cancoderOffset;
+                break;
+        }
+        a = m_cancoderOffset;
         return Rotation2d.fromDegrees(
             wrapCancoderOutput(
-                cancoder.getAbsolutePosition() + m_cancoderOffset
+                cancoder.getAbsolutePosition() + a
             ));
     }
 
@@ -140,20 +160,32 @@ public class SwerveModule {
     }
 
      /**
-     * @param position position of cancoder in degrees
+     * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360
      * @return         adjusted degree within a [-180, 180] wrapped output
      */
     private double wrapCancoderOutput(double position) {
-        double m = Math.floor(Math.abs((Math.abs(position)-180) / 360));
+        SmartDashboard.putNumber("raw can" + m_rotationPort, position);
+        // double m = Math.floor(Math.abs((Math.abs(position)-180)) / 360);
 
         if (position > 180.0) {
-            position =- 360.0 * (m + 1);
+            position =- 360.0;
         }
         if (position < -180.0) {
-            position += 360.0 * (m + 1);
+            position += 360.0;
         }
 
         return position;
+    }
+
+    private double wrapSetpoint (double sp) {
+        if (sp > 0.5) {
+            sp =- 1.0;
+        }
+        if (sp < -0.5) {
+            sp += 1.0;
+        }
+
+        return sp;
     }
 
     /**
