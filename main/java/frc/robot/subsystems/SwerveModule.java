@@ -55,7 +55,7 @@ public class SwerveModule {
         m_cancoderOffset = cancoderOffset;
         m_rotationPort = rotationPort;
 
-        rotPID.enableContinuousInput(-0.51, 0.51);
+        rotPID.enableContinuousInput(-0.50, 0.50);
 
 
         initializeMotors();
