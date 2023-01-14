@@ -61,9 +61,7 @@ public class SwerveModule {
         initializeMotors();
         initializeMotorsPID();
         initializeCancoder();
-        // resetAngleEncoder((cancoder.getAbsolutePosition()+cancoderOffset)/360 * ConversionConstants.CTRE_TICKS_PER_REV);
         resetDriveEncoder(0.0);
-        // cancoder.setPosition(cancoder.getAbsolutePosition()+cancoderOffset);
     }
 
     /**
@@ -160,12 +158,11 @@ public class SwerveModule {
     }
 
      /**
-     * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360
+     * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360, motors must be inverted
      * @return         adjusted degree within a [-180, 180] wrapped output
      */
     private double wrapCancoderOutput(double position) {
         SmartDashboard.putNumber("raw can" + m_rotationPort, position);
-        // double m = Math.floor(Math.abs((Math.abs(position)-180)) / 360);
 
         if (position > 180.0) {
             position =- 360.0;
@@ -208,7 +205,6 @@ public class SwerveModule {
         double setpoint = convertAngleToSetPoint(
             (getRotationPosition()/ticks) *2*Math.PI, 
             desiredState.angle.getRadians()) / (2*Math.PI) * ticks;
-        // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
 
         SmartDashboard.putNumber("SETPOINT " + m_rotationPort, setpoint);
         motors[1].set(TalonFXControlMode.Position, setpoint);
@@ -226,16 +222,13 @@ public class SwerveModule {
 
         double setpoint =
             desiredState.angle.getRadians() / (2*Math.PI);
-        // setpoint = desiredState.angle.getRadians() / (2*Math.PI) * ConversionConstants.CTRE_TICKS_PER_REV;
 
         double current =
             getCancoderAngle().getRadians() / (2*Math.PI);
 
         SmartDashboard.putNumber("SETPOINT " + m_rotationPort, setpoint);
-        // System.out.println("SETPOINT " + setpoint);
         
         SmartDashboard.putNumber("ANGLESTATE " + m_rotationPort, current);
-        // System.out.println("CURRENT ANGLE " + current);
 
         double pidOutput = rotPID.calculate(current, setpoint);
         SmartDashboard.putNumber("PID OUTPUT " + m_rotationPort, pidOutput);
