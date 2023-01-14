@@ -56,14 +56,9 @@ public class SwerveModule {
         m_cancoderOffset = cancoderOffset;
         m_rotationPort = rotationPort;
 
-        if (m_RotInverted) {
-            m_invertConstant = -1;
-        } else {
-            m_invertConstant = 1;
-        }
+        m_invertConstant = m_RotInverted ? -1 : 1;
 
         rotPID.enableContinuousInput(-0.50, 0.50);
-
 
         initializeMotors();
         initializeMotorsPID();
