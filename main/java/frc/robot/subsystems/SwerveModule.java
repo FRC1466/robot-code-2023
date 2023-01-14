@@ -162,7 +162,6 @@ public class SwerveModule {
      * @return         adjusted degree within a [-180, 180] wrapped output
      */
     private double wrapCancoderOutput(double position) {
-        SmartDashboard.putNumber("raw can" + m_rotationPort, position);
 
         if (position > 180.0) {
             position =- 360.0;
