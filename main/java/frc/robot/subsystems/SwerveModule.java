@@ -12,6 +12,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -30,11 +31,12 @@ public class SwerveModule {
     private boolean m_driveInverted;
     private int m_invertConstant;
     private int m_rotationPort;
+    private Rotation2d cancoderRotation2d = new Rotation2d();
+    private SwerveModulePosition swerveModulePosition;
     private PIDController rotPID = new PIDController(
         PIDConstants.DRIVE_GAINS_POSITION.P,
         PIDConstants.DRIVE_GAINS_POSITION.I,
         PIDConstants.DRIVE_GAINS_POSITION.D);
-    
     
     /**
      * Initialize a Swerve Module
@@ -44,15 +46,12 @@ public class SwerveModule {
         int rotationPort,
         int cancoderPort,
         double cancoderOffset,
-        boolean isRotationOffset,
         boolean driveInverted,
         boolean rotInverted
     ) {
         motors = new WPI_TalonFX[] {
             new WPI_TalonFX(drivePort),
-            new WPI_TalonFX(rotationPort)
-        }; 
-
+            new WPI_TalonFX(rotationPort)}; 
         cancoder = new WPI_CANCoder(cancoderPort);
 
         m_RotInverted = rotInverted;
@@ -67,7 +66,7 @@ public class SwerveModule {
         initializeMotors();
         initializeMotorsPID();
         initializeCancoder();
-        resetDriveEncoder(0.0);
+        setDriveEncoder(0.0);
         initializeTelemetry();
     }
 
@@ -92,16 +91,17 @@ public class SwerveModule {
     public SwerveModuleState getState() {
         return new SwerveModuleState(
             motors[0].getSelectedSensorVelocity() * ConversionConstants.CTRE_NATIVE_TO_MPS, 
-            new Rotation2d(motors[1].getSelectedSensorPosition() * ConversionConstants.CTRE_TICKS_PER_REV % ConversionConstants.CTRE_TICKS_PER_REV)
+            cancoderRotation2d
             );
     }
 
     /**
-     * get list of errors
-     * @return list of doubles for both motor errors, 0: drive, 1: position
+     * @return current module positions of the module
      */
-    public double[] getErrorStates() {
-        return new double[] {motors[0].getClosedLoopError(), motors[1].getClosedLoopError()};
+    public SwerveModulePosition getModulePosition() {
+        swerveModulePosition.distanceMeters = getDrivePosition();
+        swerveModulePosition.angle = cancoderRotation2d;
+        return swerveModulePosition;
     }
 
     /**
@@ -171,37 +171,38 @@ public class SwerveModule {
     }
 
 
+    /**
+     * set state of swerve module given a SwerveModuleState
+     * @param desiredState the SwerveModuleState to set to
+     */
     public void setDesiredState(SwerveModuleState desiredState) {
+        cancoderRotation2d = getCancoderAngle();
         SwerveModuleState state =
             SwerveModuleState.optimize(
                 desiredState, 
-                getCancoderAngle());
+                cancoderRotation2d);
 
         double unitsVel = state.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
         motors[0].set(TalonFXControlMode.Velocity, unitsVel);
 
         double setpoint =
             state.angle.getRadians() / (2*Math.PI);
-
         double current =
-            getCancoderAngle().getRadians() / (2*Math.PI);
+            cancoderRotation2d.getRadians() / (2*Math.PI);
         setpointEntry.setDouble(setpoint);
         currentAngleEntry.setDouble(current);
 
-
-        double pidOutput = rotPID.calculate(current, setpoint);
-        SmartDashboard.putNumber("PID OUTPUT " + m_rotationPort, pidOutput);
-        // System.out.println("PID OUTPUT " + pidOutput);
-
-        pidOutput = MathUtil.clamp(pidOutput, -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
-
+        double pidOutput = MathUtil.clamp(
+            rotPID.calculate(current, setpoint), 
+            -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
         pidOutputEntry.setDouble(pidOutput);
 
         motors[1].set(TalonFXControlMode.PercentOutput, pidOutput);  
     }
 
     /**
-     * 
+     * set drive position to setpoint
+     * @param i double from [-1, 1]
      */
     public void setDrivePosition(double i) {
         double pos = i * ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
@@ -212,7 +213,7 @@ public class SwerveModule {
      * set drive sensor position to a double
      * @param i set position to this (raw ctre)
      */
-    public void resetDriveEncoder(double i) {
+    public void setDriveEncoder(double i) {
         motors[0].setSelectedSensorPosition(i);
     }
 
@@ -250,7 +251,7 @@ public class SwerveModule {
      * @param drive inversion of drive motor
      * @param rot inversion of rotation motor
      */
-    public void changeMotorInversion(boolean drive, boolean rot) {
+    public void setMotorInversion(boolean drive, boolean rot) {
         motors[0].setInverted(drive);
         motors[1].setInverted(rot);
     }

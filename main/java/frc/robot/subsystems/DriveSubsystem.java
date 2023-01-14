@@ -31,7 +31,6 @@ public class DriveSubsystem extends SubsystemBase {
     DriveConstants.FRONTLEFT_PORT_ROTATE,
     DriveConstants.FRONTLEFT_PORT_CANCODER,
     DriveConstants.FRONTLEFT_OFFSET,
-    false,
     DriveConstants.FRONTLEFT_DRIVEINVERT,
     DriveConstants.FRONTLEFT_ROTINVERT);
   private final SwerveModule frontRightModule = new SwerveModule(
@@ -39,7 +38,6 @@ public class DriveSubsystem extends SubsystemBase {
     DriveConstants.FRONTRIGHT_PORT_ROTATE,
     DriveConstants.FRONTRIGHT_PORT_CANCODER,
     DriveConstants.FRONTRIGHT_OFFSET,
-    false,
     DriveConstants.FRONTRIGHT_DRIVEINVERT,
     DriveConstants.FRONTRIGHT_ROTINVERT);
   private final SwerveModule backLeftModule = new SwerveModule(
@@ -47,7 +45,6 @@ public class DriveSubsystem extends SubsystemBase {
     DriveConstants.BACKLEFT_PORT_ROTATE,
     DriveConstants.BACKLEFT_PORT_CANCODER,
     DriveConstants.BACKLEFT_OFFSET,
-    false,
     DriveConstants.BACKLEFT_DRIVEINVERT,
     DriveConstants.BACKLEFT_ROTINVERT);
   private final SwerveModule backRightModule = new SwerveModule(
@@ -55,26 +52,15 @@ public class DriveSubsystem extends SubsystemBase {
     DriveConstants.BACKRIGHT_PORT_ROTATE,
     DriveConstants.BACKRIGHT_PORT_CANCODER,
     DriveConstants.BACKRIGHT_OFFSET,
-    false,
     DriveConstants.BACKRIGHT_DRIVEINVERT,
     DriveConstants.BACKRIGHT_ROTINVERT);
 
-
+  private final Pose2d initialPose = new Pose2d(1.0, 1.5, new Rotation2d());
   private ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 0);
   private SwerveModuleState[] moduleStates = DriveConstants.KINEMATICS.toSwerveModuleStates(speeds);
-
-  public SwerveModulePosition[] getCalculatedSwervePositions() {
-    return new SwerveModulePosition[] {
-      new SwerveModulePosition(frontLeftModule.getDrivePosition()*Constants.ConversionConstants.METERS_PER_TICK, moduleStates[0].angle),
-      new SwerveModulePosition(frontRightModule.getDrivePosition()*Constants.ConversionConstants.METERS_PER_TICK, moduleStates[1].angle),
-      new SwerveModulePosition(backLeftModule.getDrivePosition()*Constants.ConversionConstants.METERS_PER_TICK, moduleStates[2].angle),
-      new SwerveModulePosition(backRightModule.getDrivePosition()*Constants.ConversionConstants.METERS_PER_TICK, moduleStates[3].angle)
-    };
-  }
-
-  private final Pose2d initialPose = new Pose2d(5.0, 13.5, new Rotation2d(0));
-  private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.KINEMATICS, getGyroHeading(), getCalculatedSwervePositions(), initialPose);
-
+  private SwerveModulePosition[] modulePositions = {
+    new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
+  private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.KINEMATICS, getGyroHeading(), getCurrentSwervePositions(), initialPose);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -108,7 +94,6 @@ public class DriveSubsystem extends SubsystemBase {
   }
   
   /**
-   * 
    * @return Rotation2d of gyro
    */
   public Rotation2d getGyroHeading() {
@@ -130,7 +115,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose Pose2d that the robot is at
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(getGyroHeading(), getCalculatedSwervePositions(), pose);
+    m_odometry.resetPosition(getGyroHeading(), getCurrentSwervePositions(), pose);
   }
 
   public void resetGyro() {
@@ -154,7 +139,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateRobotPose() {
     m_odometry.update(
       getGyroHeading(),
-      getCalculatedSwervePositions()
+      getCurrentSwervePositions()
       );
     odometryXEntry.setDouble(m_odometry.getPoseMeters().getX());
     odometryYEntry.setDouble(m_odometry.getPoseMeters().getY());
@@ -171,15 +156,23 @@ public class DriveSubsystem extends SubsystemBase {
     backRightModule.setDesiredState(moduleStates[3]);
   }
 
+  /**
+   * drive a specific swerve module only by position (only front left)
+   * @param i double from [-1, 1]
+   */
   public void drivePosSpecificModule(double i) {
     frontLeftModule.setDrivePosition(i);
   }
 
+  /**
+   * set modude positions to a locked position with vel pid set to 0 to attempt to brake
+   */
   public void driveFromStopped() {
-    frontLeftModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
-    frontRightModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
-    backLeftModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
-    backRightModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
+    SwerveModuleState stopped = new SwerveModuleState(0, new Rotation2d(Math.PI));
+    frontLeftModule.setDesiredState(stopped);
+    frontRightModule.setDesiredState(stopped);
+    backLeftModule.setDesiredState(stopped);
+    backRightModule.setDesiredState(stopped);
   }
 
   /**
@@ -188,7 +181,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param vx horizontal velocity in m/s
    * @param vy vertical velocity in m/s
    */
-  public void updateSpeeds(double rad, double vx, double vy) {
+  public void setSpeeds(double rad, double vx, double vy) {
     speeds.omegaRadiansPerSecond = rad;
     speeds.vxMetersPerSecond = vx;
     speeds.vyMetersPerSecond = vy;
@@ -200,7 +193,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param vx horizontal velocity in m/s
    * @param vy vertical velocity in m/s
    */
-  public void updateSpeedsFieldRelative(double rad, double vx, double vy) {
+  public void setSpeedsFieldRelative(double rad, double vx, double vy) {
     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroHeading());
   }
 
@@ -215,10 +208,10 @@ public class DriveSubsystem extends SubsystemBase {
    * update each module's inversion
    */
   public void updateModuleInversion() {
-    frontLeftModule.changeMotorInversion(DriveConstants.FRONTLEFT_DRIVEINVERT, DriveConstants.FRONTLEFT_ROTINVERT);
-    frontRightModule.changeMotorInversion(DriveConstants.FRONTRIGHT_DRIVEINVERT, DriveConstants.FRONTRIGHT_ROTINVERT);
-    backLeftModule.changeMotorInversion(DriveConstants.BACKLEFT_DRIVEINVERT, DriveConstants.BACKLEFT_ROTINVERT);
-    backRightModule.changeMotorInversion(DriveConstants.BACKRIGHT_DRIVEINVERT, DriveConstants.BACKRIGHT_ROTINVERT);
+    frontLeftModule.setMotorInversion(DriveConstants.FRONTLEFT_DRIVEINVERT, DriveConstants.FRONTLEFT_ROTINVERT);
+    frontRightModule.setMotorInversion(DriveConstants.FRONTRIGHT_DRIVEINVERT, DriveConstants.FRONTRIGHT_ROTINVERT);
+    backLeftModule.setMotorInversion(DriveConstants.BACKLEFT_DRIVEINVERT, DriveConstants.BACKLEFT_ROTINVERT);
+    backRightModule.setMotorInversion(DriveConstants.BACKRIGHT_DRIVEINVERT, DriveConstants.BACKRIGHT_ROTINVERT);
   }
 
   /**
@@ -231,31 +224,17 @@ public class DriveSubsystem extends SubsystemBase {
     backRightModule.updatePID();
   }
 
+  /**
+   * set all modules' position pid
+   * @param p
+   * @param i
+   * @param d
+   */
   public void setModulePositionPID(double p, double i, double d) {
     frontLeftModule.setRotationPID(p, i, d);
     frontRightModule.setRotationPID(p, i, d);
     backLeftModule.setRotationPID(p, i, d);
     backRightModule.setRotationPID(p, i, d);
-  }
-
-  /**
-   * @return length of module states list
-   */
-  public int getStatesLength() {
-    return moduleStates.length;
-  }
-
-  /**
-   * get all motor errors
-   * @return list of all errorstates of the motors
-   */
-  public double[][] getErrorStates() {
-    return new double[][] {
-      frontLeftModule.getErrorStates(),
-      frontRightModule.getErrorStates(),
-      backLeftModule.getErrorStates(),
-      backRightModule.getErrorStates()
-    };
   }
 
   /**
@@ -276,7 +255,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return list of all velocities of the motors
    */
   public double[][] getVelocities() {
-
     return new double[][] {
       frontLeftModule.getVelocity(),
       frontRightModule.getVelocity(),
@@ -285,13 +263,27 @@ public class DriveSubsystem extends SubsystemBase {
     };
   }
 
-  public SwerveModuleState[] getCalculatedSwerveModuleStates() {
+  /**
+   * @return SwerveModuleState[] of all modules, calculated from drive velocity and cancoders
+   */
+  public SwerveModuleState[] getCurrentSwerveModuleStates() {
     return new SwerveModuleState[] {
       frontLeftModule.getState(),
       frontRightModule.getState(),
       backLeftModule.getState(),
       backRightModule.getState()
     };
+  }
+
+  /**
+   * @return SwerveModulePosition[] of all modules, calculated from drive position and cancoders
+   */
+  public SwerveModulePosition[] getCurrentSwervePositions() {
+    modulePositions[0] = frontLeftModule.getModulePosition();
+    modulePositions[1] = frontRightModule.getModulePosition();
+    modulePositions[2] = backLeftModule.getModulePosition();
+    modulePositions[3] = backRightModule.getModulePosition();
+    return modulePositions;
   }
 
 
