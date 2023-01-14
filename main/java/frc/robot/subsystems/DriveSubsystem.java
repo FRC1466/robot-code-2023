@@ -155,13 +155,6 @@ public class DriveSubsystem extends SubsystemBase {
     backRightModule.setDesiredState(moduleStates[3]);
   }
 
-  public void driveAlternate() {
-    frontLeftModule.setDesiredStateCancoder(moduleStates[0]);
-    frontRightModule.setDesiredStateCancoder(moduleStates[1]);
-    backLeftModule.setDesiredStateCancoder(moduleStates[2]);
-    backRightModule.setDesiredStateCancoder(moduleStates[3]);
-  }
-
   public void driveSpecificModule(int i) {
     switch (i) {
       case 1:

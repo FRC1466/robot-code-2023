@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PIDConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -95,7 +94,7 @@ public class DriveCommand extends CommandBase {
                 if (m_controller.getLeftTriggerAxis() > 0.8) {
                     m_drive.driveFromStopped();
                 } else {
-                    m_drive.driveAlternate();
+                    m_drive.drive();
                 }
                 break;
             case 1:

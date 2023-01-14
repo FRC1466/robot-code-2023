@@ -134,29 +134,6 @@ public class SwerveModule {
         return new double[] {motors[0].getSelectedSensorVelocity(), motors[1].getSelectedSensorVelocity()};
     }
 
-    /**
-     * @param currentAngle        what the controller currently reads (radians)
-     * @param targetAngleSetpoint the desired angle (radians)
-     * @return the target angle in controller's scope (radians)
-     */
-    private double convertAngleToSetPoint(double currentAngle, double targetAngleSetpoint) {
-        targetAngleSetpoint = Math.IEEEremainder(targetAngleSetpoint, Math.PI * 2); //this function has a very specific usecase lol
-
-        double remainder = currentAngle % (Math.PI * 2);
-        double adjustedAngleSetpoint = targetAngleSetpoint + (currentAngle - remainder);
-
-        // We don't want to rotate over 180 degrees, so just rotate the other way (add a
-        // full rotation)
-        if (adjustedAngleSetpoint - currentAngle > Math.PI) {
-            adjustedAngleSetpoint -= Math.PI * 2;
-        } else if (adjustedAngleSetpoint - currentAngle < -Math.PI) {
-            adjustedAngleSetpoint += Math.PI * 2;
-        }
-
-        return adjustedAngleSetpoint;
-
-    }
-
      /**
      * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360, motors must be inverted
      * @return         adjusted degree within a [-180, 180] wrapped output
@@ -173,43 +150,18 @@ public class SwerveModule {
         return position;
     }
 
-    /**
-     * set motor velocity and position from a state using PID from Talons
-     * @param desiredState SwerveModuleState, unoptimized, that corresponds to the swerve module
-     */
+
     public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState state =
-            SwerveModuleState.optimize(
-                desiredState, 
-                new Rotation2d(0));
-        
-        double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
-        motors[0].set(TalonFXControlMode.Velocity, unitsVel);
-
-        SmartDashboard.putNumber("ANGLESTATE " + m_rotationPort, desiredState.angle.getRadians());
-
-        double ticks = ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
-
-        double setpoint = convertAngleToSetPoint(
-            (getRotationPosition()/ticks) *2*Math.PI, 
-            desiredState.angle.getRadians()) / (2*Math.PI) * ticks;
-
-        SmartDashboard.putNumber("SETPOINT " + m_rotationPort, setpoint);
-        motors[1].set(TalonFXControlMode.Position, setpoint);
-    }
-
-
-    public void setDesiredStateCancoder(SwerveModuleState desiredState) {
         SwerveModuleState state =
             SwerveModuleState.optimize(
                 desiredState, 
                 getCancoderAngle());
 
-        double unitsVel = desiredState.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
+        double unitsVel = state.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
         motors[0].set(TalonFXControlMode.Velocity, unitsVel);
 
         double setpoint =
-            desiredState.angle.getRadians() / (2*Math.PI);
+            state.angle.getRadians() / (2*Math.PI);
 
         double current =
             getCancoderAngle().getRadians() / (2*Math.PI);
