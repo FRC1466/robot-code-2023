@@ -174,17 +174,6 @@ public class SwerveModule {
         return position;
     }
 
-    private double wrapSetpoint (double sp) {
-        if (sp > 0.5) {
-            sp =- 1.0;
-        }
-        if (sp < -0.5) {
-            sp += 1.0;
-        }
-
-        return sp;
-    }
-
     /**
      * set motor velocity and position from a state using PID from Talons
      * @param desiredState SwerveModuleState, unoptimized, that corresponds to the swerve module
