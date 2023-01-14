@@ -1,7 +1,5 @@
 package frc.robot.commands.Autonomous;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
@@ -15,8 +13,7 @@ import frc.robot.Constants.DriveConstants;
 public class SwerveTrajectory {
     private DriveSubsystem m_drive;
     private PPSwerveControllerCommand m_swerveControllerCommand;
-
-    PathPlannerTrajectory examplePath = PathPlanner.loadPath("Test Path", new PathConstraints(4, 3));
+    private PathPlannerTrajectory m_path;
 
     private ProfiledPIDController thetaController =
         new ProfiledPIDController(
@@ -25,14 +22,15 @@ public class SwerveTrajectory {
             AutoConstants.THETA_CONTROLLER.D, 
             AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
     
-    public SwerveTrajectory(DriveSubsystem drive) {
+    public SwerveTrajectory(DriveSubsystem drive, PathPlannerTrajectory path) {
 
         m_drive = drive;
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        m_path = path;
 
         m_swerveControllerCommand =
         new PPSwerveControllerCommand(
-            examplePath,
+            m_path,
             m_drive::getPose, // Functional interface to feed supplier
             DriveConstants.KINEMATICS,
             // Position controllers
