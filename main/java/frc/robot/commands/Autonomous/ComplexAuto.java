@@ -6,7 +6,7 @@ import com.pathplanner.lib.PathPlanner;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.TelemetrySubsystem;
+import frc.robot.subsystems.AdjustableTelemetry;
 
 public class ComplexAuto extends SequentialCommandGroup {
     private SwerveTrajectory st;
@@ -14,7 +14,7 @@ public class ComplexAuto extends SequentialCommandGroup {
         st = new SwerveTrajectory(drive, PathPlanner.loadPath("Test Path", new PathConstraints(4, 3)));
         
         addCommands(
-            new InstantCommand(() -> m_tele.updatePIDConstants()),
+            new InstantCommand(() -> tele.updatePIDConstants()),
             st.getCommand()
         );
     }

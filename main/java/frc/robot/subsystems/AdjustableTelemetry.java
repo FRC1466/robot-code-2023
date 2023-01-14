@@ -12,10 +12,13 @@ import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DebugConstants;
 import frc.robot.Constants.PIDConstants;
 
-public class TelemetrySubsystem {
+public class AdjustableTelemetry {
     private ShuffleboardTab tuningTab = Shuffleboard.getTab("Tuning");
 
-    public TelemetrySubsystem() {
+    /**
+     * initializes the Telemetry class
+     */
+    public AdjustableTelemetry() {
         initializePIDUpdate();
         initializeEncoderUpdates();
         initializeDriveLimits();
@@ -63,18 +66,6 @@ public class TelemetrySubsystem {
     }
     
     private void initializePIDUpdate() {
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
-        System.out.println("ASJDGKASJDGHELPPSWORK");
 
         ShuffleboardLayout positionPID = tuningTab
             .getLayout("Position PID", BuiltInLayouts.kList)
@@ -148,14 +139,14 @@ public class TelemetrySubsystem {
         
         vxLimit = driveLimits.add("vxLimit", DriveConstants.LIMIT_VX).getEntry();
         vyLimit = driveLimits.add("vyLimit", DriveConstants.LIMIT_VY).getEntry();
-        rotLimit = driveLimits.add("rotLimit", DriveConstants.LIMIT_ROT).getEntry();
+        rotLimit = driveLimits.add("rotLimit", DriveConstants.LIMIT_RAD).getEntry();
         clampLimit = driveLimits.add("clampLimit", DriveConstants.LIMIT_PID_CLAMP).getEntry();
     }
 
     public void updateDriveLimits() {
         DriveConstants.LIMIT_VX = vxLimit.getDouble(DriveConstants.LIMIT_VX);
         DriveConstants.LIMIT_VY = vyLimit.getDouble(DriveConstants.LIMIT_VY);
-        DriveConstants.LIMIT_ROT = rotLimit.getDouble(DriveConstants.LIMIT_ROT);
+        DriveConstants.LIMIT_RAD = rotLimit.getDouble(DriveConstants.LIMIT_RAD);
         DriveConstants.LIMIT_PID_CLAMP = clampLimit.getDouble((DriveConstants.LIMIT_PID_CLAMP));
     }
 

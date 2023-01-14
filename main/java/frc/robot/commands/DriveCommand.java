@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PIDConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.TelemetrySubsystem;
+import frc.robot.subsystems.AdjustableTelemetry;
 
 import java.lang.Math;
 
@@ -14,11 +14,11 @@ import java.lang.Math;
 public class DriveCommand extends CommandBase {
     private final DriveSubsystem m_drive;
     private final XboxController m_controller;
-    private final TelemetrySubsystem m_tele;
+    private final AdjustableTelemetry m_tele;
     private boolean m_isFieldRelative;
     private double vx = 0;
     private double vy = 0;
-    private double rot = 0;
+    private double rad = 0;
     private int PID_iter = 0;
     private int m_toggleModule = 0;
     
@@ -29,13 +29,13 @@ public class DriveCommand extends CommandBase {
      */
     public DriveCommand(
         DriveSubsystem subsystem, 
-        TelemetrySubsystem tele,
+        AdjustableTelemetry tele,
         XboxController controller,
         boolean isFieldRelative
         ) {
         m_drive = subsystem;
-        m_tele = tele;
         addRequirements(m_drive);
+        m_tele = tele;
         m_controller = controller;
         m_isFieldRelative = isFieldRelative;
 

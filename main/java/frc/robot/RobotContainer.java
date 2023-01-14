@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.TelemetrySubsystem;
+import frc.robot.subsystems.AdjustableTelemetry;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.Autonomous.ComplexAuto;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
 
   private final boolean isFieldRelative = false;
-  private final TelemetrySubsystem m_tele = new TelemetrySubsystem();
+  private final AdjustableTelemetry m_tele = new AdjustableTelemetry();
 
   // The robot's subsystems
   private final DriveSubsystem m_drive = new DriveSubsystem();
