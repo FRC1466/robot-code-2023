@@ -50,44 +50,25 @@ public class DriveCommand extends CommandBase {
      * local driving function
      */
     private void m_drive() {
-        vx = m_controller.getLeftX() * DriveConstants.LIMIT_VX;
-        vy = m_controller.getLeftY() * DriveConstants.LIMIT_VY;
-        rot = -m_controller.getRightX() * DriveConstants.LIMIT_ROT;
+        vx = Math.abs(m_controller.getLeftX())>0.07 ? m_controller.getLeftX() * DriveConstants.LIMIT_VX : 0;
+        vy = Math.abs(m_controller.getLeftY())>0.07 ? m_controller.getLeftY() * DriveConstants.LIMIT_VY : 0;
+        rad = Math.abs(m_controller.getRightX())>0.05 ? m_controller.getRightX() * DriveConstants.LIMIT_RAD : 0;
 
-        if (m_controller.getYButtonPressed()) {
-            if(m_toggleModule >= 1) {
-                m_toggleModule = 0;
-            } else {
-                m_toggleModule++;
-            }
-        }
+        if (m_controller.getYButtonPressed())
+            m_toggleModule = m_toggleModule >= 1 ? 0 : m_toggleModule++;
 
-        if (!(Math.abs(vx) > 0.15)) { // this can be done better with inbuilt stuff
-            vx = 0;
-        }
-
-        if (!(Math.abs(vy) > 0.15)) {
-            vy = 0;
-        }
-
-        if (!(Math.abs(rot) > 0.16)) {
-            rot = 0;
-        }
-
-        if (m_isFieldRelative) {
-            m_drive.updateSpeedsFieldRelative(rot, vx, vy);
-        } else {
-            m_drive.updateSpeeds(rot, vx, vy);
-        }
+        if (m_isFieldRelative)
+            m_drive.setSpeedsFieldRelative(rad, vx, vy);
+        else
+            m_drive.setSpeeds(rad, vx, vy);
         
         m_drive.updateModuleStates();
         switch (m_toggleModule) {
             case 0:
-                if (m_controller.getLeftTriggerAxis() > 0.8) {
-                    m_drive.driveFromStopped();
-                } else {
+                if (m_controller.getLeftTriggerAxis() > 0.8) 
+                    m_drive.driveFromStopped(); 
+                else 
                     m_drive.drive();
-                }
                 break;
             case 1:
                 m_drive.drivePosSpecificModule(m_controller.getRightTriggerAxis());

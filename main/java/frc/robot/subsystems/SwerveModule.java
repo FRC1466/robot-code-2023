@@ -233,6 +233,12 @@ public class SwerveModule {
         motors[1].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.IZONE, PIDConstants.TIMEOUT_MS);
     }
 
+    /**
+     * set pid of rotation WPI pid control loop
+     * @param p
+     * @param i
+     * @param d
+     */
     public void setRotationPID(double p, double i, double d) {
         rotPID.setP(p);
         rotPID.setI(i);
