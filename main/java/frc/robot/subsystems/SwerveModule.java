@@ -188,17 +188,11 @@ public class SwerveModule {
     }
 
     /**
-     * set angle encoder to a double
-     * @param i set position to this
+     * 
      */
-    public void resetAngleEncoder(double i) {
-        motors[1].setSelectedSensorPosition(i);
-    }
-
-    public void resetTalonAngleByCancoderOffset(double i) {
-        SmartDashboard.putNumber("abspos" + m_rotationPort, cancoder.getAbsolutePosition());
-        System.out.println(cancoder.getAbsolutePosition());
-        resetAngleEncoder(i+cancoder.getAbsolutePosition());
+    public void setDrivePosition(double i) {
+        double pos = i * ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
+        motors[0].set(TalonFXControlMode.Position, pos);
     }
 
     /**

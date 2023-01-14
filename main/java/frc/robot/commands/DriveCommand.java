@@ -62,7 +62,7 @@ public class DriveCommand extends CommandBase {
         rot = -m_controller.getRightX() * DriveConstants.LIMIT_ROT;
 
         if (m_controller.getYButtonPressed()) {
-            if(m_toggleModule >=4) {
+            if(m_toggleModule >= 1) {
                 m_toggleModule = 0;
             } else {
                 m_toggleModule++;
@@ -98,38 +98,11 @@ public class DriveCommand extends CommandBase {
                 }
                 break;
             case 1:
-            m_drive.driveSpecificModule(1);
-                break;
-            case 2:
-            m_drive.driveSpecificModule(2);
-                break;
-            case 3:
-            m_drive.driveSpecificModule(3);
-                break;
-            case 4:
-            m_drive.driveSpecificModule(4);
+                m_drive.drivePosSpecificModule(m_controller.getRightTriggerAxis());
                 break;
             default:
                 break;
         }
-
-        if (m_controller.getLeftBumperPressed()) {
-            switch (m_toggleModule) {
-                case 1:
-                m_drive.resetSpecificAngleEncoder(1);
-                    break;
-                case 2:
-                m_drive.resetSpecificAngleEncoder(2);
-                    break;
-                case 3:
-                m_drive.resetSpecificAngleEncoder(3);
-                    break;
-                case 4:
-                m_drive.resetSpecificAngleEncoder(4);
-                    break;
-                default:
-                    break;
-            }}
         
     }
 

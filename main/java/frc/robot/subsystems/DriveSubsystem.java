@@ -76,11 +76,6 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     gyro.reset();
-
-    SmartDashboard.putData("reset front left pos", new InstantCommand(() -> frontLeftModule.resetAngleEncoder(0)));
-    SmartDashboard.putData("reset front right pos", new InstantCommand(() -> frontRightModule.resetAngleEncoder(0)));
-    SmartDashboard.putData("reset back left pos", new InstantCommand(() -> backLeftModule.resetAngleEncoder(0)));
-    SmartDashboard.putData("reset back right pos", new InstantCommand(() -> backRightModule.resetAngleEncoder(0)));
     SmartDashboard.putData("reset gyro position", new InstantCommand(() -> gyro.reset()));
   }
   
@@ -138,13 +133,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("odometry rad", m_odometry.getPoseMeters().getRotation().getRadians());
   }
 
-  public void resetAngleByCancoderOffset(double[] list) {
-    frontLeftModule.resetAngleEncoder(list[0]);
-    frontRightModule.resetAngleEncoder(list[1]);
-    backLeftModule.resetAngleEncoder(list[2]);
-    backRightModule.resetAngleEncoder(list[3]);
-  }
-
   /**
    * drive robot from current module states in the class
    */
@@ -155,23 +143,8 @@ public class DriveSubsystem extends SubsystemBase {
     backRightModule.setDesiredState(moduleStates[3]);
   }
 
-  public void driveSpecificModule(int i) {
-    switch (i) {
-      case 1:
-        frontLeftModule.setDesiredState(new SwerveModuleState(0, moduleStates[0].angle));
-        break;
-      case 2:
-        frontRightModule.setDesiredState(new SwerveModuleState(0, moduleStates[1].angle));
-        break;
-      case 3:
-        backLeftModule.setDesiredState(new SwerveModuleState(0, moduleStates[2].angle));
-        break;
-      case 4:
-        backRightModule.setDesiredState(new SwerveModuleState(0, moduleStates[3].angle));
-        break;
-      default:
-        break;
-      }
+  public void drivePosSpecificModule(double i) {
+    frontLeftModule.setDrivePosition(i);
   }
 
   public void driveFromStopped() {
@@ -179,25 +152,6 @@ public class DriveSubsystem extends SubsystemBase {
     frontRightModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
     backLeftModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
     backRightModule.setDesiredState(new SwerveModuleState(0, new Rotation2d(Math.PI)));
-  }
-
-  public void resetSpecificAngleEncoder(int i) {
-    switch (i) {
-      case 1:
-        frontLeftModule.resetAngleEncoder(0);
-        break;
-      case 2:
-        frontRightModule.resetAngleEncoder(0);
-        break;
-      case 3:
-        backLeftModule.resetAngleEncoder(0);
-        break;
-      case 4:
-        backRightModule.resetAngleEncoder(0);
-        break;
-      default:
-        break;
-      }
   }
 
   /**
