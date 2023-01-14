@@ -24,6 +24,7 @@ public class SwerveModule {
     private double m_cancoderOffset;
     private boolean m_RotInverted;
     private boolean m_driveInverted;
+    private int m_invertConstant;
     private int m_rotationPort;
     private PIDController rotPID = new PIDController(
         PIDConstants.DRIVE_GAINS_POSITION.P,
@@ -54,6 +55,12 @@ public class SwerveModule {
         m_driveInverted = driveInverted;
         m_cancoderOffset = cancoderOffset;
         m_rotationPort = rotationPort;
+
+        if (m_RotInverted) {
+            m_invertConstant = -1;
+        } else {
+            m_invertConstant = 1;
+        }
 
         rotPID.enableContinuousInput(-0.50, 0.50);
 
@@ -135,16 +142,15 @@ public class SwerveModule {
     }
 
      /**
-     * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360, motors must be inverted
+     * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360
      * @return         adjusted degree within a [-180, 180] wrapped output
      */
     private double wrapCancoderOutput(double position) {
-
         if (position > 180.0) {
-            position =- 360.0;
+            position += 360.0 * m_invertConstant;
         }
         if (position < -180.0) {
-            position += 360.0;
+            position += 360.0 * -m_invertConstant;
         }
 
         return position;
