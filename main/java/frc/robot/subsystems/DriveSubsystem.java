@@ -10,8 +10,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -75,8 +78,33 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    initializeTelemetry();
     gyro.reset();
-    SmartDashboard.putData("reset gyro position", new InstantCommand(() -> gyro.reset()));
+  }
+
+  private GenericEntry gyroRotEntry;
+  private GenericEntry gyroPitchEntry;
+  private GenericEntry odometryXEntry;
+  private GenericEntry odometryYEntry;
+  private GenericEntry odometryDegEntry;
+  /**
+   * initializes telemetry
+   */
+  private void initializeTelemetry() {
+    ShuffleboardTab teleTab = Shuffleboard.getTab("Telemetry");
+    ShuffleboardLayout gyroLayout = teleTab
+      .getLayout("gyro", BuiltInLayouts.kList)
+      .withSize(1, 3);
+    gyroLayout.add("reset gyro position", new InstantCommand(() -> gyro.reset()));
+    gyroRotEntry = gyroLayout.add("gyro rotation deg", gyro.getRotation2d().getDegrees()).getEntry();
+    gyroPitchEntry = gyroLayout.add("gyro pitch deg", gyro.getPitch()).getEntry();
+
+    ShuffleboardLayout odometryLayout = teleTab
+      .getLayout("odometry", BuiltInLayouts.kList)
+      .withSize(1, 3);
+      odometryXEntry = odometryLayout.add("x", m_odometry.getPoseMeters().getX()).getEntry();
+      odometryYEntry = odometryLayout.add("y", m_odometry.getPoseMeters().getY()).getEntry();
+      odometryDegEntry = odometryLayout.add("deg", m_odometry.getPoseMeters().getRotation().getDegrees()).getEntry();
   }
   
   /**
@@ -84,8 +112,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Rotation2d of gyro
    */
   public Rotation2d getGyroHeading() {
-    SmartDashboard.putNumber("gyro rotation degrees", gyro.getRotation2d().getDegrees());
-    SmartDashboard.putNumber("gyro pitch (degrees?)", gyro.getPitch());
+    gyroRotEntry.setDouble(gyro.getRotation2d().getDegrees());
+    gyroPitchEntry.setDouble(gyro.getPitch());
     return gyro.getRotation2d();
   }
 
@@ -128,9 +156,9 @@ public class DriveSubsystem extends SubsystemBase {
       getGyroHeading(),
       getCalculatedSwervePositions()
       );
-    SmartDashboard.putNumber("odometry x", m_odometry.getPoseMeters().getX());
-    SmartDashboard.putNumber("odometry y", m_odometry.getPoseMeters().getY());
-    SmartDashboard.putNumber("odometry rad", m_odometry.getPoseMeters().getRotation().getRadians());
+    odometryXEntry.setDouble(m_odometry.getPoseMeters().getX());
+    odometryYEntry.setDouble(m_odometry.getPoseMeters().getY());
+    odometryDegEntry.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
   }
 
   /**
@@ -162,11 +190,8 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void updateSpeeds(double rad, double vx, double vy) {
     speeds.omegaRadiansPerSecond = rad;
-    SmartDashboard.putNumber("speedsRad", rad);
     speeds.vxMetersPerSecond = vx;
-    SmartDashboard.putNumber("speedsvx", vx);
     speeds.vyMetersPerSecond = vy;
-    SmartDashboard.putNumber("speedsvy", vy);
   }
 
   /**

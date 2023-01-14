@@ -1,7 +1,11 @@
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PIDConstants;
@@ -39,18 +43,7 @@ public class DriveCommand extends CommandBase {
         m_controller = controller;
         m_isFieldRelative = isFieldRelative;
 
-         /* m_drive.resetAngleByCancoderOffset(
-            new double[] {
-                SmartDashboard.getNumber("0 cc", 0.0),
-                SmartDashboard.getNumber("1 cc", 0.0),
-                SmartDashboard.getNumber("2 cc", 0.0),
-                SmartDashboard.getNumber("3 cc", 0.0),
-            }
-        ); */
-        SmartDashboard.putNumber("vx limit", DriveConstants.LIMIT_VX);
-        SmartDashboard.putNumber("vy limit", DriveConstants.LIMIT_VY); 
-        SmartDashboard.putNumber("rot limit", DriveConstants.LIMIT_ROT);
-        
+        initializeTelemetry();
     }
 
     /**
@@ -67,7 +60,6 @@ public class DriveCommand extends CommandBase {
             } else {
                 m_toggleModule++;
             }
-            SmartDashboard.putNumber("togglemodule", m_toggleModule);
         }
 
         if (!(Math.abs(vx) > 0.15)) { // this can be done better with inbuilt stuff
@@ -125,10 +117,40 @@ public class DriveCommand extends CommandBase {
         m_tele.setCodeDebugStates();
     }
 
-    private void updateSmartDashboard() {
-        SmartDashboard.putNumber("vx", vx);
-        SmartDashboard.putNumber("vy", vy);
-        SmartDashboard.putNumber("rot", rot);
+    private GenericEntry vxEntry;
+    private GenericEntry vyEntry;
+    private GenericEntry radEntry;
+    private GenericEntry moduleToggleEntry;
+    /**
+     * initialize telemetry
+     */
+    private void initializeTelemetry() {
+        ShuffleboardTab teleTab = Shuffleboard.getTab("Telemetry");
+        ShuffleboardLayout driveLayout = teleTab
+            .getLayout("drive", BuiltInLayouts.kList)
+            .withSize(1, 3);
+        vxEntry = driveLayout.add("vx", vx).getEntry();
+        vyEntry = driveLayout.add("vy", vy).getEntry();
+        radEntry = driveLayout.add("rad", rad).getEntry();
+        moduleToggleEntry = driveLayout.add("module toggle", m_toggleModule).getEntry();
+    }
+
+    /**
+     * update telemetry
+     */
+    private void updateTelemetry() {
+        vxEntry.setDouble(vx);
+        vyEntry.setDouble(vy);
+        radEntry.setDouble(rad);
+        moduleToggleEntry.setDouble(m_toggleModule);
+    }
+
+    /**
+     * set field relative
+     * @param i false or true
+     */
+    public void setFieldRelative(boolean i) {
+        m_isFieldRelative = i;
     }
     
 
@@ -140,8 +162,9 @@ public class DriveCommand extends CommandBase {
     @Override
     public void execute() {
         m_tele.updateDriveLimits();
+        updateTelemetry();
         m_drive();
-        updateSmartDashboard();
+        
         if (PID_iter*20 > 5000) { // 5000ms PID update time
             updatePID();
             debuggingUpdate();

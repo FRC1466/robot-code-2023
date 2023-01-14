@@ -13,7 +13,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants.ConversionConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PIDConstants;
@@ -64,6 +68,21 @@ public class SwerveModule {
         initializeMotorsPID();
         initializeCancoder();
         resetDriveEncoder(0.0);
+        initializeTelemetry();
+    }
+
+    private GenericEntry setpointEntry;
+    private GenericEntry currentAngleEntry;
+    private GenericEntry pidOutputEntry;
+    private void initializeTelemetry() {
+        ShuffleboardTab teleTab = Shuffleboard.getTab("Telemetry");
+        ShuffleboardLayout moduleLayout = teleTab
+            .getLayout("MODULE " + m_rotationPort, BuiltInLayouts.kList)
+            .withSize(1, 3);
+            
+        setpointEntry = moduleLayout.add("SETPOINT", 0).getEntry();
+        currentAngleEntry = moduleLayout.add("ANGLE", 0).getEntry();
+        pidOutputEntry = moduleLayout.add("PID OUTPUT", 0).getEntry();
     }
 
     /**
@@ -166,10 +185,9 @@ public class SwerveModule {
 
         double current =
             getCancoderAngle().getRadians() / (2*Math.PI);
+        setpointEntry.setDouble(setpoint);
+        currentAngleEntry.setDouble(current);
 
-        SmartDashboard.putNumber("SETPOINT " + m_rotationPort, setpoint);
-        
-        SmartDashboard.putNumber("ANGLESTATE " + m_rotationPort, current);
 
         double pidOutput = rotPID.calculate(current, setpoint);
         SmartDashboard.putNumber("PID OUTPUT " + m_rotationPort, pidOutput);
@@ -177,7 +195,7 @@ public class SwerveModule {
 
         pidOutput = MathUtil.clamp(pidOutput, -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
 
-        SmartDashboard.putNumber("PID OUTPUT CLAMP " + m_rotationPort, pidOutput);
+        pidOutputEntry.setDouble(pidOutput);
 
         motors[1].set(TalonFXControlMode.PercentOutput, pidOutput);  
     }
