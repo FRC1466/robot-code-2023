@@ -66,7 +66,7 @@ public class SwerveModule {
      */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-            Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Swerve.circumference, Swerve.driveGearRatio),
+            Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Swerve.wheelCircumference, Swerve.driveGearRatio),
             getAngle()
             );
     }
@@ -76,7 +76,7 @@ public class SwerveModule {
      */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            Conversions.falconToMeters(driveMotor.getSelectedSensorPosition(), Swerve.circumference, Swerve.driveGearRatio), 
+            Conversions.falconToMeters(driveMotor.getSelectedSensorPosition(), Swerve.wheelCircumference, Swerve.driveGearRatio), 
             getAngle()
         );
     }
@@ -104,7 +104,7 @@ public class SwerveModule {
      * @param desiredState the SwerveModuleState to set to
      */
     public void setSpeed(SwerveModuleState desiredState) {
-        double sp = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Swerve.circumference, Swerve.driveGearRatio);
+        double sp = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Swerve.wheelCircumference, Swerve.driveGearRatio);
         driveMotor.set(TalonFXControlMode.Velocity, sp);
     }
 

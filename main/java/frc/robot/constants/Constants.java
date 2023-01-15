@@ -84,7 +84,7 @@ public final class Constants {
       public static final double 
         trackWidth = 0.375,
         wheelDiameter = 1.975*2,
-        circumference = wheelDiameter * Math.PI;
+        wheelCircumference = wheelDiameter * Math.PI;
 
       public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
         new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
