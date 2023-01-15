@@ -129,7 +129,7 @@ public class DriveCommand extends CommandBase {
     public void execute() {
         tele.updateDriveLimits();
         updateTelemetry();
-        drive();
+        // drive();
         
         if (pidIter*20 > 5000) { // 5000ms PID update time
             updatePID();

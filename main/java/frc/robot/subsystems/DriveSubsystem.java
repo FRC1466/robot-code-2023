@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants.Swerve;
@@ -100,6 +101,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateModuleTelemetry() {
     for(SwerveModule module : swerveModules){ 
       cancoderEntries[module.moduleNumber].setDouble(module.getCancoderAngle().getDegrees());
+      SmartDashboard.putNumber("module " + module.moduleNumber + "cancoder deg", module.getCancoderAngle().getDegrees());
       integratedEntries[module.moduleNumber].setDouble(module.getPosition().angle.getDegrees());
       velEntries[module.moduleNumber].setDouble(module.getState().speedMetersPerSecond);
     }

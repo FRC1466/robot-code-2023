@@ -45,7 +45,7 @@ public final class ModuleConfigs {
         swerveDriveConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
 
         swerveCancoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-        swerveCancoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+        swerveCancoderConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
         swerveCancoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
         swerveCancoderConfig.sensorDirection = true;
 
