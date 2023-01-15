@@ -10,14 +10,20 @@ import frc.robot.constants.Constants.AutoConstants;
 import frc.robot.subsystems.AdjustableTelemetry;
 
 public class ComplexAuto extends SequentialCommandGroup {
-    private SwerveTrajectory st;
+    private SwerveTrajectory swerveTrajectory;
+
+    /**
+     * create new complex auto
+     * @param drive drive subsystem
+     * @param tele telemetry
+     */
     public ComplexAuto(DriveSubsystem drive, AdjustableTelemetry tele) {
-        st = new SwerveTrajectory(drive, PathPlanner.loadPath("Test Path", 
+        swerveTrajectory = new SwerveTrajectory(drive, PathPlanner.loadPath("Test Path", 
         new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)));
         
         addCommands(
             new InstantCommand(() -> tele.updatePIDConstants()),
-            st.getCommand()
+            swerveTrajectory.getCommand()
         );
     }
 }

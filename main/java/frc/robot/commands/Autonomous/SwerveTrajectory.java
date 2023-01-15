@@ -10,19 +10,19 @@ import frc.robot.subsystems.DriveSubsystem;
 
 
 public class SwerveTrajectory {
-    private DriveSubsystem m_drive;
-    private PPSwerveControllerCommand m_swerveControllerCommand;
-    private PathPlannerTrajectory m_path;
+    private PPSwerveControllerCommand swerveControllerCommand;
     
+    /**
+     * create new Swerve Trajectory
+     * @param drive drive sybsystem
+     * @param path trajectory of swerve
+     */
     public SwerveTrajectory(DriveSubsystem drive, PathPlannerTrajectory path) {
 
-        m_drive = drive;
-        m_path = path;
-
-        m_swerveControllerCommand =
+        swerveControllerCommand =
         new PPSwerveControllerCommand(
-            m_path,
-            m_drive::getPose, // Functional interface to feed supplier
+            path,
+            drive::getPose, // Functional interface to feed supplier
             Swerve.KINEMATICS,
             // Position controllers
             new PIDController(
@@ -37,15 +37,15 @@ public class SwerveTrajectory {
                 AutoConstants.thetaController.P,
                 AutoConstants.thetaController.I, 
                 AutoConstants.thetaController.D),
-            m_drive::setDesiredModuleStates,
-            m_drive);
+            drive::setDesiredModuleStates,
+            drive);
     }
 
     // look into auto builder and markers
     
 
     public PPSwerveControllerCommand getCommand() {
-        return m_swerveControllerCommand;
+        return swerveControllerCommand;
     }
    
     

@@ -52,6 +52,9 @@ public class SwerveModule {
         driftOffset = new Rotation2d();
     }
 
+    /**
+     * @return rotation of falcon motor
+     */
     public Rotation2d getAngle() {
         return Rotation2d.fromDegrees(Conversions.falconToDegrees(angleMotor.getSelectedSensorPosition(), 
         Swerve.angleGearRatio));
@@ -96,11 +99,19 @@ public class SwerveModule {
         setSpeed(desiredState);
     }
 
+    /**
+     * set speed of swerve module given a SwerveModuleState
+     * @param desiredState the SwerveModuleState to set to
+     */
     public void setSpeed(SwerveModuleState desiredState) {
         double sp = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Swerve.circumference, Swerve.driveGearRatio);
         driveMotor.set(TalonFXControlMode.Velocity, sp);
     }
 
+    /**
+     * set angle of swerve module given a SwerveModuleState
+     * @param desiredState the SwerveModuleState to set to
+     */
     public void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (4 * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
         
@@ -108,6 +119,9 @@ public class SwerveModule {
         lastAngle = angle;
     }
 
+    /**
+     * reset falcon angles to the absolute position of encoder (incl offset)
+     */
     public void resetToAbsolute(){
         double absolutePosition = Conversions.degreesToFalcon(getCancoderAngle().getDegrees() - angleOffset.getDegrees(), Swerve.angleGearRatio);
         angleMotor.setSelectedSensorPosition(absolutePosition);

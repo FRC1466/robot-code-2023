@@ -27,7 +27,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final WPI_TalonSRX gyroTalonSRX;
   private final WPI_PigeonIMU gyro;
-  private final SwerveModule[] mSwerveModules;
+  private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
   private SwerveDriveOdometry swerveOdometry;
@@ -42,7 +42,7 @@ public class DriveSubsystem extends SubsystemBase {
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
     
 
-    mSwerveModules = new SwerveModule[] {
+    swerveModules = new SwerveModule[] {
       new SwerveModule(0, Swerve.Mod0.constants),
       new SwerveModule(1, Swerve.Mod1.constants),
       new SwerveModule(2, Swerve.Mod2.constants),
@@ -83,7 +83,7 @@ public class DriveSubsystem extends SubsystemBase {
     cancoderEntries = new GenericEntry[4];
     integratedEntries = new GenericEntry[4];
     velEntries = new GenericEntry[4];
-    for(SwerveModule module : mSwerveModules){
+    for(SwerveModule module : swerveModules){
       ShuffleboardLayout encoderLayout = teleTab
         .getLayout("Module " + module.moduleNumber + " Encoders", BuiltInLayouts.kList)
         .withSize(1, 3);
@@ -94,8 +94,11 @@ public class DriveSubsystem extends SubsystemBase {
     
   }
 
+  /**
+   * updates telemetry of modules
+   */
   public void updateModuleTelemetry() {
-    for(SwerveModule module : mSwerveModules){ 
+    for(SwerveModule module : swerveModules){ 
       cancoderEntries[module.moduleNumber].setDouble(module.getCancoderAngle().getDegrees());
       integratedEntries[module.moduleNumber].setDouble(module.getPosition().angle.getDegrees());
       velEntries[module.moduleNumber].setDouble(module.getState().speedMetersPerSecond);
@@ -111,9 +114,12 @@ public class DriveSubsystem extends SubsystemBase {
     return gyro.getRotation2d();
   }
 
-  public void zeroGyro() {
-    gyro.setYaw(0);
-  }
+    /**
+     * resets gyro
+     */
+    public void resetGyro() {
+      gyro.reset();
+    }
 
   /**
    * 
@@ -131,12 +137,11 @@ public class DriveSubsystem extends SubsystemBase {
     swerveOdometry.resetPosition(getGyroRotation2d(), getSwervePositions(), pose);
   }
 
-  public void resetGyro() {
-    gyro.reset();
-  }
-
+  /**
+   * reset modules to their absolute position
+   */
   public void resetModulesToAbsolute() {
-    for(SwerveModule modules : mSwerveModules){
+    for(SwerveModule modules : swerveModules){
       modules.resetToAbsolute();
   }
   }
@@ -146,7 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param states list of SwerveModuleStates that correspond to the robot
    */
   public void setDesiredModuleStates(SwerveModuleState[] states) {
-    for (SwerveModule module : mSwerveModules) {
+    for (SwerveModule module : swerveModules) {
       module.setDesiredState(states[module.moduleNumber]);
     }
   }
@@ -168,7 +173,7 @@ public class DriveSubsystem extends SubsystemBase {
    * drive robot from current module states in the class
    */
   public void drive() {
-    for (SwerveModule module : mSwerveModules) {
+    for (SwerveModule module : swerveModules) {
       module.setDesiredState(desiredModuleStates[module.moduleNumber]);
     }
   }
@@ -178,7 +183,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param i double from [-1, 1]
    */
   public void drivePosSpecificModule(double i) {
-    mSwerveModules[0].setDrivePosition(i);
+    swerveModules[0].setDrivePosition(i);
   }
 
   /**
@@ -186,7 +191,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void driveFromStopped() {
     SwerveModuleState stopped = new SwerveModuleState(0, new Rotation2d(Math.PI/2));
-    for (SwerveModule module : mSwerveModules) {
+    for (SwerveModule module : swerveModules) {
       module.setDesiredState(stopped);
     }
   }
@@ -224,7 +229,7 @@ public class DriveSubsystem extends SubsystemBase {
    * update PID in the module substates from constants
    */
   public void updatePIDConfigs() {
-    for (SwerveModule module : mSwerveModules) {
+    for (SwerveModule module : swerveModules) {
       module.updatePID();;
     }
   }
@@ -234,7 +239,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public SwerveModuleState[] getSwerveModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
-    for(SwerveModule module : mSwerveModules){
+    for(SwerveModule module : swerveModules){
         states[module.moduleNumber] = module.getState();
     }
     return states;
@@ -245,7 +250,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public SwerveModulePosition[] getSwervePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
-    for(SwerveModule module : mSwerveModules){
+    for(SwerveModule module : swerveModules){
         positions[module.moduleNumber] = module.getPosition();
     }
     return positions;

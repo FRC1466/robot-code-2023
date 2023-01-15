@@ -14,6 +14,9 @@ public final class ModuleConfigs {
     public TalonFXConfiguration swerveDriveConfig;
     public CANCoderConfiguration swerveCancoderConfig;
 
+    /**
+     * create a set of configs for a swerve module
+     */
     public ModuleConfigs() {
         swerveAngleConfig = new TalonFXConfiguration();
         swerveDriveConfig = new TalonFXConfiguration();

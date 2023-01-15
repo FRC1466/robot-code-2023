@@ -19,7 +19,7 @@ public class DriveCommand extends CommandBase {
     private final XboxController controller;
     private final AdjustableTelemetry tele;
     private boolean isFieldRelative;
-    
+
     private double vx = 0;
     private double vy = 0;
     private double rad = 0;
@@ -124,12 +124,6 @@ public class DriveCommand extends CommandBase {
     public void setFieldRelative(boolean i) {
         isFieldRelative = i;
     }
-    
-
-    @Override
-    public void initialize() {
-    
-    }
 
     @Override
     public void execute() {
@@ -142,6 +136,5 @@ public class DriveCommand extends CommandBase {
             pidIter = 0;
         }
         pidIter++;
-        
     }
 }
