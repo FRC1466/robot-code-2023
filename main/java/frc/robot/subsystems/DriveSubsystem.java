@@ -11,59 +11,44 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants.Swerve;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 public class DriveSubsystem extends SubsystemBase {
 
-  private final WPI_TalonSRX gyro_motor = new WPI_TalonSRX(DriveConstants.GYRO_PORT);
-  private final WPI_PigeonIMU gyro = new WPI_PigeonIMU(gyro_motor);
-  private final SwerveModule frontLeftModule = new SwerveModule(
-    DriveConstants.FRONTLEFT_PORT_DRIVE, 
-    DriveConstants.FRONTLEFT_PORT_ROTATE,
-    DriveConstants.FRONTLEFT_PORT_CANCODER,
-    DriveConstants.FRONTLEFT_OFFSET,
-    DriveConstants.FRONTLEFT_DRIVEINVERT,
-    DriveConstants.FRONTLEFT_ROTINVERT);
-  private final SwerveModule frontRightModule = new SwerveModule(
-    DriveConstants.FRONTRIGHT_PORT_DRIVE, 
-    DriveConstants.FRONTRIGHT_PORT_ROTATE,
-    DriveConstants.FRONTRIGHT_PORT_CANCODER,
-    DriveConstants.FRONTRIGHT_OFFSET,
-    DriveConstants.FRONTRIGHT_DRIVEINVERT,
-    DriveConstants.FRONTRIGHT_ROTINVERT);
-  private final SwerveModule backLeftModule = new SwerveModule(
-    DriveConstants.BACKLEFT_PORT_DRIVE, 
-    DriveConstants.BACKLEFT_PORT_ROTATE,
-    DriveConstants.BACKLEFT_PORT_CANCODER,
-    DriveConstants.BACKLEFT_OFFSET,
-    DriveConstants.BACKLEFT_DRIVEINVERT,
-    DriveConstants.BACKLEFT_ROTINVERT);
-  private final SwerveModule backRightModule = new SwerveModule(
-    DriveConstants.BACKRIGHT_PORT_DRIVE, 
-    DriveConstants.BACKRIGHT_PORT_ROTATE,
-    DriveConstants.BACKRIGHT_PORT_CANCODER,
-    DriveConstants.BACKRIGHT_OFFSET,
-    DriveConstants.BACKRIGHT_DRIVEINVERT,
-    DriveConstants.BACKRIGHT_ROTINVERT);
-
-  private final Pose2d initialPose = new Pose2d(1.0, 1.5, new Rotation2d());
-  private ChassisSpeeds speeds = new ChassisSpeeds(0, 0, 0);
-  private SwerveModuleState[] moduleStates = DriveConstants.KINEMATICS.toSwerveModuleStates(speeds);
-  private SwerveModulePosition[] modulePositions = {
-    new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition(), new SwerveModulePosition()};
-  private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.KINEMATICS, getGyroHeading(), getCurrentSwervePositions(), initialPose);
+  private final WPI_TalonSRX gyroTalonSRX;
+  private final WPI_PigeonIMU gyro;
+  private final SwerveModule[] mSwerveModules;
+  private ChassisSpeeds speeds;
+  private SwerveModuleState[] desiredModuleStates;
+  private SwerveDriveOdometry swerveOdometry;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    gyroTalonSRX =  new WPI_TalonSRX(Swerve.gyroID);
+    gyro = new WPI_PigeonIMU(gyroTalonSRX);
+
+    swerveOdometry = new SwerveDriveOdometry(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions());
+    speeds = new ChassisSpeeds();
+    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
+    
+
+    mSwerveModules = new SwerveModule[] {
+      new SwerveModule(0, Swerve.Mod0.constants),
+      new SwerveModule(1, Swerve.Mod1.constants),
+      new SwerveModule(2, Swerve.Mod2.constants),
+      new SwerveModule(3, Swerve.Mod3.constants),
+    };
+    
     initializeTelemetry();
     gyro.reset();
   }
@@ -73,6 +58,9 @@ public class DriveSubsystem extends SubsystemBase {
   private GenericEntry odometryXEntry;
   private GenericEntry odometryYEntry;
   private GenericEntry odometryDegEntry;
+  private GenericEntry[] cancoderEntries;
+  private GenericEntry[] integratedEntries;
+  private GenericEntry[] velEntries;
   /**
    * initializes telemetry
    */
@@ -88,18 +76,43 @@ public class DriveSubsystem extends SubsystemBase {
     ShuffleboardLayout odometryLayout = teleTab
       .getLayout("odometry", BuiltInLayouts.kList)
       .withSize(1, 3);
-      odometryXEntry = odometryLayout.add("x", m_odometry.getPoseMeters().getX()).getEntry();
-      odometryYEntry = odometryLayout.add("y", m_odometry.getPoseMeters().getY()).getEntry();
-      odometryDegEntry = odometryLayout.add("deg", m_odometry.getPoseMeters().getRotation().getDegrees()).getEntry();
+    odometryXEntry = odometryLayout.add("x", swerveOdometry.getPoseMeters().getX()).getEntry();
+    odometryYEntry = odometryLayout.add("y", swerveOdometry.getPoseMeters().getY()).getEntry();
+    odometryDegEntry = odometryLayout.add("deg", swerveOdometry.getPoseMeters().getRotation().getDegrees()).getEntry();
+
+    cancoderEntries = new GenericEntry[4];
+    integratedEntries = new GenericEntry[4];
+    velEntries = new GenericEntry[4];
+    for(SwerveModule module : mSwerveModules){
+      ShuffleboardLayout encoderLayout = teleTab
+        .getLayout("Module " + module.moduleNumber + " Encoders", BuiltInLayouts.kList)
+        .withSize(1, 3);
+      cancoderEntries[module.moduleNumber] = encoderLayout.add("Cancoder", module.getCancoderAngle().getDegrees()).getEntry();
+      integratedEntries[module.moduleNumber] = encoderLayout.add("Integrated", module.getPosition().angle.getDegrees()).getEntry();
+      velEntries[module.moduleNumber] = encoderLayout.add("Velocity", module.getState().speedMetersPerSecond).getEntry();    
+    }
+    
+  }
+
+  public void updateModuleTelemetry() {
+    for(SwerveModule module : mSwerveModules){ 
+      cancoderEntries[module.moduleNumber].setDouble(module.getCancoderAngle().getDegrees());
+      integratedEntries[module.moduleNumber].setDouble(module.getPosition().angle.getDegrees());
+      velEntries[module.moduleNumber].setDouble(module.getState().speedMetersPerSecond);
+    }
   }
   
   /**
    * @return Rotation2d of gyro
    */
-  public Rotation2d getGyroHeading() {
+  public Rotation2d getGyroRotation2d() {
     gyroRotEntry.setDouble(gyro.getRotation2d().getDegrees());
     gyroPitchEntry.setDouble(gyro.getPitch());
     return gyro.getRotation2d();
+  }
+
+  public void zeroGyro() {
+    gyro.setYaw(0);
   }
 
   /**
@@ -107,7 +120,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Pose2d of the robot from odometry
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return swerveOdometry.getPoseMeters();
   }
 
   /**
@@ -115,45 +128,49 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose Pose2d that the robot is at
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(getGyroHeading(), getCurrentSwervePositions(), pose);
+    swerveOdometry.resetPosition(getGyroRotation2d(), getSwervePositions(), pose);
   }
 
   public void resetGyro() {
     gyro.reset();
   }
 
+  public void resetModulesToAbsolute() {
+    for(SwerveModule modules : mSwerveModules){
+      modules.resetToAbsolute();
+  }
+  }
+
   /**
    * drive from module states list
    * @param states list of SwerveModuleStates that correspond to the robot
    */
-  public void driveFromModuleStates(SwerveModuleState[] states) {
-    frontLeftModule.setDesiredState(states[0]);
-    frontRightModule.setDesiredState(states[1]);
-    backLeftModule.setDesiredState(states[2]);
-    backRightModule.setDesiredState(states[3]);
+  public void setDesiredModuleStates(SwerveModuleState[] states) {
+    for (SwerveModule module : mSwerveModules) {
+      module.setDesiredState(states[module.moduleNumber]);
+    }
   }
 
   /**
    * update the odometry of the robot with current pose of the robot
    */
   public void updateRobotPose() {
-    m_odometry.update(
-      getGyroHeading(),
-      getCurrentSwervePositions()
+    swerveOdometry.update(
+      getGyroRotation2d(),
+      getSwervePositions()
       );
-    odometryXEntry.setDouble(m_odometry.getPoseMeters().getX());
-    odometryYEntry.setDouble(m_odometry.getPoseMeters().getY());
-    odometryDegEntry.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
+    odometryXEntry.setDouble(swerveOdometry.getPoseMeters().getX());
+    odometryYEntry.setDouble(swerveOdometry.getPoseMeters().getY());
+    odometryDegEntry.setDouble(swerveOdometry.getPoseMeters().getRotation().getDegrees());
   }
 
   /**
    * drive robot from current module states in the class
    */
   public void drive() {
-    frontLeftModule.setDesiredState(moduleStates[0]);
-    frontRightModule.setDesiredState(moduleStates[1]);
-    backLeftModule.setDesiredState(moduleStates[2]);
-    backRightModule.setDesiredState(moduleStates[3]);
+    for (SwerveModule module : mSwerveModules) {
+      module.setDesiredState(desiredModuleStates[module.moduleNumber]);
+    }
   }
 
   /**
@@ -161,18 +178,17 @@ public class DriveSubsystem extends SubsystemBase {
    * @param i double from [-1, 1]
    */
   public void drivePosSpecificModule(double i) {
-    frontLeftModule.setDrivePosition(i);
+    mSwerveModules[0].setDrivePosition(i);
   }
 
   /**
    * set modude positions to a locked position with vel pid set to 0 to attempt to brake
    */
   public void driveFromStopped() {
-    SwerveModuleState stopped = new SwerveModuleState(0, new Rotation2d(Math.PI));
-    frontLeftModule.setDesiredState(stopped);
-    frontRightModule.setDesiredState(stopped);
-    backLeftModule.setDesiredState(stopped);
-    backRightModule.setDesiredState(stopped);
+    SwerveModuleState stopped = new SwerveModuleState(0, new Rotation2d(Math.PI/2));
+    for (SwerveModule module : mSwerveModules) {
+      module.setDesiredState(stopped);
+    }
   }
 
   /**
@@ -194,102 +210,55 @@ public class DriveSubsystem extends SubsystemBase {
    * @param vy vertical velocity in m/s
    */
   public void setSpeedsFieldRelative(double rad, double vx, double vy) {
-    speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroHeading());
+    speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroRotation2d());
   }
 
   /**
    * update normal moduleStates
    */
   public void updateModuleStates() {
-    moduleStates = DriveConstants.KINEMATICS.toSwerveModuleStates(speeds);
-  }
-
-  /**
-   * update each module's inversion
-   */
-  public void updateModuleInversion() {
-    frontLeftModule.setMotorInversion(DriveConstants.FRONTLEFT_DRIVEINVERT, DriveConstants.FRONTLEFT_ROTINVERT);
-    frontRightModule.setMotorInversion(DriveConstants.FRONTRIGHT_DRIVEINVERT, DriveConstants.FRONTRIGHT_ROTINVERT);
-    backLeftModule.setMotorInversion(DriveConstants.BACKLEFT_DRIVEINVERT, DriveConstants.BACKLEFT_ROTINVERT);
-    backRightModule.setMotorInversion(DriveConstants.BACKRIGHT_DRIVEINVERT, DriveConstants.BACKRIGHT_ROTINVERT);
+    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
   }
 
   /**
    * update PID in the module substates from constants
    */
   public void updatePIDConfigs() {
-    frontLeftModule.updatePID();
-    frontRightModule.updatePID();
-    backLeftModule.updatePID();
-    backRightModule.updatePID();
-  }
-
-  /**
-   * set all modules' position pid
-   * @param p
-   * @param i
-   * @param d
-   */
-  public void setModulePositionPID(double p, double i, double d) {
-    frontLeftModule.setRotationPID(p, i, d);
-    frontRightModule.setRotationPID(p, i, d);
-    backLeftModule.setRotationPID(p, i, d);
-    backRightModule.setRotationPID(p, i, d);
-  }
-
-  /**
-   * get all motor positions
-   * @return list of all positions of the motors
-   */
-  public double[] getDrivePositions() {
-    return new double[] {
-      frontLeftModule.getDrivePosition(),
-      frontRightModule.getDrivePosition(),
-      backLeftModule.getDrivePosition(),
-      backRightModule.getDrivePosition()
-    };
-  }
-
-  /**
-   * get all motor velocities
-   * @return list of all velocities of the motors
-   */
-  public double[][] getVelocities() {
-    return new double[][] {
-      frontLeftModule.getVelocity(),
-      frontRightModule.getVelocity(),
-      backLeftModule.getVelocity(),
-      backRightModule.getVelocity()
-    };
+    for (SwerveModule module : mSwerveModules) {
+      module.updatePID();;
+    }
   }
 
   /**
    * @return SwerveModuleState[] of all modules, calculated from drive velocity and cancoders
    */
-  public SwerveModuleState[] getCurrentSwerveModuleStates() {
-    return new SwerveModuleState[] {
-      frontLeftModule.getState(),
-      frontRightModule.getState(),
-      backLeftModule.getState(),
-      backRightModule.getState()
-    };
+  public SwerveModuleState[] getSwerveModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for(SwerveModule module : mSwerveModules){
+        states[module.moduleNumber] = module.getState();
+    }
+    return states;
   }
 
   /**
    * @return SwerveModulePosition[] of all modules, calculated from drive position and cancoders
    */
-  public SwerveModulePosition[] getCurrentSwervePositions() {
-    modulePositions[0] = frontLeftModule.getModulePosition();
-    modulePositions[1] = frontRightModule.getModulePosition();
-    modulePositions[2] = backLeftModule.getModulePosition();
-    modulePositions[3] = backRightModule.getModulePosition();
-    return modulePositions;
+  public SwerveModulePosition[] getSwervePositions() {
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
+    for(SwerveModule module : mSwerveModules){
+        positions[module.moduleNumber] = module.getPosition();
+    }
+    return positions;
   }
 
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()){
+      resetModulesToAbsolute();
+    }
     updateRobotPose();
+    updateModuleTelemetry();
   }
 
 }

@@ -5,83 +5,56 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.AbsoluteSensorRange;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.Constants.ConversionConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.PIDConstants;
+import frc.lib.math.Conversions;
+import frc.lib.util.ModuleState;
+import frc.lib.util.SwerveModuleConstants;
+import frc.robot.Robot;
+import frc.robot.constants.Constants.Swerve;
 
 public class SwerveModule {
-    private WPI_TalonFX[] motors;
+    public int moduleNumber;
+    private WPI_TalonFX angleMotor;
+    private WPI_TalonFX driveMotor;
     private WPI_CANCoder cancoder;
-    private double m_cancoderOffset;
-    private boolean m_RotInverted;
-    private boolean m_driveInverted;
-    private int m_invertConstant;
-    private int m_rotationPort;
-    private Rotation2d cancoderRotation2d = new Rotation2d();
-    private SwerveModulePosition swerveModulePosition;
-    private PIDController rotPID = new PIDController(
-        PIDConstants.DRIVE_GAINS_POSITION.P,
-        PIDConstants.DRIVE_GAINS_POSITION.I,
-        PIDConstants.DRIVE_GAINS_POSITION.D);
+    private boolean angleInvert;
+    private boolean driveInvert;
+    private Rotation2d angleOffset;
+    private Rotation2d lastAngle;
+    private Rotation2d driftOffset;
     
     /**
      * Initialize a Swerve Module
      */
     public SwerveModule(
-        int drivePort,
-        int rotationPort,
-        int cancoderPort,
-        double cancoderOffset,
-        boolean driveInverted,
-        boolean rotInverted
+        int moduleID,
+        SwerveModuleConstants moduleConstants
     ) {
-        motors = new WPI_TalonFX[] {
-            new WPI_TalonFX(drivePort),
-            new WPI_TalonFX(rotationPort)}; 
-        cancoder = new WPI_CANCoder(cancoderPort);
+        this.angleInvert = moduleConstants.angleInvert;
+        this.driveInvert = moduleConstants.driveInvert;
+        this.angleOffset = moduleConstants.angleOffset;
+        this.moduleNumber = moduleID;
 
-        m_RotInverted = rotInverted;
-        m_driveInverted = driveInverted;
-        m_cancoderOffset = cancoderOffset;
-        m_rotationPort = rotationPort;
+        cancoder = new WPI_CANCoder(moduleConstants.cancoderID);
+        configCancoder();
 
-        m_invertConstant = m_RotInverted ? -1 : 1;
+        driveMotor = new WPI_TalonFX(moduleConstants.driveMotorID);
+        configDriveMotor();
 
-        rotPID.enableContinuousInput(-0.50, 0.50);
+        angleMotor = new WPI_TalonFX(moduleConstants.angleMotorID);
+        configAngleMotor();
 
-        initializeMotors();
-        initializeMotorsPID();
-        initializeCancoder();
-        setDriveEncoder(0.0);
-        initializeTelemetry();
+        lastAngle = getState().angle;
+        driftOffset = new Rotation2d();
     }
 
-    private GenericEntry setpointEntry;
-    private GenericEntry currentAngleEntry;
-    private GenericEntry pidOutputEntry;
-    private void initializeTelemetry() {
-        ShuffleboardTab teleTab = Shuffleboard.getTab("Telemetry");
-        ShuffleboardLayout moduleLayout = teleTab
-            .getLayout("MODULE " + m_rotationPort, BuiltInLayouts.kList)
-            .withSize(1, 3);
-            
-        setpointEntry = moduleLayout.add("SETPOINT", 0).getEntry();
-        currentAngleEntry = moduleLayout.add("ANGLE", 0).getEntry();
-        pidOutputEntry = moduleLayout.add("PID OUTPUT", 0).getEntry();
+    public Rotation2d getAngle() {
+        return Rotation2d.fromDegrees(Conversions.falconToDegrees(angleMotor.getSelectedSensorPosition(), 
+        Swerve.angleGearRatio));
     }
 
     /**
@@ -90,84 +63,26 @@ public class SwerveModule {
      */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-            motors[0].getSelectedSensorVelocity() * ConversionConstants.CTRE_NATIVE_TO_MPS, 
-            cancoderRotation2d
+            Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Swerve.circumference, Swerve.driveGearRatio),
+            getAngle()
             );
     }
 
     /**
      * @return current module positions of the module
      */
-    public SwerveModulePosition getModulePosition() {
-        swerveModulePosition.distanceMeters = getDrivePosition();
-        swerveModulePosition.angle = cancoderRotation2d;
-        return swerveModulePosition;
-    }
-
-    /**
-     * 
-     * @return drive position in raw ctre units
-     */
-    public double getDrivePosition() {
-        return motors[0].getSelectedSensorPosition();
-    }
-
-    /**
-     * 
-     * @return position of rotation motor in raw ctre units
-     */
-    public double getRotationPosition() {
-        return motors[1].getSelectedSensorPosition();
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+            Conversions.falconToMeters(driveMotor.getSelectedSensorPosition(), Swerve.circumference, Swerve.driveGearRatio), 
+            getAngle()
+        );
     }
 
     public Rotation2d getCancoderAngle() 
     {
-        double a;
-        switch (m_rotationPort) {
-            case 4:
-                a = DriveConstants.FRONTRIGHT_OFFSET;
-                break;
-            case 2:
-                a = DriveConstants.FRONTLEFT_OFFSET;
-                break;
-            case 6:
-                a = DriveConstants.BACKRIGHT_OFFSET;
-                break;
-            case 8:
-                a = DriveConstants.BACKLEFT_OFFSET;
-                break;
-            default:
-                a = m_cancoderOffset;
-                break;
-        }
-        a = m_cancoderOffset;
         return Rotation2d.fromDegrees(
-            wrapCancoderOutput(
-                cancoder.getAbsolutePosition() + a
-            ));
-    }
-
-    /**
-     * get list of velocities
-     * @return list of doubles for both motor velocities, 0: drive, 1: position
-     */
-    public double[] getVelocity() {
-        return new double[] {motors[0].getSelectedSensorVelocity(), motors[1].getSelectedSensorVelocity()};
-    }
-
-     /**
-     * @param position position of cancoder in degrees, rotation offsets CANNOT be over 360
-     * @return         adjusted degree within a [-180, 180] wrapped output
-     */
-    private double wrapCancoderOutput(double position) {
-        if (position > 180.0) {
-            position += 360.0 * m_invertConstant;
-        }
-        if (position < -180.0) {
-            position += 360.0 * -m_invertConstant;
-        }
-
-        return position;
+            cancoder.getAbsolutePosition()
+            );
     }
 
 
@@ -176,37 +91,35 @@ public class SwerveModule {
      * @param desiredState the SwerveModuleState to set to
      */
     public void setDesiredState(SwerveModuleState desiredState) {
-        cancoderRotation2d = getCancoderAngle();
-        SwerveModuleState state =
-            SwerveModuleState.optimize(
-                desiredState, 
-                cancoderRotation2d);
+        desiredState = ModuleState.optimize(desiredState, getState().angle); 
+        setAngle(desiredState);
+        setSpeed(desiredState);
+    }
 
-        double unitsVel = state.speedMetersPerSecond / ConversionConstants.CTRE_NATIVE_TO_MPS;
-        motors[0].set(TalonFXControlMode.Velocity, unitsVel);
+    public void setSpeed(SwerveModuleState desiredState) {
+        double sp = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Swerve.circumference, Swerve.driveGearRatio);
+        driveMotor.set(TalonFXControlMode.Velocity, sp);
+    }
 
-        double setpoint =
-            state.angle.getRadians() / (2*Math.PI);
-        double current =
-            cancoderRotation2d.getRadians() / (2*Math.PI);
-        setpointEntry.setDouble(setpoint);
-        currentAngleEntry.setDouble(current);
+    public void setAngle(SwerveModuleState desiredState) {
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (4 * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
+        
+        driveMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle.plus(driftOffset).getDegrees(), Swerve.angleGearRatio));
+        lastAngle = angle;
+    }
 
-        double pidOutput = MathUtil.clamp(
-            rotPID.calculate(current, setpoint), 
-            -DriveConstants.LIMIT_PID_CLAMP, DriveConstants.LIMIT_PID_CLAMP);
-        pidOutputEntry.setDouble(pidOutput);
-
-        motors[1].set(TalonFXControlMode.PercentOutput, pidOutput);  
+    public void resetToAbsolute(){
+        double absolutePosition = Conversions.degreesToFalcon(getCancoderAngle().getDegrees() - angleOffset.getDegrees(), Swerve.angleGearRatio);
+        angleMotor.setSelectedSensorPosition(absolutePosition);
     }
 
     /**
-     * set drive position to setpoint
-     * @param i double from [-1, 1]
+     * set drive position to a degree
+     * @param i position in degrees
      */
     public void setDrivePosition(double i) {
-        double pos = i * ConversionConstants.CHANGED_CTRE_TICKS_PER_REV;
-        motors[0].set(TalonFXControlMode.Position, pos);
+        double pos = Conversions.degreesToFalcon(i, Swerve.driveGearRatio);
+        driveMotor.set(TalonFXControlMode.Position, pos);
     }
 
     /**
@@ -214,36 +127,24 @@ public class SwerveModule {
      * @param i set position to this (raw ctre)
      */
     public void setDriveEncoder(double i) {
-        motors[0].setSelectedSensorPosition(i);
+        driveMotor.setSelectedSensorPosition(i);
     }
 
     /**
      * update PID config of motors from PID Constants
      */
     public void updatePID() {
-        motors[0].config_kF(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.F, PIDConstants.TIMEOUT_MS);
-        motors[0].config_kP(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.P, PIDConstants.TIMEOUT_MS);
-        motors[0].config_kI(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.I, PIDConstants.TIMEOUT_MS);
-        motors[0].config_kD(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.D, PIDConstants.TIMEOUT_MS);
-        motors[0].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.IZONE, PIDConstants.TIMEOUT_MS);
+        driveMotor.config_kF(Swerve.pidLoopIdx, Swerve.driveGainsVelocity.F, Swerve.timeoutMS);
+        driveMotor.config_kP(Swerve.pidLoopIdx, Swerve.driveGainsVelocity.P, Swerve.timeoutMS);
+        driveMotor.config_kI(Swerve.pidLoopIdx, Swerve.driveGainsVelocity.I, Swerve.timeoutMS);
+        driveMotor.config_kD(Swerve.pidLoopIdx, Swerve.driveGainsVelocity.D, Swerve.timeoutMS);
+        driveMotor.config_IntegralZone(Swerve.pidLoopIdx, Swerve.driveGainsVelocity.integralZone, Swerve.timeoutMS);
 
-        motors[1].config_kF(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.F, PIDConstants.TIMEOUT_MS);
-        motors[1].config_kP(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.P, PIDConstants.TIMEOUT_MS);
-        motors[1].config_kI(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.I, PIDConstants.TIMEOUT_MS);
-        motors[1].config_kD(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.D, PIDConstants.TIMEOUT_MS);
-        motors[1].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.IZONE, PIDConstants.TIMEOUT_MS);
-    }
-
-    /**
-     * set pid of rotation WPI pid control loop
-     * @param p
-     * @param i
-     * @param d
-     */
-    public void setRotationPID(double p, double i, double d) {
-        rotPID.setP(p);
-        rotPID.setI(i);
-        rotPID.setD(d);
+        angleMotor.config_kF(Swerve.pidLoopIdx, Swerve.driveGainsPosition.F, Swerve.timeoutMS);
+        angleMotor.config_kP(Swerve.pidLoopIdx, Swerve.driveGainsPosition.P, Swerve.timeoutMS);
+        angleMotor.config_kI(Swerve.pidLoopIdx, Swerve.driveGainsPosition.I, Swerve.timeoutMS);
+        angleMotor.config_kD(Swerve.pidLoopIdx, Swerve.driveGainsPosition.D, Swerve.timeoutMS);
+        angleMotor.config_IntegralZone(Swerve.pidLoopIdx, Swerve.driveGainsPosition.integralZone, Swerve.timeoutMS);
     }
 
     /**
@@ -252,71 +153,35 @@ public class SwerveModule {
      * @param rot inversion of rotation motor
      */
     public void setMotorInversion(boolean drive, boolean rot) {
-        motors[0].setInverted(drive);
-        motors[1].setInverted(rot);
+        driveMotor.setInverted(drive);
+        angleMotor.setInverted(rot);
     }
 
-    /**
-     * initialize motor configs
-     */
-    private void initializeMotors() {
-        for (int i = 0; i < motors.length; i++) {
-            motors[i].configFactoryDefault();
-            motors[i].set(ControlMode.PercentOutput, 0);
-            motors[i].setNeutralMode(NeutralMode.Brake);
-            motors[i].configNeutralDeadband(0.001);
-        }
-        motors[1].setInverted(m_RotInverted);
-        motors[0].setInverted(m_driveInverted);
+    private void configCancoder() {
+        cancoder.configFactoryDefault();
+        cancoder.configAllSettings(Robot.moduleConfigs.swerveCancoderConfig);
     }
 
-    /**
-     * initialize motor PID configs
-     */
-    private void initializeMotorsPID() {
-        motors[0].configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-        PIDConstants.PID_LOOP_IDX, 
-        PIDConstants.TIMEOUT_MS);
-        motors[1].configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-        PIDConstants.PID_LOOP_IDX, 
-        PIDConstants.TIMEOUT_MS);
-        
-  
-  
-        /* Config the peak and nominal outputs */
-        motors[0].configNominalOutputForward(0, PIDConstants.TIMEOUT_MS);
-        motors[0].configNominalOutputReverse(0, PIDConstants.TIMEOUT_MS);
-        motors[0].configPeakOutputForward(PIDConstants.DRIVE_GAINS_VELOCITY.PEAK_OUTPUT, PIDConstants.TIMEOUT_MS);
-        motors[0].configPeakOutputReverse(-PIDConstants.DRIVE_GAINS_VELOCITY.PEAK_OUTPUT, PIDConstants.TIMEOUT_MS);
-  
-        motors[1].configNominalOutputForward(0, PIDConstants.TIMEOUT_MS);
-        motors[1].configNominalOutputReverse(0, PIDConstants.TIMEOUT_MS);
-        motors[1].configPeakOutputForward(PIDConstants.DRIVE_GAINS_POSITION.PEAK_OUTPUT, PIDConstants.TIMEOUT_MS);
-        motors[1].configPeakOutputReverse(-PIDConstants.DRIVE_GAINS_POSITION.PEAK_OUTPUT, PIDConstants.TIMEOUT_MS);
-  
-        /* Config the Velocity closed loop gains in slot0 */
-        motors[0].config_kF(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.F, PIDConstants.TIMEOUT_MS);
-        motors[0].config_kP(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.P, PIDConstants.TIMEOUT_MS);
-        motors[0].config_kI(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.I, PIDConstants.TIMEOUT_MS);
-        motors[0].config_kD(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.D, PIDConstants.TIMEOUT_MS);
-        motors[0].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_VELOCITY.IZONE, PIDConstants.TIMEOUT_MS);
-  
-        motors[1].config_kF(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.F, PIDConstants.TIMEOUT_MS);
-        motors[1].config_kP(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.P, PIDConstants.TIMEOUT_MS);
-        motors[1].config_kI(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.I, PIDConstants.TIMEOUT_MS);
-        motors[1].config_kD(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.D, PIDConstants.TIMEOUT_MS);
-        motors[1].config_IntegralZone(PIDConstants.PID_LOOP_IDX, PIDConstants.DRIVE_GAINS_POSITION.IZONE, PIDConstants.TIMEOUT_MS);
-  
-        /* Hopefully make not continous */
-        motors[1].configFeedbackNotContinuous(true, PIDConstants.TIMEOUT_MS);
-        motors[1].configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Signed_PlusMinus180);
-        motors[1].configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-
+    private void configAngleMotor() {
+        angleMotor.configFactoryDefault();
+        angleMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
+        Swerve.pidLoopIdx, 
+        Swerve.timeoutMS);
+        angleMotor.configAllSettings(Robot.moduleConfigs.swerveAngleConfig);
+        angleMotor.setNeutralMode(NeutralMode.Brake);
+        angleMotor.configNeutralDeadband(0.001);
+        angleMotor.setInverted(angleInvert);
+        resetToAbsolute();
     }
-    private void initializeCancoder() {
-        cancoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
-        cancoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        cancoder.setPositionToAbsolute();
-        cancoder.configSensorDirection(true);
+
+    private void configDriveMotor() {
+        driveMotor.configFactoryDefault();
+        driveMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
+        Swerve.pidLoopIdx, 
+        Swerve.timeoutMS);
+        driveMotor.configAllSettings(Robot.moduleConfigs.swerveDriveConfig);
+        driveMotor.setNeutralMode(NeutralMode.Brake);
+        driveMotor.configNeutralDeadband(0.001);
+        driveMotor.setInverted(driveInvert);
     }
 }

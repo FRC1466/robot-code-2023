@@ -7,71 +7,73 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.PIDConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.constants.Constants.Swerve;
 import frc.robot.subsystems.AdjustableTelemetry;
 
 import java.lang.Math;
 
 
 public class DriveCommand extends CommandBase {
-    private final DriveSubsystem m_drive;
-    private final XboxController m_controller;
-    private final AdjustableTelemetry m_tele;
-    private boolean m_isFieldRelative;
+    private final DriveSubsystem drive;
+    private final XboxController controller;
+    private final AdjustableTelemetry tele;
+    private boolean isFieldRelative;
+    
     private double vx = 0;
     private double vy = 0;
     private double rad = 0;
-    private int PID_iter = 0;
-    private int m_toggleModule = 0;
+    private int pidIter = 0;
+    private int toggleModule = 0;
     
     /**
      * Default command for driving
-     * @param subsystem drive subsystem
+     * @param drive drive subsystem
      * @param controller drive controller
+     * @param tele adjustable telemetry
+     * @param isFieldRelative if calculating with field relative
      */
     public DriveCommand(
-        DriveSubsystem subsystem, 
+        DriveSubsystem drive, 
         AdjustableTelemetry tele,
         XboxController controller,
         boolean isFieldRelative
         ) {
-        m_drive = subsystem;
-        addRequirements(m_drive);
-        m_tele = tele;
-        m_controller = controller;
-        m_isFieldRelative = isFieldRelative;
+        this.drive = drive;
+        this.tele = tele;
+        this.controller = controller;
+        this.isFieldRelative = isFieldRelative;
 
+        addRequirements(drive);
         initializeTelemetry();
     }
 
     /**
      * local driving function
      */
-    private void m_drive() {
-        vx = Math.abs(m_controller.getLeftX())>0.07 ? m_controller.getLeftX() * DriveConstants.LIMIT_VX : 0;
-        vy = Math.abs(m_controller.getLeftY())>0.07 ? m_controller.getLeftY() * DriveConstants.LIMIT_VY : 0;
-        rad = Math.abs(m_controller.getRightX())>0.05 ? m_controller.getRightX() * DriveConstants.LIMIT_RAD : 0;
+    private void drive() {
+        vx = Math.abs(controller.getLeftX())>0.07 ? controller.getLeftX() * Swerve.Limits.vx : 0;
+        vy = Math.abs(controller.getLeftY())>0.07 ? controller.getLeftY() * Swerve.Limits.vy : 0;
+        rad = Math.abs(controller.getRightX())>0.05 ? controller.getRightX() * Swerve.Limits.rad : 0;
 
-        if (m_controller.getYButtonPressed())
-            m_toggleModule = m_toggleModule >= 1 ? 0 : m_toggleModule++;
+        if (controller.getYButtonPressed())
+            toggleModule = toggleModule >= 1 ? 0 : toggleModule++;
 
-        if (m_isFieldRelative)
-            m_drive.setSpeedsFieldRelative(rad, vx, vy);
+        if (isFieldRelative)
+            drive.setSpeedsFieldRelative(rad, vx, vy);
         else
-            m_drive.setSpeeds(rad, vx, vy);
+            drive.setSpeeds(rad, vx, vy);
         
-        m_drive.updateModuleStates();
-        switch (m_toggleModule) {
+        drive.updateModuleStates();
+        switch (toggleModule) {
             case 0:
-                if (m_controller.getLeftTriggerAxis() > 0.8) 
-                    m_drive.driveFromStopped(); 
+                if (controller.getLeftTriggerAxis() > 0.8) 
+                    drive.driveFromStopped(); 
                 else 
-                    m_drive.drive();
+                    drive.drive();
                 break;
             case 1:
-                m_drive.drivePosSpecificModule(m_controller.getRightTriggerAxis());
+                drive.drivePosSpecificModule(controller.getRightTriggerAxis());
                 break;
             default:
                 break;
@@ -83,19 +85,8 @@ public class DriveCommand extends CommandBase {
      * Update PID system from SmartDashboard for quick and easy tuning
      */
     private void updatePID() {
-        m_tele.updatePIDConstants();
-        m_drive.updatePIDConfigs();
-        m_drive.setModulePositionPID(
-            PIDConstants.DRIVE_GAINS_POSITION.P,
-            PIDConstants.DRIVE_GAINS_POSITION.I,
-            PIDConstants.DRIVE_GAINS_POSITION.D);
-    }
-
-    private void debuggingUpdate() {
-        m_tele.updateEncoders();
-        m_tele.setModuleInversion();
-        m_drive.updateModuleInversion();
-        m_tele.setCodeDebugStates();
+        tele.updatePIDConstants();
+        drive.updatePIDConfigs();
     }
 
     private GenericEntry vxEntry;
@@ -113,7 +104,7 @@ public class DriveCommand extends CommandBase {
         vxEntry = driveLayout.add("vx", vx).getEntry();
         vyEntry = driveLayout.add("vy", vy).getEntry();
         radEntry = driveLayout.add("rad", rad).getEntry();
-        moduleToggleEntry = driveLayout.add("module toggle", m_toggleModule).getEntry();
+        moduleToggleEntry = driveLayout.add("module toggle", toggleModule).getEntry();
     }
 
     /**
@@ -123,7 +114,7 @@ public class DriveCommand extends CommandBase {
         vxEntry.setDouble(vx);
         vyEntry.setDouble(vy);
         radEntry.setDouble(rad);
-        moduleToggleEntry.setDouble(m_toggleModule);
+        moduleToggleEntry.setDouble(toggleModule);
     }
 
     /**
@@ -131,7 +122,7 @@ public class DriveCommand extends CommandBase {
      * @param i false or true
      */
     public void setFieldRelative(boolean i) {
-        m_isFieldRelative = i;
+        isFieldRelative = i;
     }
     
 
@@ -142,16 +133,15 @@ public class DriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        m_tele.updateDriveLimits();
+        tele.updateDriveLimits();
         updateTelemetry();
-        m_drive();
+        drive();
         
-        if (PID_iter*20 > 5000) { // 5000ms PID update time
+        if (pidIter*20 > 5000) { // 5000ms PID update time
             updatePID();
-            debuggingUpdate();
-            PID_iter = 0;
+            pidIter = 0;
         }
-        PID_iter++;
+        pidIter++;
         
     }
 }

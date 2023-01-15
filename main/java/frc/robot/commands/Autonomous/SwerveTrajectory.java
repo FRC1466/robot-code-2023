@@ -4,49 +4,40 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import frc.robot.constants.Constants.AutoConstants;
+import frc.robot.constants.Constants.Swerve;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 
 
 public class SwerveTrajectory {
     private DriveSubsystem m_drive;
     private PPSwerveControllerCommand m_swerveControllerCommand;
     private PathPlannerTrajectory m_path;
-
-    private ProfiledPIDController thetaController =
-        new ProfiledPIDController(
-            AutoConstants.THETA_CONTROLLER.P,
-            AutoConstants.THETA_CONTROLLER.I, 
-            AutoConstants.THETA_CONTROLLER.D, 
-            AutoConstants.THETA_CONTROLLER_CONSTRAINTS);
     
     public SwerveTrajectory(DriveSubsystem drive, PathPlannerTrajectory path) {
 
         m_drive = drive;
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
         m_path = path;
 
         m_swerveControllerCommand =
         new PPSwerveControllerCommand(
             m_path,
             m_drive::getPose, // Functional interface to feed supplier
-            DriveConstants.KINEMATICS,
+            Swerve.KINEMATICS,
             // Position controllers
             new PIDController(
-                AutoConstants.TRANSLATION_CONTROLLER.P,
-                AutoConstants.TRANSLATION_CONTROLLER.I, 
-                AutoConstants.TRANSLATION_CONTROLLER.D),
+                AutoConstants.translationController.P,
+                AutoConstants.translationController.I, 
+                AutoConstants.translationController.D),
             new PIDController(
-                AutoConstants.TRANSLATION_CONTROLLER.P, 
-                AutoConstants.TRANSLATION_CONTROLLER.I, 
-                AutoConstants.TRANSLATION_CONTROLLER.D),
+                AutoConstants.translationController.P, 
+                AutoConstants.translationController.I, 
+                AutoConstants.translationController.D),
             new PIDController(
-                AutoConstants.THETA_CONTROLLER.P,
-                AutoConstants.THETA_CONTROLLER.I, 
-                AutoConstants.THETA_CONTROLLER.D),
-            m_drive::driveFromModuleStates,
+                AutoConstants.thetaController.P,
+                AutoConstants.thetaController.I, 
+                AutoConstants.thetaController.D),
+            m_drive::setDesiredModuleStates,
             m_drive);
     }
 
