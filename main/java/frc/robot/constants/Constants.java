@@ -29,9 +29,9 @@ public final class Constants {
         angleMotorID = 2,
         cancoderID = 9;
       public static final boolean 
-        driveInvert = true,
-        angleInvert = true;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+        driveInvert = false,
+        angleInvert = false;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-18.27-5.1+90-28.485);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
       }
@@ -45,8 +45,8 @@ public final class Constants {
         cancoderID = 10;
       public static final boolean 
         driveInvert = false,
-        angleInvert = true;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+        angleInvert = false;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(3.34+90-180-21.885);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
       }
@@ -60,37 +60,37 @@ public final class Constants {
         cancoderID = 12;
       public static final boolean 
         driveInvert = false,
-        angleInvert = true;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+        angleInvert = false;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-53.87+90-(11.05/2)-10.0);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
       }
 
     /* Module Specific Constants */
-    /* Back Left Module - Module 2 */
+    /* Back Right Module - Module 3 */
     public static final class Mod3 {
       public static final int 
-        driveMotorID = 7,
-        angleMotorID = 8,
-        cancoderID = 12;
+        driveMotorID = 5,
+        angleMotorID = 6,
+        cancoderID = 11;
       public static final boolean 
-        driveInvert = true,
-        angleInvert = true;
-      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
+        driveInvert = false,
+        angleInvert = false;
+      public static final Rotation2d angleOffset = Rotation2d.fromDegrees(7.56-12.75+90-16-9.044+8.345);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
       }
 
       public static final double 
         trackWidth = 0.375,
-        wheelDiameter = 1.975*2,
+        wheelDiameter = 0.10033,
         wheelCircumference = wheelDiameter * Math.PI;
 
       public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
-        new Translation2d(trackWidth/2, trackWidth/2), //frontright
-        new Translation2d(-trackWidth/2, -trackWidth/2), //backleft
-        new Translation2d(trackWidth/2, -trackWidth/2)); //backright
+        new Translation2d(trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(trackWidth/2, -trackWidth/2), //frontright
+        new Translation2d(-trackWidth/2, trackWidth/2), //backleft
+        new Translation2d(-trackWidth/2, -trackWidth/2)); //backright
       
       public static final double 
         driveGearRatio = 8.14,
@@ -101,14 +101,14 @@ public final class Constants {
 
       public static final class Limits {
         public static double 
-          vx = 1.5,
-          vy = 1.5,
+          vx = 3.0,
+          vy = 3.0,
           rad = 4.0;
       } 
 
       public static final Gains 
-        driveGainsVelocity  = new Gains(0.198, 0.00085, 4.0, 0,  0,  0.8),
-        driveGainsPosition  = new Gains(0.05, 0.00001, 0, 0,  0,  0.6);
+        driveGainsVelocity  = new Gains(0.21, 0.00085, 4.0, 0,  0,  0.8),
+        driveGainsPosition  = new Gains(0.050953, 0, 0.0014019, 0,  0,  0.6);
       public static final int 
         slotIdx = 0,
         pidLoopIdx = 0,
@@ -117,14 +117,14 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int 
-      driverID = 0,
+      driverID = 4,
       intakeID = 1;
   }
 
   public static final class AutoConstants {
     public static final double
-      maxSpeedMPS = 3.0,
-      maxAccelerationMPS = 2.0;
+      maxSpeedMPS = 2.0,
+      maxAccelerationMPS = 1.0;
 
     public static final Gains
       thetaController = new Gains(1, 0, 0, 0, 0, 1),

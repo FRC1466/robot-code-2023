@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.subsystems.DriveSubsystem;
@@ -23,13 +26,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
 
-  private final boolean isFieldRelative = false;
+  private final boolean isFieldRelative = true;
   private final AdjustableTelemetry m_tele = new AdjustableTelemetry();
 
   // The robot's subsystems
   private final DriveSubsystem m_drive = new DriveSubsystem();
 
-  private final XboxController m_driverController = new XboxController(OIConstants.driverID);
+  private final Joystick m_driverController = new Joystick(OIConstants.driverID);
 
 
 
@@ -64,7 +67,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kRightBumper.value).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
+    new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
+    new JoystickButton(m_driverController, 3).onTrue(new InstantCommand(() -> m_drive.resetOdometry(new Pose2d())));
   }
     
 

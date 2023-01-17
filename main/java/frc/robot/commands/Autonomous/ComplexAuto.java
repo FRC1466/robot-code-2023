@@ -3,6 +3,8 @@ package frc.robot.commands.Autonomous;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
@@ -23,6 +25,7 @@ public class ComplexAuto extends SequentialCommandGroup {
         
         addCommands(
             new InstantCommand(() -> tele.updatePIDConstants()),
+            new InstantCommand(() -> drive.resetOdometry(new Pose2d(2.18, 4.74, new Rotation2d()))),
             swerveTrajectory.getCommand()
         );
     }

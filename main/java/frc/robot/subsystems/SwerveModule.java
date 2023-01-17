@@ -10,6 +10,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
 import frc.lib.util.ModuleState;
 import frc.lib.util.SwerveModuleConstants;
@@ -95,6 +96,8 @@ public class SwerveModule {
      */
     public void setDesiredState(SwerveModuleState desiredState) {
         desiredState = ModuleState.optimize(desiredState, getState().angle); 
+        SmartDashboard.putNumber("mod"+ moduleNumber + "angle", desiredState.angle.getDegrees());
+        SmartDashboard.putNumber("mod"+ moduleNumber +"speed", desiredState.speedMetersPerSecond);
         setAngle(desiredState);
         setSpeed(desiredState);
     }
@@ -105,6 +108,7 @@ public class SwerveModule {
      */
     public void setSpeed(SwerveModuleState desiredState) {
         double sp = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Swerve.wheelCircumference, Swerve.driveGearRatio);
+        SmartDashboard.putNumber("mod"+moduleNumber+"speed", sp);
         driveMotor.set(TalonFXControlMode.Velocity, sp);
     }
 
@@ -114,8 +118,10 @@ public class SwerveModule {
      */
     public void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (4 * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
-        
-        driveMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle.plus(driftOffset).getDegrees(), Swerve.angleGearRatio));
+        SmartDashboard.putNumber("mod"+moduleNumber+"initangle", angle.getDegrees());
+        double a = Conversions.degreesToFalcon(angle.getDegrees(), Swerve.angleGearRatio);
+        SmartDashboard.putNumber("mod"+moduleNumber+"angle", a);
+        angleMotor.set(ControlMode.Position, a);
         lastAngle = angle;
     }
 
@@ -185,7 +191,6 @@ public class SwerveModule {
         angleMotor.setNeutralMode(NeutralMode.Brake);
         angleMotor.configNeutralDeadband(0.001);
         angleMotor.setInverted(angleInvert);
-        resetToAbsolute();
     }
 
     private void configDriveMotor() {

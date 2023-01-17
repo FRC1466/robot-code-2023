@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -16,7 +17,7 @@ import java.lang.Math;
 
 public class DriveCommand extends CommandBase {
     private final DriveSubsystem drive;
-    private final XboxController controller;
+    private final Joystick controller;
     private final AdjustableTelemetry tele;
     private boolean isFieldRelative;
 
@@ -36,7 +37,7 @@ public class DriveCommand extends CommandBase {
     public DriveCommand(
         DriveSubsystem drive, 
         AdjustableTelemetry tele,
-        XboxController controller,
+        Joystick controller,
         boolean isFieldRelative
         ) {
         this.drive = drive;
@@ -52,11 +53,17 @@ public class DriveCommand extends CommandBase {
      * local driving function
      */
     private void drive() {
-        vx = Math.abs(controller.getLeftX())>0.07 ? controller.getLeftX() * Swerve.Limits.vx : 0;
-        vy = Math.abs(controller.getLeftY())>0.07 ? controller.getLeftY() * Swerve.Limits.vy : 0;
-        rad = Math.abs(controller.getRightX())>0.05 ? controller.getRightX() * Swerve.Limits.rad : 0;
+        if (!controller.getRawButton(2)) {
+            vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx : 0;
+            vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy : 0;
+            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad : 0;
+        } else {
+            vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx * 0.3 : 0;
+            vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
+            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad *0.3 : 0;
+        }
 
-        if (controller.getYButtonPressed())
+        if (controller.getRawButton(4))
             toggleModule = toggleModule >= 1 ? 0 : toggleModule++;
 
         if (isFieldRelative)
@@ -67,13 +74,13 @@ public class DriveCommand extends CommandBase {
         drive.updateModuleStates();
         switch (toggleModule) {
             case 0:
-                if (controller.getLeftTriggerAxis() > 0.8) 
+                if (controller.getRawButton(5)) 
                     drive.driveFromStopped(); 
                 else 
                     drive.drive();
                 break;
             case 1:
-                drive.drivePosSpecificModule(controller.getRightTriggerAxis());
+                drive.drivePosSpecificModule(controller.getY());
                 break;
             default:
                 break;
@@ -129,12 +136,12 @@ public class DriveCommand extends CommandBase {
     public void execute() {
         tele.updateDriveLimits();
         updateTelemetry();
-        // drive();
+        drive();
         
-        if (pidIter*20 > 5000) { // 5000ms PID update time
-            updatePID();
-            pidIter = 0;
-        }
-        pidIter++;
+        // if (pidIter*20 > 5000) { // 5000ms PID update time
+        //     updatePID();
+        //     pidIter = 0;
+        // }
+        // pidIter++;
     }
 }

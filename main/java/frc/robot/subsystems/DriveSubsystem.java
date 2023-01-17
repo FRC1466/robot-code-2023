@@ -37,20 +37,20 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     gyroTalonSRX =  new WPI_TalonSRX(Swerve.gyroID);
     gyro = new WPI_PigeonIMU(gyroTalonSRX);
-
-    swerveOdometry = new SwerveDriveOdometry(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions());
-    speeds = new ChassisSpeeds();
-    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
-    
-
     swerveModules = new SwerveModule[] {
       new SwerveModule(0, Swerve.Mod0.constants),
       new SwerveModule(1, Swerve.Mod1.constants),
       new SwerveModule(2, Swerve.Mod2.constants),
       new SwerveModule(3, Swerve.Mod3.constants),
     };
-    
+
     initializeTelemetry();
+
+    swerveOdometry = new SwerveDriveOdometry(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions());
+    speeds = new ChassisSpeeds();
+    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
+
+    
     gyro.reset();
   }
 
@@ -77,9 +77,9 @@ public class DriveSubsystem extends SubsystemBase {
     ShuffleboardLayout odometryLayout = teleTab
       .getLayout("odometry", BuiltInLayouts.kList)
       .withSize(1, 3);
-    odometryXEntry = odometryLayout.add("x", swerveOdometry.getPoseMeters().getX()).getEntry();
-    odometryYEntry = odometryLayout.add("y", swerveOdometry.getPoseMeters().getY()).getEntry();
-    odometryDegEntry = odometryLayout.add("deg", swerveOdometry.getPoseMeters().getRotation().getDegrees()).getEntry();
+    odometryXEntry = odometryLayout.add("x", 0.0).getEntry();
+    odometryYEntry = odometryLayout.add("y", 0.0).getEntry();
+    odometryDegEntry = odometryLayout.add("deg", 0.0).getEntry();
 
     cancoderEntries = new GenericEntry[4];
     integratedEntries = new GenericEntry[4];
@@ -261,9 +261,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled()){
-      resetModulesToAbsolute();
-    }
     updateRobotPose();
     updateModuleTelemetry();
   }

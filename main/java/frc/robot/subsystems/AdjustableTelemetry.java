@@ -70,12 +70,12 @@ public class AdjustableTelemetry {
             .getLayout("Auto PID", BuiltInLayouts.kList)
             .withSize(1, 6);
 
-        translationPEntry = autoPIDLayout.add("P", AutoConstants.translationController.P).getEntry();
-        translationIEntry = autoPIDLayout.add("D", AutoConstants.translationController.I).getEntry();
-        translationDEntry = autoPIDLayout.add("D", AutoConstants.translationController.D).getEntry();
-        thetaPEntry = autoPIDLayout.add("P", AutoConstants.thetaController.P).getEntry();
-        thetaIEntry = autoPIDLayout.add("I", AutoConstants.thetaController.I).getEntry();
-        thetaDEntry = autoPIDLayout.add("D", AutoConstants.thetaController.D).getEntry();
+        translationPEntry = autoPIDLayout.add("P_t", AutoConstants.translationController.P).getEntry();
+        translationIEntry = autoPIDLayout.add("I_t", AutoConstants.translationController.I).getEntry();
+        translationDEntry = autoPIDLayout.add("D_t", AutoConstants.translationController.D).getEntry();
+        thetaPEntry = autoPIDLayout.add("P_r", AutoConstants.thetaController.P).getEntry();
+        thetaIEntry = autoPIDLayout.add("I_r", AutoConstants.thetaController.I).getEntry();
+        thetaDEntry = autoPIDLayout.add("D_r", AutoConstants.thetaController.D).getEntry();
     } 
 
     private void initializeDriveLimits() {
