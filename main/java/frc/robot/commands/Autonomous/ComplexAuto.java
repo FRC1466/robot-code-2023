@@ -2,6 +2,7 @@ package frc.robot.commands.Autonomous;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,12 +21,13 @@ public class ComplexAuto extends SequentialCommandGroup {
      * @param tele telemetry
      */
     public ComplexAuto(DriveSubsystem drive, AdjustableTelemetry tele) {
-        swerveTrajectory = new SwerveTrajectory(drive, PathPlanner.loadPath("Test Path", 
-        new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)));
+        PathPlannerTrajectory traj = PathPlanner.loadPath("Test Path", 
+        new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS));
+        swerveTrajectory = new SwerveTrajectory(drive, traj);
         
         addCommands(
             new InstantCommand(() -> tele.updatePIDConstants()),
-            new InstantCommand(() -> drive.resetOdometry(new Pose2d(2.18, 4.74, new Rotation2d()))),
+            new InstantCommand(() -> drive.resetOdometry(traj.getInitialHolonomicPose())),
             swerveTrajectory.getCommand()
         );
     }

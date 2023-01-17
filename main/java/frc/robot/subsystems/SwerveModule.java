@@ -26,7 +26,6 @@ public class SwerveModule {
     private boolean driveInvert;
     private Rotation2d angleOffset;
     private Rotation2d lastAngle;
-    private Rotation2d driftOffset;
     
     /**
      * Initialize a Swerve Module
@@ -50,7 +49,6 @@ public class SwerveModule {
         configAngleMotor();
 
         lastAngle = getState().angle;
-        driftOffset = new Rotation2d();
     }
 
     /**
