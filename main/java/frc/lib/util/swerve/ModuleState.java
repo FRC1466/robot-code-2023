@@ -1,6 +1,6 @@
 // CREDITS TO TEAM 364 BASE SWERVE!
 
-package frc.lib.util;
+package frc.lib.util.swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;

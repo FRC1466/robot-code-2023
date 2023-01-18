@@ -12,8 +12,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
-import frc.lib.util.ModuleState;
-import frc.lib.util.SwerveModuleConstants;
+import frc.lib.util.swerve.ModuleState;
+import frc.lib.util.swerve.SwerveModuleConstants;
 import frc.robot.Robot;
 import frc.robot.constants.Constants.Swerve;
 

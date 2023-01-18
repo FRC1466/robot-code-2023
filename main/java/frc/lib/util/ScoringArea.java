@@ -3,20 +3,20 @@ package frc.lib.util;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public class ScoringArea {
-    private final RectanglePoseArea scoreArea;
+    private final RectanglePoseArea scoreRect;
     private final HolonomicPose2d leftPosition;
     private final HolonomicPose2d middlePosition;
     private final HolonomicPose2d rightPosition;
 
-    public ScoringArea(RectanglePoseArea scoreArea, HolonomicPose2d leftPosition, HolonomicPose2d middlePosition, HolonomicPose2d rightPosition) {
-        this.scoreArea = scoreArea;
+    public ScoringArea(RectanglePoseArea scoreRect, HolonomicPose2d leftPosition, HolonomicPose2d middlePosition, HolonomicPose2d rightPosition) {
+        this.scoreRect = scoreRect;
         this.leftPosition = leftPosition;
         this.middlePosition = middlePosition;
         this.rightPosition = rightPosition;
     }
 
     public RectanglePoseArea getScoreRectangle() {
-        return scoreArea;
+        return scoreRect;
     }
 
     public HolonomicPose2d getLeftPosition() {
@@ -32,12 +32,12 @@ public class ScoringArea {
     }
 
     public boolean isPoseWithinScoringArea(Pose2d pose) {
-        return scoreArea.isPoseWithinArea(pose);
+        return scoreRect.isPoseWithinArea(pose);
     }
 
     public double getDistanceFromPose(Pose2d pose) {
-        var dx = Math.max(scoreArea.getMinX() - pose.getX(), Math.max(0, pose.getX() - scoreArea.getMaxX()));
-        var dy = Math.max(scoreArea.getMinY() - pose.getY(), Math.max(0, pose.getY() - scoreArea.getMaxY()));
+        var dx = Math.max(scoreRect.getMinX() - pose.getX(), Math.max(0, pose.getX() - scoreRect.getMaxX()));
+        var dy = Math.max(scoreRect.getMinY() - pose.getY(), Math.max(0, pose.getY() - scoreRect.getMaxY()));
         return Math.sqrt(dx*dx + dy*dy);
     }
     

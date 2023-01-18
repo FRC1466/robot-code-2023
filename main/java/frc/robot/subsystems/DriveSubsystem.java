@@ -4,11 +4,11 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
@@ -32,7 +32,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private SwerveDriveOdometry swerveOdometry;
+  private SwerveDrivePoseEstimator swerveOdometry;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -47,10 +47,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     initializeTelemetry();
 
-    swerveOdometry = new SwerveDriveOdometry(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions());
+    swerveOdometry = new SwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
-
     
     gyro.reset();
   }
@@ -129,7 +128,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Pose2d of the robot from odometry
    */
   public Pose2d getPose() {
-    return swerveOdometry.getPoseMeters();
+    return swerveOdometry.getEstimatedPosition();
   }
 
   public boolean isPoseWithinArea(RectanglePoseArea area) {
@@ -171,9 +170,9 @@ public class DriveSubsystem extends SubsystemBase {
       getGyroRotation2d(),
       getSwervePositions()
       );
-    odometryXEntry.setDouble(swerveOdometry.getPoseMeters().getX());
-    odometryYEntry.setDouble(swerveOdometry.getPoseMeters().getY());
-    odometryDegEntry.setDouble(swerveOdometry.getPoseMeters().getRotation().getDegrees());
+    odometryXEntry.setDouble(swerveOdometry.getEstimatedPosition().getX());
+    odometryYEntry.setDouble(swerveOdometry.getEstimatedPosition().getY());
+    odometryDegEntry.setDouble(swerveOdometry.getEstimatedPosition().getRotation().getDegrees());
   }
 
   /**
@@ -222,6 +221,16 @@ public class DriveSubsystem extends SubsystemBase {
    * @param vy vertical velocity in m/s
    */
   public void setSpeedsFieldRelative(double rad, double vx, double vy) {
+    speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroRotation2d());
+  }
+
+    /**
+   * update speeds from field relative setup
+   * @param rad rad/s speed of robot
+   * @param vx horizontal velocity in m/s
+   * @param vy vertical velocity in m/s
+   */
+  public void setSpeedsFieldRelativeAlternate(double rad, double vx, double vy) {
     Pose2d robot_pose_vel = new Pose2d(vx * 0.01, vy * 0.01, Rotation2d.fromRadians(rad * 0.01));
     Twist2d twist_vel = getPose().log(robot_pose_vel);
     ChassisSpeeds adjSpeeds = new ChassisSpeeds(twist_vel.dx / 0.01, twist_vel.dy / 0.01, twist_vel.dtheta / 0.01);

@@ -59,7 +59,7 @@ public class DriveCommand extends CommandBase {
         } else {
             vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx * 0.3 : 0;
             vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
-            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad *0.3 : 0;
+            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
         }
 
         if (controller.getRawButton(4))

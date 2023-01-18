@@ -6,9 +6,9 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.util.Gains;
-import frc.lib.util.SwerveModuleConstants;
+import frc.lib.util.swerve.BetterSwerveKinematics;
+import frc.lib.util.swerve.SwerveModuleConstants;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -86,7 +86,7 @@ public final class Constants {
         wheelDiameter = 0.10033,
         wheelCircumference = wheelDiameter * Math.PI;
 
-      public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
+      public final static BetterSwerveKinematics KINEMATICS = new BetterSwerveKinematics(
         new Translation2d(trackWidth/2, trackWidth/2), //frontleft
         new Translation2d(trackWidth/2, -trackWidth/2), //frontright
         new Translation2d(-trackWidth/2, trackWidth/2), //backleft
