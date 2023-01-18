@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.RectanglePoseArea;
 import frc.robot.constants.Constants.Swerve;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -130,11 +132,15 @@ public class DriveSubsystem extends SubsystemBase {
     return swerveOdometry.getPoseMeters();
   }
 
+  public boolean isPoseWithinArea(RectanglePoseArea area) {
+    return area.isPoseWithinArea(getPose());
+  }
+
   /**
    * reset odometry of the robot from a given pose
    * @param pose Pose2d that the robot is at
    */
-  public void resetOdometry(Pose2d pose) {
+  public void resetPose(Pose2d pose) {
     swerveOdometry.resetPosition(getGyroRotation2d(), getSwervePositions(), pose);
   }
 
@@ -216,7 +222,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @param vy vertical velocity in m/s
    */
   public void setSpeedsFieldRelative(double rad, double vx, double vy) {
-    speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroRotation2d());
+    Pose2d robot_pose_vel = new Pose2d(vx * 0.01, vy * 0.01, Rotation2d.fromRadians(rad * 0.01));
+    Twist2d twist_vel = getPose().log(robot_pose_vel);
+    ChassisSpeeds adjSpeeds = new ChassisSpeeds(twist_vel.dx / 0.01, twist_vel.dy / 0.01, twist_vel.dtheta / 0.01);
+    speeds = ChassisSpeeds.fromFieldRelativeSpeeds(adjSpeeds.vxMetersPerSecond, adjSpeeds.vyMetersPerSecond, adjSpeeds.omegaRadiansPerSecond, getGyroRotation2d());
   }
 
   /**
