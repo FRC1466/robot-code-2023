@@ -32,7 +32,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private SwerveDrivePoseEstimator swerveOdometry;
+  private SwerveDrivePoseEstimator swervePoseEstimator;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -47,7 +47,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     initializeTelemetry();
 
-    swerveOdometry = new SwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
+    swervePoseEstimator = new SwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
     
@@ -128,7 +128,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Pose2d of the robot from odometry
    */
   public Pose2d getPose() {
-    return swerveOdometry.getEstimatedPosition();
+    return swervePoseEstimator.getEstimatedPosition();
   }
 
   public boolean isPoseWithinArea(RectanglePoseArea area) {
@@ -140,7 +140,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose Pose2d that the robot is at
    */
   public void resetPose(Pose2d pose) {
-    swerveOdometry.resetPosition(getGyroRotation2d(), getSwervePositions(), pose);
+    swervePoseEstimator.resetPosition(getGyroRotation2d(), getSwervePositions(), pose);
   }
 
   /**
@@ -166,13 +166,13 @@ public class DriveSubsystem extends SubsystemBase {
    * update the odometry of the robot with current pose of the robot
    */
   public void updateRobotPose() {
-    swerveOdometry.update(
+    swervePoseEstimator.update(
       getGyroRotation2d(),
       getSwervePositions()
       );
-    odometryXEntry.setDouble(swerveOdometry.getEstimatedPosition().getX());
-    odometryYEntry.setDouble(swerveOdometry.getEstimatedPosition().getY());
-    odometryDegEntry.setDouble(swerveOdometry.getEstimatedPosition().getRotation().getDegrees());
+    odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
+    odometryYEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getY());
+    odometryDegEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getRotation().getDegrees());
   }
 
   /**
