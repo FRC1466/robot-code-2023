@@ -125,7 +125,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * 
-   * @return Pose2d of the robot from odometry
+   * @return Pose2d of the robot from pose estimator
    */
   public Pose2d getPose() {
     return swervePoseEstimator.getEstimatedPosition();
