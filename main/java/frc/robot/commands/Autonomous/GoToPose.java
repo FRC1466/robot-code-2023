@@ -27,6 +27,7 @@ public class GoToPose {
         Rotation2d heading = pose.getRotation();
 
         List<PathPoint> path = new ArrayList<PathPoint>(){{
+            add(new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()));
             add(new PathPoint(translation, heading, holonomic));
         }};
         

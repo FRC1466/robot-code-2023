@@ -55,11 +55,11 @@ public class DriveCommand extends CommandBase {
         if (!controller.getRawButton(2)) {
             vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx : 0;
             vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy : 0;
-            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad : 0;
+            rad = Math.abs(controller.getZ())>0.15 ? -controller.getZ() * Swerve.Limits.rad : 0;
         } else {
             vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx * 0.3 : 0;
             vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
-            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
+            rad = Math.abs(controller.getZ())>0.15 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
         }
 
         if (controller.getRawButton(4))
@@ -71,19 +71,20 @@ public class DriveCommand extends CommandBase {
             drive.setSpeeds(rad, vx, vy);
         
         drive.updateModuleStates();
-        switch (toggleModule) {
-            case 0:
-                if (controller.getRawButton(5)) 
-                    drive.driveFromStopped(); 
-                else 
-                    drive.drive();
-                break;
-            case 1:
-                drive.drivePosSpecificModule(controller.getY());
-                break;
-            default:
-                break;
-        }
+        drive.drive();
+        // switch (toggleModule) {
+        //     case 0:
+        //         if (controller.getRawButton(5)) 
+        //             drive.driveFromStopped(); 
+        //         else 
+        //             drive.drive();
+        //         break;
+        //     case 1:
+        //         drive.drivePosSpecificModule(controller.getY());
+        //         break;
+        //     default:
+        //         break;
+        // }
         
     }
 

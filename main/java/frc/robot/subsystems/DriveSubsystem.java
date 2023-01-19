@@ -179,6 +179,7 @@ public class DriveSubsystem extends SubsystemBase {
    * drive robot from current module states in the class
    */
   public void drive() {
+    SmartDashboard.putString("test2", desiredModuleStates.toString());
     for (SwerveModule module : swerveModules) {
       module.setDesiredState(desiredModuleStates[module.moduleNumber]);
     }
@@ -242,6 +243,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void updateModuleStates() {
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
+    SmartDashboard.putString("test3", desiredModuleStates.toString());
   }
 
   /**
