@@ -127,7 +127,7 @@ public final class Constants {
       maxAccelerationMPS = 1.0;
 
     public static final Gains
-      thetaController = new Gains(1, 0, 0, 0, 0, 1),
+      thetaController = new Gains(5, 0, 0, 0, 0, 1),
       translationController = new Gains(1, 0, 0, 0, 0, 1);
   }
 
