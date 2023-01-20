@@ -22,12 +22,15 @@ public class GoToPose {
     PathPlannerTrajectory traj;
     
 
-    public GoToPose(Pose2d pose, Rotation2d holonomic, PathConstraints constraints, DriveSubsystem drive) {
+    public GoToPose(Pose2d pose, Rotation2d heading, PathConstraints constraints, DriveSubsystem drive) {
         Translation2d translation = pose.getTranslation();
-        Rotation2d heading = pose.getRotation();
+        Rotation2d holonomic = pose.getRotation();
+
+        PathPoint currentPathPoint = new PathPoint(drive.getPose().getTranslation(), new Rotation2d(), drive.getPose().getRotation());
+        
 
         List<PathPoint> path = new ArrayList<PathPoint>(){{
-            add(new PathPoint(new Translation2d(), new Rotation2d(), new Rotation2d()));
+            add(currentPathPoint);
             add(new PathPoint(translation, heading, holonomic));
         }};
         
@@ -58,8 +61,11 @@ public class GoToPose {
     }
 
     public GoToPose(PathPoint pathPoint, PathConstraints constraints, DriveSubsystem drive) {
+        
+        PathPoint currentPathPoint = new PathPoint(drive.getPose().getTranslation(), new Rotation2d(), drive.getPose().getRotation());
 
         List<PathPoint> path = new ArrayList<PathPoint>(){{
+            add(currentPathPoint);
             add(pathPoint);
         }};
         
