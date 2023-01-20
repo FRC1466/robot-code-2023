@@ -101,13 +101,13 @@ public final class Constants {
 
       public static final class Limits {
         public static double 
-          vx = 3.0,
-          vy = 3.0,
+          vx = 3.5,
+          vy = 3.5,
           rad = 4.0;
       } 
 
       public static final Gains 
-        driveGainsVelocity  = new Gains(0.21, 0.00085, 4.0, 0,  0,  0.8),
+        driveGainsVelocity  = new Gains(0.15, 0, 2.0, 0,  0,  0.8),
         driveGainsPosition  = new Gains(0.050953, 0, 0.0014019, 0,  0,  0.6);
       public static final int 
         slotIdx = 0,

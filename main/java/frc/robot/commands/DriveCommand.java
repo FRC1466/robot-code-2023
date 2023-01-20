@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.constants.Constants.Swerve;
@@ -53,13 +54,14 @@ public class DriveCommand extends CommandBase {
      */
     private void drive() {
         if (!controller.getRawButton(2)) {
-            vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx : 0;
-            vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy : 0;
-            rad = Math.abs(controller.getZ())>0.15 ? -controller.getZ() * Swerve.Limits.rad : 0;
+            vx = Math.abs(controller.getX())>0.02 ? -controller.getX() * Swerve.Limits.vx : 0;
+            vy = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vy : 0;
+            rad = Math.abs(controller.getZ())>0.35 ? -controller.getZ() * Swerve.Limits.rad : 0;
+            SmartDashboard.putNumber("Z", controller.getZ());
         } else {
-            vx = Math.abs(controller.getX())>0.07 ? -controller.getX() * Swerve.Limits.vx * 0.3 : 0;
-            vy = Math.abs(controller.getY())>0.07 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
-            rad = Math.abs(controller.getZ())>0.15 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
+            vx = Math.abs(controller.getX())>0.02 ? -controller.getX() * Swerve.Limits.vx * 0.3 : 0;
+            vy = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
+            rad = Math.abs(controller.getZ())>0.26 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
         }
 
         if (controller.getRawButton(4))
