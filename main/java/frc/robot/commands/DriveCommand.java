@@ -19,7 +19,7 @@ public class DriveCommand extends CommandBase {
     private final DriveSubsystem drive;
     private final Joystick controller;
     private final AdjustableTelemetry tele;
-    private boolean isFieldRelative;
+    private boolean defaultFieldRelative;
 
     private double vx = 0;
     private double vy = 0;
@@ -32,18 +32,18 @@ public class DriveCommand extends CommandBase {
      * @param drive drive subsystem
      * @param controller drive controller
      * @param tele adjustable telemetry
-     * @param isFieldRelative if calculating with field relative
+     * @param defaultFieldRelative if calculating with field relative
      */
     public DriveCommand(
         DriveSubsystem drive, 
         AdjustableTelemetry tele,
         Joystick controller,
-        boolean isFieldRelative
+        boolean defaultFieldRelative
         ) {
         this.drive = drive;
         this.tele = tele;
         this.controller = controller;
-        this.isFieldRelative = isFieldRelative;
+        this.defaultFieldRelative = defaultFieldRelative;
 
         addRequirements(drive);
         initializeTelemetry();
@@ -67,10 +67,9 @@ public class DriveCommand extends CommandBase {
         if (controller.getRawButton(4))
             toggleModule = toggleModule >= 1 ? 0 : toggleModule++;
 
-        if (isFieldRelative)
-            drive.setSpeedsFieldRelative(rad, vx, vy);
-        else
-            drive.setSpeeds(rad, vx, vy);
+        Boolean isFieldRelative = defaultFieldRelative ? !controller.getRawButton(6) : controller.getRawButton(6);
+        // if default is true, then when button is not pressed, its field relative, if false, then opposite
+        drive.setSpeeds(rad, vx, vy, isFieldRelative);
         
         drive.updateModuleStates();
         drive.drive();
@@ -130,8 +129,8 @@ public class DriveCommand extends CommandBase {
      * set field relative
      * @param i false or true
      */
-    public void setFieldRelative(boolean i) {
-        isFieldRelative = i;
+    public void setDefaultFieldRelative(boolean i) {
+        defaultFieldRelative = i;
     }
 
     @Override
