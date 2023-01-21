@@ -30,7 +30,7 @@ public final class Constants {
         cancoderID = 9;
       public static final boolean 
         driveInvert = false,
-        angleInvert = false;
+        angleInvert = true;
       public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-18.27-5.1+90-28.485);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
@@ -45,7 +45,7 @@ public final class Constants {
         cancoderID = 10;
       public static final boolean 
         driveInvert = false,
-        angleInvert = false;
+        angleInvert = true;
       public static final Rotation2d angleOffset = Rotation2d.fromDegrees(3.34+90-180-21.885);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
@@ -60,7 +60,7 @@ public final class Constants {
         cancoderID = 12;
       public static final boolean 
         driveInvert = false,
-        angleInvert = false;
+        angleInvert = true;
       public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-53.87+90-(11.05/2)-10.0);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
@@ -75,7 +75,7 @@ public final class Constants {
         cancoderID = 11;
       public static final boolean 
         driveInvert = false,
-        angleInvert = false;
+        angleInvert = true;
       public static final Rotation2d angleOffset = Rotation2d.fromDegrees(7.56-12.75+90-16-9.044+8.345);
       public static final SwerveModuleConstants constants = 
           new SwerveModuleConstants(driveMotorID, angleMotorID, cancoderID, angleOffset, angleInvert, driveInvert);
@@ -86,14 +86,15 @@ public final class Constants {
         wheelDiameter = 0.10033,
         wheelCircumference = wheelDiameter * Math.PI;
 
+      
       public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-        new Translation2d(trackWidth/2, trackWidth/2), //frontleft
-        new Translation2d(trackWidth/2, -trackWidth/2), //frontright
-        new Translation2d(-trackWidth/2, trackWidth/2), //backleft
-        new Translation2d(-trackWidth/2, -trackWidth/2)); //backright
+        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(trackWidth/2, trackWidth/2), //frontright
+        new Translation2d(-trackWidth/2, -trackWidth/2), //backleft
+        new Translation2d(-trackWidth/2, trackWidth/2)); //backright
       
       public static final double 
-        driveGearRatio = 8.14,
+        driveGearRatio = 8.14, // refine this for pose estimation
         angleGearRatio = 12.839355527714421;
 
       public static final int
