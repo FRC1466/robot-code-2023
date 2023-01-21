@@ -5,12 +5,15 @@
 package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.AdjustableTelemetry;
 import frc.lib.util.RectanglePoseArea;
@@ -30,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   private final boolean isFieldRelative = true;
   private final AdjustableTelemetry m_tele = new AdjustableTelemetry();
@@ -57,7 +61,15 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    
+    final Command auto1 = new ComplexAuto(m_drive, m_tele);
+    GoToPose auto2Constructor = new GoToPose(
+      new PathPoint(new Translation2d(4.0, 2.6), new Rotation2d()),
+      new PathConstraints(2.0, 2.0),
+      m_drive);
+    final Command auto2 = auto2Constructor.getCommand();
+    m_chooser.addOption("auto 1", auto1);
+    m_chooser.addOption("auto 2", auto2);
+    SmartDashboard.putData("CHOOSE", m_chooser);
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
@@ -66,11 +78,6 @@ public class RobotContainer {
     );
 
   }
-
-  private boolean isPoseWithinScoring() {
-    return m_drive.isPoseWithinArea(new RectanglePoseArea(new Translation2d(1.51, 4.13), new Translation2d(3.26, 5.18)));
-  }
-
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -81,13 +88,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
     new JoystickButton(m_driverController, 3).onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
-    // new JoystickButton(m_driverController, 5).whileTrue(goToScoring.getCommand(1, m_drive.getPose()));
-    // new JoystickButton(m_driverController, 6).whileTrue(goToScoring.getCommand(2, m_drive.getPose()));
-    // new JoystickButton(m_driverController, 7).whileTrue(goToScoring.getCommand(3, m_drive.getPose()));
+    new JoystickButton(m_driverController, 7).whileTrue(goToScoring.getCommand(1, m_drive.getPose()));
+    new JoystickButton(m_driverController, 9).whileTrue(goToScoring.getCommand(2, m_drive.getPose()));
+    new JoystickButton(m_driverController, 11).whileTrue(goToScoring.getCommand(3, m_drive.getPose()));
   }
-    
-
-
 
   /**
    * Use this to pass the  autonomous command to the main {@link Robot} class.
@@ -97,9 +101,7 @@ public class RobotContainer {
 
 
   public Command getAuto() {
-    return new ComplexAuto(m_drive, m_tele);
+    return m_chooser.getSelected();
   }
-
-
 
 }
