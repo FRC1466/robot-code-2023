@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -131,6 +132,10 @@ public class DriveSubsystem extends SubsystemBase {
     return swervePoseEstimator.getEstimatedPosition();
   }
 
+  public ChassisSpeeds getChassisSpeeds() {
+    return speeds;
+  }
+
   public boolean isPoseWithinArea(RectanglePoseArea area) {
     return area.isPoseWithinArea(getPose());
   }
@@ -208,21 +213,17 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rad rad/s speed of robot
    * @param vx horizontal velocity in m/s
    * @param vy vertical velocity in m/s
+   * @param isFieldRelative the state of field relative
    */
-  public void setSpeeds(double rad, double vx, double vy) {
-    speeds.omegaRadiansPerSecond = rad;
-    speeds.vxMetersPerSecond = vx;
-    speeds.vyMetersPerSecond = vy;
-  }
-
-  /**
-   * update speeds from field relative setup
-   * @param rad rad/s speed of robot
-   * @param vx horizontal velocity in m/s
-   * @param vy vertical velocity in m/s
-   */
-  public void setSpeedsFieldRelative(double rad, double vx, double vy) {
-    speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroRotation2d());
+  public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {
+    if (isFieldRelative) {
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroRotation2d());
+    } else {
+      speeds.omegaRadiansPerSecond = rad;
+      speeds.vxMetersPerSecond = vx;
+      speeds.vyMetersPerSecond = vy;
+    }
+    
   }
 
     /**
