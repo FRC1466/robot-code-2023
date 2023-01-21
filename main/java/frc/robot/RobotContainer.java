@@ -67,7 +67,7 @@ public class RobotContainer {
       new PathConstraints(2.0, 2.0),
       m_drive);
     final Command auto2 = auto2Constructor.getCommand();
-    m_chooser.addOption("auto 1", auto1);
+    m_chooser.setDefaultOption("auto 1", auto1);
     m_chooser.addOption("auto 2", auto2);
     SmartDashboard.putData("CHOOSE", m_chooser);
 
