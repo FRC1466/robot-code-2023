@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -33,6 +34,7 @@ public class DriveSubsystem extends SubsystemBase {
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
   private BetterSwerveDrivePoseEstimator swervePoseEstimator;
+  private PIDController headingController = new PIDController(0.8, 0, 0);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -235,9 +237,10 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {
     if (isFieldRelative) {
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, rad, getGyroRotation2d());
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, 
+      rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad), getGyroRotation2d());
     } else {
-      speeds.omegaRadiansPerSecond = rad;
+      speeds.omegaRadiansPerSecond = rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad);
       speeds.vxMetersPerSecond = vx;
       speeds.vyMetersPerSecond = vy;
     }
