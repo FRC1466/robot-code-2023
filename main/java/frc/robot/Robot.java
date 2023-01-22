@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.concurrent.TimeUnit;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,6 +32,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    try {
+      TimeUnit.SECONDS.sleep(1);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     moduleConfigs = new ModuleConfigs();
     robotContainer = new RobotContainer();
   }
