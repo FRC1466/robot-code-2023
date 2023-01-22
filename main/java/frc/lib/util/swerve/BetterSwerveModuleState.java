@@ -9,7 +9,7 @@ package frc.lib.util.swerve;
  import edu.wpi.first.math.kinematics.SwerveModuleState;
  
  public class BetterSwerveModuleState extends SwerveModuleState {
-     public double speedMetersPerSecond;
+     public double speedMetersPerSecond = 0;
  
      /** Rad per sec */
      public double omegaRadPerSecond = 0;

@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.util.Gains;
+import frc.lib.util.swerve.BetterSwerveKinematics;
 import frc.lib.util.swerve.SwerveModuleConstants;
 
 /**
@@ -87,12 +88,18 @@ public final class RobotConstants {
         wheelCircumference = wheelDiameter * Math.PI;
 
       
+      public final static BetterSwerveKinematics BETTER_KINEMATICS = new BetterSwerveKinematics(
+        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(trackWidth/2, trackWidth/2), //frontright
+        new Translation2d(-trackWidth/2, -trackWidth/2), //backleft
+        new Translation2d(-trackWidth/2, trackWidth/2)); //backright
+
       public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
         new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
         new Translation2d(trackWidth/2, trackWidth/2), //frontright
         new Translation2d(-trackWidth/2, -trackWidth/2), //backleft
         new Translation2d(-trackWidth/2, trackWidth/2)); //backright
-      
+    
       public static final double 
         driveGearRatio = 8.14, // refine this for pose estimation
         angleGearRatio = 12.839355527714421;
@@ -114,6 +121,7 @@ public final class RobotConstants {
         slotIdx = 0,
         pidLoopIdx = 0,
         timeoutMS = 30;
+      public static final double MODULE_STEER_FF_CL = -0.3;
   }
 
   public static final class OIConstants {

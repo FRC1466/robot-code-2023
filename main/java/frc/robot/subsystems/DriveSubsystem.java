@@ -103,7 +103,7 @@ public class DriveSubsystem extends SubsystemBase {
    * updates telemetry of modules
    */
   public void updateModuleTelemetry() {
-    for(SwerveModule module : swerveModules){ 
+    for(var module : swerveModules){ 
       cancoderEntries[module.moduleNumber].setDouble(module.getCancoderAngle().getDegrees());
       SmartDashboard.putNumber("module " + module.moduleNumber + "cancoder deg", module.getCancoderAngle().getDegrees());
       integratedEntries[module.moduleNumber].setDouble(module.getPosition().angle.getDegrees());
@@ -170,7 +170,7 @@ public class DriveSubsystem extends SubsystemBase {
    * reset modules to their absolute position
    */
   public void resetModulesToAbsolute() {
-    for(SwerveModule modules : swerveModules){
+    for(var modules : swerveModules){
       modules.resetToAbsolute();
   }
   }
@@ -180,7 +180,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param states list of SwerveModuleStates that correspond to the robot
    */
   public void setDesiredModuleStates(SwerveModuleState[] states) {
-    for (SwerveModule module : swerveModules) {
+    for (var module : swerveModules) {
       module.setDesiredState(states[module.moduleNumber]);
     }
   }
@@ -204,7 +204,7 @@ public class DriveSubsystem extends SubsystemBase {
    * drive robot from current module states in the class
    */
   public void drive() {
-    for (SwerveModule module : swerveModules) {
+    for (var module : swerveModules) {
       module.setDesiredState(desiredModuleStates[module.moduleNumber]);
     }
   }
@@ -221,8 +221,8 @@ public class DriveSubsystem extends SubsystemBase {
    * set modude positions to a locked position with vel pid set to 0 to attempt to brake
    */
   public void driveFromStopped() {
-    SwerveModuleState stopped = new SwerveModuleState(0, new Rotation2d(Math.PI/2));
-    for (SwerveModule module : swerveModules) {
+    var stopped = new SwerveModuleState(0, new Rotation2d(Math.PI/2));
+    for (var module : swerveModules) {
       module.setDesiredState(stopped);
     }
   }
@@ -252,9 +252,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @param vy vertical velocity in m/s
    */
   public void setSpeedsFieldRelativeAlternate(double rad, double vx, double vy) {
-    Pose2d robot_pose_vel = new Pose2d(vx * 0.01, vy * 0.01, Rotation2d.fromRadians(rad * 0.01));
-    Twist2d twist_vel = getPose().log(robot_pose_vel);
-    ChassisSpeeds adjSpeeds = new ChassisSpeeds(twist_vel.dx / 0.01, twist_vel.dy / 0.01, twist_vel.dtheta / 0.01);
+    var robot_pose_vel = new Pose2d(vx * 0.02, vy * 0.02, Rotation2d.fromRadians(rad * 0.02));
+    var twist_vel = getPose().log(robot_pose_vel);
+    var adjSpeeds = new ChassisSpeeds(twist_vel.dx / 0.02, twist_vel.dy / 0.02, twist_vel.dtheta / 0.02);
     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(adjSpeeds.vxMetersPerSecond, adjSpeeds.vyMetersPerSecond, adjSpeeds.omegaRadiansPerSecond, getGyroRotation2d());
   }
 
@@ -262,7 +262,11 @@ public class DriveSubsystem extends SubsystemBase {
    * update normal moduleStates
    */
   public void updateModuleStates() {
-    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
+    var desiredBetterModuleState = Swerve.BETTER_KINEMATICS.toSwerveModuleStates(speeds);
+    for (int i = 0; i < desiredModuleStates.length; i++) {
+      desiredModuleStates[i].angle = Rotation2d.fromRadians(desiredBetterModuleState[i].angle.getRadians() + desiredBetterModuleState[i].omegaRadPerSecond * Swerve.MODULE_STEER_FF_CL * 0.065);
+      desiredModuleStates[i].speedMetersPerSecond = desiredBetterModuleState[i].speedMetersPerSecond;
+    }
     SmartDashboard.putString("test3", desiredModuleStates.toString());
   }
 
@@ -271,7 +275,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void updatePIDConfigs() {
     for (SwerveModule module : swerveModules) {
-      module.updatePID();;
+      module.updatePID();
     }
   }
 
@@ -279,8 +283,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return SwerveModuleState[] of all modules, calculated from drive velocity and cancoders
    */
   public SwerveModuleState[] getSwerveModuleStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    for(SwerveModule module : swerveModules){
+    var states = new SwerveModuleState[4];
+    for(var module : swerveModules){
         states[module.moduleNumber] = module.getState();
     }
     return states;
@@ -290,8 +294,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return SwerveModulePosition[] of all modules, calculated from drive position and cancoders
    */
   public SwerveModulePosition[] getSwervePositions() {
-    SwerveModulePosition[] positions = new SwerveModulePosition[4];
-    for(SwerveModule module : swerveModules){
+    var positions = new SwerveModulePosition[4];
+    for(var module : swerveModules){
         positions[module.moduleNumber] = module.getPosition();
     }
     return positions;
