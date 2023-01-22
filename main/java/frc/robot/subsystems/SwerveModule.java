@@ -15,7 +15,7 @@ import frc.lib.math.Conversions;
 import frc.lib.util.swerve.ModuleState;
 import frc.lib.util.swerve.SwerveModuleConstants;
 import frc.robot.Robot;
-import frc.robot.constants.Constants.Swerve;
+import frc.robot.constants.RobotConstants.Swerve;
 
 public class SwerveModule {
     public int moduleNumber;

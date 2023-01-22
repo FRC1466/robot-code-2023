@@ -20,7 +20,7 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.commands.autonomous.ComplexAuto;
 import frc.robot.commands.autonomous.GoToPose;
 import frc.robot.commands.autonomous.GoToScoring;
-import frc.robot.constants.Constants.OIConstants;
+import frc.robot.constants.RobotConstants.OIConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;

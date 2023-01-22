@@ -13,8 +13,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.constants.Constants.AutoConstants;
-import frc.robot.constants.Constants.Swerve;
+import frc.robot.constants.RobotConstants.AutoConstants;
+import frc.robot.constants.RobotConstants.Swerve;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class GoToPose {

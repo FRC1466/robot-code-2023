@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RectanglePoseArea;
 import frc.lib.util.swerve.BetterSwerveDrivePoseEstimator;
-import frc.robot.constants.Constants.Swerve;
+import frc.robot.constants.RobotConstants.Swerve;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;

@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.constants.Constants.AutoConstants;
-import frc.robot.constants.Constants.Swerve;
+import frc.robot.constants.RobotConstants.AutoConstants;
+import frc.robot.constants.RobotConstants.Swerve;
 
 public class AdjustableTelemetry {
     private ShuffleboardTab tuningTab;

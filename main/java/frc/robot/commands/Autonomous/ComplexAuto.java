@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.constants.Constants.AutoConstants;
-import frc.robot.constants.Constants.Swerve;
+import frc.robot.constants.RobotConstants.AutoConstants;
+import frc.robot.constants.RobotConstants.Swerve;
 import frc.robot.subsystems.AdjustableTelemetry;
 
 public class ComplexAuto extends SequentialCommandGroup {
