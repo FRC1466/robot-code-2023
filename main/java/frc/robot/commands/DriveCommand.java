@@ -72,20 +72,10 @@ public class DriveCommand extends CommandBase {
         drive.setSpeeds(rad, vx, vy, isFieldRelative);
         
         drive.updateModuleStates();
-        drive.drive();
-        // switch (toggleModule) {
-        //     case 0:
-        //         if (controller.getRawButton(5)) 
-        //             drive.driveFromStopped(); 
-        //         else 
-        //             drive.drive();
-        //         break;
-        //     case 1:
-        //         drive.drivePosSpecificModule(controller.getY());
-        //         break;
-        //     default:
-        //         break;
-        // }
+        if (controller.getRawButton(5)) 
+            drive.driveFromStopped(); 
+        else 
+            drive.drive();
         
     }
 
