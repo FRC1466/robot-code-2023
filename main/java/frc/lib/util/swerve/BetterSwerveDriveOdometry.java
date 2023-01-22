@@ -150,7 +150,7 @@ public class BetterSwerveDriveOdometry {
 
       moduleDeltas[index] =
           new SwerveModulePosition(deltaDistance, current.angle);
-      previous.distanceMeters = current.distanceMeters; // wtf does this do?? wpi people are confusing
+      previous.distanceMeters = current.distanceMeters;
     }
 
     var twist = m_kinematics.toTwist2d(moduleDeltas);
