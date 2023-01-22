@@ -116,8 +116,6 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Rotation2d getGyroRotation2d() {
     gyroRotEntry.setDouble(gyro.getRotation2d().getDegrees());
-    gyroPitchEntry.setDouble(gyro.getPitch());
-    gyroRollEntry.setDouble(gyro.getRoll());
     return gyro.getRotation2d();
   }
 
@@ -125,6 +123,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Rotation2d of gyro pitch
    */
   public Rotation2d getGyroPitch() {
+    gyroPitchEntry.setDouble(gyro.getPitch());
     return Rotation2d.fromDegrees(gyro.getPitch());
   }
 
@@ -132,6 +131,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Rotation2d of gyro pitch
    */
   public Rotation2d getGyroRoll() {
+    gyroRollEntry.setDouble(gyro.getRoll());
     return Rotation2d.fromDegrees(gyro.getRoll());
   }
 
@@ -204,7 +204,6 @@ public class DriveSubsystem extends SubsystemBase {
    * drive robot from current module states in the class
    */
   public void drive() {
-    SmartDashboard.putString("test2", desiredModuleStates.toString());
     for (SwerveModule module : swerveModules) {
       module.setDesiredState(desiredModuleStates[module.moduleNumber]);
     }
@@ -243,8 +242,7 @@ public class DriveSubsystem extends SubsystemBase {
       speeds.omegaRadiansPerSecond = rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad);
       speeds.vxMetersPerSecond = vx;
       speeds.vyMetersPerSecond = vy;
-    }
-    
+    } 
   }
 
     /**
