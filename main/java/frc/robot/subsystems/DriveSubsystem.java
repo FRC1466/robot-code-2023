@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -20,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RectanglePoseArea;
+import frc.lib.util.swerve.BetterSwerveDrivePoseEstimator;
 import frc.robot.constants.Constants.Swerve;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -32,7 +32,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private SwerveDrivePoseEstimator swervePoseEstimator;
+  private BetterSwerveDrivePoseEstimator swervePoseEstimator;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -47,7 +47,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     initializeTelemetry();
 
-    swervePoseEstimator = new SwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
+    swervePoseEstimator = new BetterSwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
     
@@ -56,6 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private GenericEntry gyroRotEntry;
   private GenericEntry gyroPitchEntry;
+  private GenericEntry gyroRollEntry;
   private GenericEntry odometryXEntry;
   private GenericEntry odometryYEntry;
   private GenericEntry odometryDegEntry;
@@ -73,6 +74,7 @@ public class DriveSubsystem extends SubsystemBase {
     gyroLayout.add("reset gyro position", new InstantCommand(() -> gyro.reset()));
     gyroRotEntry = gyroLayout.add("gyro rotation deg", gyro.getRotation2d().getDegrees()).getEntry();
     gyroPitchEntry = gyroLayout.add("gyro pitch deg", gyro.getPitch()).getEntry();
+    gyroRollEntry = gyroLayout.add("gyro roll deg", gyro.getRoll()).getEntry();
 
     ShuffleboardLayout odometryLayout = teleTab
       .getLayout("odometry", BuiltInLayouts.kList)
@@ -108,20 +110,35 @@ public class DriveSubsystem extends SubsystemBase {
   }
   
   /**
-   * @return Rotation2d of gyro
+   * @return Rotation2d of gyro yaw
    */
   public Rotation2d getGyroRotation2d() {
     gyroRotEntry.setDouble(gyro.getRotation2d().getDegrees());
     gyroPitchEntry.setDouble(gyro.getPitch());
+    gyroRollEntry.setDouble(gyro.getRoll());
     return gyro.getRotation2d();
   }
 
-    /**
-     * resets gyro
-     */
-    public void resetGyro() {
-      gyro.reset();
-    }
+  /**
+   * @return Rotation2d of gyro pitch
+   */
+  public Rotation2d getGyroPitch() {
+    return Rotation2d.fromDegrees(gyro.getPitch());
+  }
+
+  /**
+   * @return Rotation2d of gyro pitch
+   */
+  public Rotation2d getGyroRoll() {
+    return Rotation2d.fromDegrees(gyro.getRoll());
+  }
+
+  /**
+   * resets gyro
+   */
+  public void resetGyro() {
+    gyro.reset();
+  }
 
   /**
    * 
@@ -172,6 +189,8 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateRobotPose() {
     swervePoseEstimator.update(
       getGyroRotation2d(),
+      getGyroPitch(),
+      getGyroRoll(),
       getSwervePositions()
       );
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
