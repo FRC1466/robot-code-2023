@@ -23,6 +23,7 @@ import frc.robot.commands.autonomous.GoToScoring;
 import frc.robot.constants.RobotConstants.OIConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -90,6 +91,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 7).whileTrue(goToScoring.getCommand(1, m_drive.getPose()));
     new JoystickButton(m_driverController, 9).whileTrue(goToScoring.getCommand(2, m_drive.getPose()));
     new JoystickButton(m_driverController, 11).whileTrue(goToScoring.getCommand(3, m_drive.getPose()));
+    new JoystickButton(m_driverController, 12).whileTrue(new RepeatCommand(new InstantCommand(() -> m_drive.driveAutoBalancingFull())));
   }
 
   /**

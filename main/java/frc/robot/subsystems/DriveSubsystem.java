@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -21,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RectanglePoseArea;
 import frc.lib.util.swerve.BetterSwerveDrivePoseEstimator;
+import frc.lib.util.swerve.SwerveBalance;
 import frc.robot.constants.RobotConstants.Swerve;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -35,6 +35,7 @@ public class DriveSubsystem extends SubsystemBase {
   private SwerveModuleState[] desiredModuleStates;
   private BetterSwerveDrivePoseEstimator swervePoseEstimator;
   private PIDController headingController = new PIDController(0.8, 0, 0);
+  private SwerveBalance swerveBalance = new SwerveBalance();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -198,6 +199,12 @@ public class DriveSubsystem extends SubsystemBase {
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
     odometryYEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getY());
     odometryDegEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getRotation().getDegrees());
+  }
+
+  public void driveAutoBalancingFull() {
+    speeds = swerveBalance.update(getGyroPitch(), getGyroRoll());
+    updateModuleStates();
+    drive();
   }
 
   /**
