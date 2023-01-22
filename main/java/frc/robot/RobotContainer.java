@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.AdjustableTelemetry;
-import frc.lib.util.RectanglePoseArea;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.autonomous.ComplexAuto;
 import frc.robot.commands.autonomous.GoToPose;
