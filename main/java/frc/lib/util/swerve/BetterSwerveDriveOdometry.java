@@ -1,5 +1,7 @@
 package frc.lib.util.swerve;
 
+import org.ejml.simple.SimpleMatrix;
+
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -111,16 +113,17 @@ public class BetterSwerveDriveOdometry {
    * over time. This method automatically calculates the current time to calculate period
    * (difference between two timestamps). The period is used to calculate the change in distance
    * from a velocity. This also takes in an angle parameter which is used instead of the angular
-   * rate that is calculated from forward kinematics.
+   * rate that is calculated from forward kinematics. This also takes in pitch and roll to allow for more
+   * accurate pose estimation on angled surfaces using a rotation matrix.
    *
-   * @param gyroAngle The yaw reported by the gyro.
-   * @param gyroPitch The pitch reported by the gyro.
-   * @param gyroRoll The roll reported by the gyro.
+   * @param gyroYaw The yaw reported by the gyro.
+   * @param pitch The pitch reported by the gyro.
+   * @param roll The roll reported by the gyro.
    * @param modulePositions The current position of all swerve modules. Please provide the positions
    *     in the same order in which you instantiated your SwerveDriveKinematics.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d gyroAngle, Rotation2d gyroPitch, Rotation2d gyroRoll, SwerveModulePosition[] modulePositions) {
+  public Pose2d update(Rotation2d gyroYaw, Rotation2d pitch, Rotation2d roll, SwerveModulePosition[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -128,25 +131,43 @@ public class BetterSwerveDriveOdometry {
     }
 
     var moduleDeltas = new SwerveModulePosition[m_numModules];
-    var angle = gyroAngle.plus(m_gyroOffset);
+    var yaw = gyroYaw.plus(m_gyroOffset);
+
+    var rotationMatrix = new SimpleMatrix(3, 3);
+    rotationMatrix.setRow(0, 0, 
+      yaw.getCos()*pitch.getCos(),
+      yaw.getCos()*pitch.getSin()*roll.getSin() - yaw.getSin()*roll.getCos(),
+      yaw.getCos()*pitch.getSin()*roll.getCos() + yaw.getSin()*roll.getSin());
+
+    rotationMatrix.setRow(1, 0, 
+      yaw.getSin()*pitch.getCos(),
+      yaw.getSin()*pitch.getSin()*roll.getSin() + yaw.getCos()*roll.getCos(),
+      yaw.getSin()*pitch.getSin()*roll.getCos() - yaw.getCos()*roll.getSin());
+
+    rotationMatrix.setRow(2, 0, 
+      -pitch.getSin(),
+      pitch.getCos()*roll.getSin(),
+      pitch.getCos()*roll.getCos());
 
     for (int index = 0; index < m_numModules; index++) {
       var current = modulePositions[index];
       var previous = m_previousModulePositions[index];
 
       var deltaDistanceInitial = current.distanceMeters - previous.distanceMeters;
-      var deltaDistancePitch = gyroPitch.getDegrees() > 10 ? gyroPitch.getCos() * deltaDistanceInitial : deltaDistanceInitial;
-      var deltaDistanceRoll = gyroRoll.getDegrees() > 10 ? gyroRoll.getCos() * deltaDistanceInitial : deltaDistanceInitial;
-      var deltaDistanceFinal = deltaDistanceInitial >= 0 ? 
-        Math.sqrt(
-        Math.pow(deltaDistanceInitial * angle.getCos() * deltaDistancePitch, 2) +
-        Math.pow(deltaDistanceInitial * angle.getSin() * deltaDistanceRoll, 2))
-        :
-        -Math.sqrt(
-        Math.pow(deltaDistanceInitial * angle.getCos() * deltaDistancePitch, 2) +
-        Math.pow(deltaDistanceInitial * angle.getSin() * deltaDistanceRoll, 2));
+      var interpolatedAngle = previous.angle.interpolate(current.angle, 0.5);
+    
+      var deltaMatrix = new SimpleMatrix(3, 1);
+      deltaMatrix.setColumn(0, 0, 
+        interpolatedAngle.getCos()*deltaDistanceInitial,
+        interpolatedAngle.getSin()*deltaDistanceInitial,
+        0);
 
-      var deltaDistance = (gyroRoll.getDegrees() > 10 || gyroPitch.getDegrees() > 10) ? deltaDistanceFinal : deltaDistanceInitial;
+      var rotatedDeltaMatrix = rotationMatrix.mult(deltaMatrix);
+      var finalDeltaDistance = deltaDistanceInitial>=0 ? 
+        Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(0, 1), 2)) :
+        -Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(0, 1), 2));
+
+      var deltaDistance = (roll.getDegrees() > 10 || pitch.getDegrees() > 10) ? finalDeltaDistance : deltaDistanceInitial;
 
       moduleDeltas[index] =
           new SwerveModulePosition(deltaDistance, current.angle);
@@ -154,12 +175,12 @@ public class BetterSwerveDriveOdometry {
     }
 
     var twist = m_kinematics.toTwist2d(moduleDeltas);
-    twist.dtheta = angle.minus(m_previousAngle).getRadians();
+    twist.dtheta = yaw.minus(m_previousAngle).getRadians();
 
     var newPose = m_poseMeters.exp(twist);
 
-    m_previousAngle = angle;
-    m_poseMeters = new Pose2d(newPose.getTranslation(), angle);
+    m_previousAngle = yaw;
+    m_poseMeters = new Pose2d(newPose.getTranslation(), yaw);
 
     return m_poseMeters;
   }
