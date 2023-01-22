@@ -1,6 +1,8 @@
-package frc.lib.util;
+package frc.lib.util.chargedup;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import frc.lib.util.HolonomicPose2d;
+import frc.lib.util.RectanglePoseArea;
 
 public class ScoringArea {
     private final RectanglePoseArea scoreRect;

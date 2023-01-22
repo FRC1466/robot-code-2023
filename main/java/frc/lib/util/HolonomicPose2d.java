@@ -7,11 +7,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public class HolonomicPose2d {
     private final Pose2d pose2d;
-    private final Rotation2d holonomicRotation;
+    private final Rotation2d heading;
 
-    public HolonomicPose2d (Pose2d pose2d, Rotation2d holonomicRotation) {
+    public HolonomicPose2d (Pose2d pose2d, Rotation2d heading) {
         this.pose2d = pose2d;
-        this.holonomicRotation = holonomicRotation;
+        this.heading = heading;
     }
 
     public Pose2d getPoseMeters() {
@@ -19,11 +19,11 @@ public class HolonomicPose2d {
     }
 
     public Rotation2d getRotation() {
-        return holonomicRotation;
+        return heading;
     }
 
     public PathPoint getPathPoint() {
-        return new PathPoint(pose2d.getTranslation(), pose2d.getRotation(), holonomicRotation);
+        return new PathPoint(pose2d.getTranslation(), heading, pose2d.getRotation());
     }
     
 }
