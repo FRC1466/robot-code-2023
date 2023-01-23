@@ -6,8 +6,10 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 /**
  * Class for swerve drive odometry. Odometry allows you to track the robot's position on the field
@@ -25,6 +27,7 @@ public class BetterSwerveDriveOdometry {
   private Rotation2d m_previousAngle;
   private final int m_numModules;
   private SwerveModulePosition[] m_previousModulePositions;
+  private SwerveModuleState[] m_zeroModuleStates;
 
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -51,6 +54,7 @@ public class BetterSwerveDriveOdometry {
           new SwerveModulePosition(
               modulePositions[index].distanceMeters, modulePositions[index].angle);
     }
+    m_zeroModuleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 1, 0));
 
     MathSharedStore.reportUsage(MathUsageId.kOdometry_SwerveDrive, 1);
   }
@@ -134,15 +138,16 @@ public class BetterSwerveDriveOdometry {
     var yaw = gyroYaw.plus(m_gyroOffset);
 
     var rotationMatrix = new SimpleMatrix(3, 3);
+    var gyroZero = new Rotation2d(); // doing dist calcs robot relative
     rotationMatrix.setRow(0, 0, 
-      yaw.getCos()*pitch.getCos(),
-      yaw.getCos()*pitch.getSin()*roll.getSin() - yaw.getSin()*roll.getCos(),
-      yaw.getCos()*pitch.getSin()*roll.getCos() + yaw.getSin()*roll.getSin());
+      gyroZero.getCos()*pitch.getCos(),
+      gyroZero.getCos()*pitch.getSin()*roll.getSin() - gyroZero.getSin()*roll.getCos(),
+      gyroZero.getCos()*pitch.getSin()*roll.getCos() + gyroZero.getSin()*roll.getSin());
 
     rotationMatrix.setRow(1, 0, 
-      yaw.getSin()*pitch.getCos(),
-      yaw.getSin()*pitch.getSin()*roll.getSin() + yaw.getCos()*roll.getCos(),
-      yaw.getSin()*pitch.getSin()*roll.getCos() - yaw.getCos()*roll.getSin());
+      gyroZero.getSin()*pitch.getCos(),
+      gyroZero.getSin()*pitch.getSin()*roll.getSin() + gyroZero.getCos()*roll.getCos(),
+      gyroZero.getSin()*pitch.getSin()*roll.getCos() - gyroZero.getCos()*roll.getSin());
 
     rotationMatrix.setRow(2, 0, 
       -pitch.getSin(),
@@ -154,7 +159,7 @@ public class BetterSwerveDriveOdometry {
       var previous = m_previousModulePositions[index];
 
       var deltaDistanceInitial = current.distanceMeters - previous.distanceMeters;
-      var interpolatedAngle = previous.angle.interpolate(current.angle, 0.5);
+      var interpolatedAngle = previous.angle.interpolate(current.angle, 0.5).minus(m_zeroModuleStates[index].angle);
     
       var deltaMatrix = new SimpleMatrix(3, 1);
       deltaMatrix.setColumn(0, 0, 
