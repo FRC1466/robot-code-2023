@@ -28,8 +28,8 @@ public class SwerveBalance {
         var setpoint = Math.sqrt(xGrad*xGrad+yGrad*yGrad);
         var pidOutput = balanceController.calculate(setpoint, 0);
 
-        var vyMetersPerSecond = xGrad * pidOutput; // these are reversed because there is a different coordinate system
-        var vxMetersPerSecond = yGrad * pidOutput;
+        var vxMetersPerSecond = xGrad * pidOutput;
+        var vyMetersPerSecond = yGrad * pidOutput;
         return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, 0);
     }
 }

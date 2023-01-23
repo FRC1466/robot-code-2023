@@ -54,14 +54,14 @@ public class DriveCommand extends CommandBase {
      */
     private void drive() {
         if (!controller.getRawButton(2)) {
-            vx = Math.abs(controller.getX())>0.02 ? -controller.getX() * Swerve.Limits.vx : 0;
-            vy = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vy : 0;
-            rad = Math.abs(controller.getZ())>0.35 ? -controller.getZ() * Swerve.Limits.rad : 0;
+            vx = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vx : 0;
+            vy = Math.abs(controller.getX())>0.02 ? -controller.getX() * Swerve.Limits.vy : 0;
+            rad = Math.abs(controller.getZ())>0.35 ? controller.getZ() * Swerve.Limits.rad : 0;
             SmartDashboard.putNumber("Z", controller.getZ());
         } else {
-            vx = Math.abs(controller.getX())>0.02 ? -controller.getX() * Swerve.Limits.vx * 0.3 : 0;
-            vy = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
-            rad = Math.abs(controller.getZ())>0.26 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
+            vx = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vx * 0.3 : 0;
+            vy = Math.abs(controller.getX())>0.02 ? -controller.getX() * Swerve.Limits.vy * 0.3 : 0;
+            rad = Math.abs(controller.getZ())>0.26 ? controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
         }
 
         if (controller.getRawButton(4))

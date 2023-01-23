@@ -237,8 +237,8 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * update speeds kinematics class 
    * @param rad rad/s speed of robot
-   * @param vx horizontal velocity in m/s
-   * @param vy vertical velocity in m/s
+   * @param vx forward velocity in m/s
+   * @param vy sideways velocity in m/s
    * @param isFieldRelative the state of field relative
    */
   public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {

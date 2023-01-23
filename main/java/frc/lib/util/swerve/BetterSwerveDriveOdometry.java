@@ -54,7 +54,7 @@ public class BetterSwerveDriveOdometry {
           new SwerveModulePosition(
               modulePositions[index].distanceMeters, modulePositions[index].angle);
     }
-    m_zeroModuleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 1, 0));
+    m_zeroModuleStates = m_kinematics.toSwerveModuleStates(new ChassisSpeeds(1, 0, 0));
 
     MathSharedStore.reportUsage(MathUsageId.kOdometry_SwerveDrive, 1);
   }
