@@ -169,8 +169,8 @@ public class BetterSwerveDriveOdometry {
 
       var rotatedDeltaMatrix = rotationMatrix.mult(deltaMatrix);
       var finalDeltaDistance = deltaDistanceInitial>=0 ? 
-        Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(0, 1), 2)) :
-        -Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(0, 1), 2));
+        Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(1, 0), 2)) :
+        -Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(1, 0), 2));
 
       var deltaDistance = (roll.getDegrees() > 10 || pitch.getDegrees() > 10) ? finalDeltaDistance : deltaDistanceInitial;
 

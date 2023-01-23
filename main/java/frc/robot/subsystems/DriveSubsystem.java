@@ -24,12 +24,12 @@ import frc.lib.util.swerve.SwerveBalance;
 import frc.robot.constants.RobotConstants.Swerve;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 public class DriveSubsystem extends SubsystemBase {
 
-  private final WPI_TalonSRX gyroTalonSRX;
-  private final WPI_PigeonIMU gyro;
+  private final WPI_Pigeon2 gyro;
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
@@ -39,8 +39,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    gyroTalonSRX =  new WPI_TalonSRX(Swerve.gyroID);
-    gyro = new WPI_PigeonIMU(gyroTalonSRX);
+    gyro = new WPI_Pigeon2(Swerve.gyroID);
     swerveModules = new SwerveModule[] {
       new SwerveModule(0, Swerve.Mod0.constants),
       new SwerveModule(1, Swerve.Mod1.constants),
@@ -244,7 +243,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {
     if (isFieldRelative) {
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, 
-      rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad), getGyroRotation2d());
+      rad, getGyroRotation2d());
     } else {
       speeds.omegaRadiansPerSecond = rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad);
       speeds.vxMetersPerSecond = vx;
@@ -269,11 +268,11 @@ public class DriveSubsystem extends SubsystemBase {
    * update normal moduleStates
    */
   public void updateModuleStates() {
-    var desiredBetterModuleState = Swerve.BETTER_KINEMATICS.toSwerveModuleStates(speeds);
-    for (int i = 0; i < desiredModuleStates.length; i++) {
-      desiredModuleStates[i].angle = Rotation2d.fromRadians(desiredBetterModuleState[i].angle.getRadians() + desiredBetterModuleState[i].omegaRadPerSecond * Swerve.MODULE_STEER_FF_CL * 0.065);
-      desiredModuleStates[i].speedMetersPerSecond = desiredBetterModuleState[i].speedMetersPerSecond;
-    }
+    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
+    // for (int i = 0; i < desiredModuleStates.length; i++) {
+    //   desiredModuleStates[i].angle = Rotation2d.fromRadians(desiredBetterModuleState[i].angle.getRadians() + desiredBetterModuleState[i].omegaRadPerSecond * Swerve.MODULE_STEER_FF_CL * 0.065);
+    //   desiredModuleStates[i].speedMetersPerSecond = desiredBetterModuleState[i].speedMetersPerSecond;
+    // }
     SmartDashboard.putString("test3", desiredModuleStates.toString());
   }
 

@@ -56,9 +56,9 @@ public final class RobotConstants {
     /* Back Left Module - Module 2 */
     public static final class Mod2 {
       public static final int 
-        driveMotorID = 7,
-        angleMotorID = 8,
-        cancoderID = 12;
+        driveMotorID = 5,
+        angleMotorID = 6,
+        cancoderID = 11;
       public static final boolean 
         driveInvert = false,
         angleInvert = true;
@@ -71,9 +71,9 @@ public final class RobotConstants {
     /* Back Right Module - Module 3 */
     public static final class Mod3 {
       public static final int 
-        driveMotorID = 5,
-        angleMotorID = 6,
-        cancoderID = 11;
+        driveMotorID = 7,
+        angleMotorID = 8,
+        cancoderID = 12;
       public static final boolean 
         driveInvert = false,
         angleInvert = true;
