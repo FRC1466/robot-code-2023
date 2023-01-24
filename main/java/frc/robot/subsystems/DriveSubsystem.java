@@ -23,9 +23,7 @@ import frc.lib.util.swerve.BetterSwerveDrivePoseEstimator;
 import frc.lib.util.swerve.SwerveBalance;
 import frc.robot.constants.RobotConstants.Swerve;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 
 public class DriveSubsystem extends SubsystemBase {
 

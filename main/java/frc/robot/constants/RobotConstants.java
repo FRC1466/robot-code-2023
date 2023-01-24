@@ -83,7 +83,7 @@ public final class RobotConstants {
       }
 
       public static final double 
-        trackWidth = 0.375,
+        trackWidth = 0.4826,
         wheelDiameter = 0.10033,
         wheelCircumference = wheelDiameter * Math.PI;
 
