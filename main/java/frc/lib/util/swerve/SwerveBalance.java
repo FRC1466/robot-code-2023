@@ -22,8 +22,8 @@ public class SwerveBalance {
      * @return ChassisSpeeds object to set to module states.
      */
     public ChassisSpeeds update(Rotation2d pitch, Rotation2d roll) {
-        var xGrad = -pitch.getSin();
-        var yGrad = pitch.getCos()*roll.getSin();
+        var xGrad = -pitch.getSin()/pitch.getCos();
+        var yGrad = pitch.getCos()*roll.getSin()/roll.getCos();
 
         var setpoint = Math.sqrt(xGrad*xGrad+yGrad*yGrad);
         var pidOutput = balanceController.calculate(setpoint, 0);
