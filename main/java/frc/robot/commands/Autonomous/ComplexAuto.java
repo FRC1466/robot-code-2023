@@ -27,34 +27,10 @@ public class ComplexAuto extends SequentialCommandGroup {
      * @param drive drive subsystem
      * @param tele telemetry
      */
-    public ComplexAuto(DriveSubsystem drive, AdjustableTelemetry tele) {
+    public ComplexAuto(DriveSubsystem drive, AdjustableTelemetry tele, PathBuilder builder) {
         path = PathPlanner.loadPathGroup("Test Path", 
             new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS));
-
-        HashMap<String, Command> eventMap = new HashMap<>();
-        eventMap.put("marker1", new PrintCommand("Passed marker 1"));
-        eventMap.put("intakeDown", new PrintCommand("Passed intakedown 1"));
-
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            drive::getPose, // Functional interface to feed supplier
-            drive::resetPose,
-            Swerve.KINEMATICS,
-            // Position controllers
-            new PIDConstants(
-                AutoConstants.translationController.P,
-                AutoConstants.translationController.I, 
-                AutoConstants.translationController.D),
-            new PIDConstants(
-                AutoConstants.thetaController.P,
-                AutoConstants.thetaController.I, 
-                AutoConstants.thetaController.D),
-            drive::setDesiredModuleStates,
-            eventMap,
-            true,
-            drive);
-        
-        swerveControllerCommand = autoBuilder.fullAuto(path);
-
+        swerveControllerCommand = builder.getSwerveCommand(path);
         
         addCommands(
             new InstantCommand(() -> tele.updatePIDConstants()),

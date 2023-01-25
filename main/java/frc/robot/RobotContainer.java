@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +21,8 @@ import frc.robot.commands.DriveCommand;
 import frc.robot.commands.autonomous.ComplexAuto;
 import frc.robot.commands.autonomous.GoToPose;
 import frc.robot.commands.autonomous.GoToScoring;
+import frc.robot.commands.autonomous.PathBuilder;
+import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.OIConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -40,6 +43,7 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_drive = new DriveSubsystem();
+  private final PathBuilder m_builder = new PathBuilder(m_drive);
 
   private final Joystick m_driverController = new Joystick(OIConstants.driverID);
 
@@ -61,12 +65,9 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    final Command auto1 = new ComplexAuto(m_drive, m_tele);
-    GoToPose auto2Constructor = new GoToPose(
-      new PathPoint(new Translation2d(4.0, 2.6), new Rotation2d()),
-      new PathConstraints(2.0, 2.0),
-      m_drive);
-    final Command auto2 = auto2Constructor.getCommand();
+    Command auto1 = new ComplexAuto(m_drive, m_tele, m_builder);
+    Command auto2 = m_builder.getSwerveCommand(PathPlanner.loadPathGroup("3 Score T1", 
+    new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)));
     m_chooser.setDefaultOption("auto 1", auto1);
     m_chooser.addOption("auto 2", auto2);
     SmartDashboard.putData("CHOOSE", m_chooser);

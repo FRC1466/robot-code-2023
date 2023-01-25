@@ -240,10 +240,10 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {
     if (isFieldRelative) {
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, 
-      rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad), getGyroRotation2d());
+      var updatedRad = rad==0 ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, updatedRad, getGyroRotation2d());
     } else {
-      speeds.omegaRadiansPerSecond = rad + headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad);
+      speeds.omegaRadiansPerSecond = rad==0 ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
       speeds.vxMetersPerSecond = vx;
       speeds.vyMetersPerSecond = vy;
     } 
