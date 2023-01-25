@@ -4,9 +4,18 @@
 
 package frc.robot.constants;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import frc.lib.util.Gains;
 import frc.lib.util.swerve.BetterSwerveKinematics;
 import frc.lib.util.swerve.SwerveModuleConstants;
@@ -138,6 +147,60 @@ public final class RobotConstants {
     public static final Gains
       thetaController = new Gains(5, 0, 0, 0, 0, 1),
       translationController = new Gains(1, 0, 0, 0, 0, 1);
+
+    public static final List<AprilTag> aprilList = new ArrayList<>(){{
+      add(new AprilTag(1,
+        new Pose3d(
+            Units.inchesToMeters(610.77),
+            Units.inchesToMeters(42.19),
+            Units.inchesToMeters(18.22),
+            new Rotation3d(0.0, 0.0, Math.PI))));
+      add(new AprilTag(2,
+      new Pose3d(
+          Units.inchesToMeters(610.77),
+          Units.inchesToMeters(108.19),
+          Units.inchesToMeters(18.22),
+          new Rotation3d(0.0, 0.0, Math.PI))));
+      add(new AprilTag(3,
+      new Pose3d(
+          Units.inchesToMeters(610.77),
+          Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
+          Units.inchesToMeters(18.22),
+          new Rotation3d(0.0, 0.0, Math.PI))));
+      add(new AprilTag(4,
+      new Pose3d(
+          Units.inchesToMeters(636.96),
+          Units.inchesToMeters(265.74),
+          Units.inchesToMeters(27.38),
+          new Rotation3d(0.0, 0.0, Math.PI))));
+      add(new AprilTag(5,
+      new Pose3d(
+          Units.inchesToMeters(14.25),
+          Units.inchesToMeters(265.74),
+          Units.inchesToMeters(27.38),
+          new Rotation3d())));
+      add(new AprilTag(6,
+      new Pose3d(
+          Units.inchesToMeters(40.45),
+          Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
+          Units.inchesToMeters(18.22),
+          new Rotation3d())));
+      add(new AprilTag(7,
+      new Pose3d(
+          Units.inchesToMeters(40.45),
+          Units.inchesToMeters(108.19),
+          Units.inchesToMeters(18.22),
+          new Rotation3d())));
+      add(new AprilTag(8,
+      new Pose3d(
+          Units.inchesToMeters(40.45),
+          Units.inchesToMeters(42.19),
+          Units.inchesToMeters(18.22),
+          new Rotation3d())));
+    }};
+    public static final double fieldLength = Units.inchesToMeters(651.25);
+    public static final double fieldWidth = Units.inchesToMeters(315.5);
+    public static final AprilTagFieldLayout apriltagFieldLayout = new AprilTagFieldLayout(aprilList, fieldLength, fieldWidth);
   }
 
   public static final class IntakeConstants {
