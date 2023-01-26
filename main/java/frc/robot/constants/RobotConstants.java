@@ -97,16 +97,16 @@ public final class RobotConstants {
 
       
       public final static BetterSwerveKinematics BETTER_KINEMATICS = new BetterSwerveKinematics(
-        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
-        new Translation2d(trackWidth/2, trackWidth/2), //frontright
-        new Translation2d(-trackWidth/2, -trackWidth/2), //backleft
-        new Translation2d(trackWidth/2, -trackWidth/2)); //backright
+        new Translation2d(trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(trackWidth/2, -trackWidth/2), //frontright
+        new Translation2d(-trackWidth/2, trackWidth/2), //backleft
+        new Translation2d(-trackWidth/2, -trackWidth/2)); //backright
 
       public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
-        new Translation2d(trackWidth/2, trackWidth/2), //frontright
-        new Translation2d(-trackWidth/2, -trackWidth/2), //backleft
-        new Translation2d(trackWidth/2, -trackWidth/2)); //backright
+        new Translation2d(trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(-trackWidth/2, trackWidth/2), //frontright
+        new Translation2d(trackWidth/2, -trackWidth/2), //backleft
+        new Translation2d(-trackWidth/2, -trackWidth/2)); //backright
     
       public static final double 
         driveGearRatio = 8.14, // refine this for pose estimation

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -31,7 +32,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private BetterSwerveDrivePoseEstimator swervePoseEstimator;
+  private SwerveDrivePoseEstimator swervePoseEstimator;
   private PIDController headingController = new PIDController(0.8, 0, 0);
   private SwerveBalance swerveBalance = new SwerveBalance();
 
@@ -47,7 +48,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     initializeTelemetry();
 
-    swervePoseEstimator = new BetterSwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
+    swervePoseEstimator = new SwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
     
@@ -189,8 +190,8 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateRobotPose() {
     swervePoseEstimator.update(
       getGyroRotation2d(),
-      getGyroPitch(),
-      getGyroRoll(),
+      // getGyroPitch(),
+      // getGyroRoll(),
       getSwervePositions()
       );
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
@@ -239,8 +240,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param isFieldRelative the state of field relative
    */
   public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {
-    if (isFieldRelative) {
-      var updatedRad = rad==0 ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
+    if (true) {
+      var updatedRad = false ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
       speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, updatedRad, getGyroRotation2d());
     } else {
       speeds.omegaRadiansPerSecond = rad==0 ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
