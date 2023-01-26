@@ -29,7 +29,7 @@ public class PhotonCameraWrapper {
 
     public PhotonCameraWrapper() {
         try {
-            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
