@@ -6,7 +6,6 @@ package frc.robot.constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -19,7 +18,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.constants.RobotConstants.AutoConstants;
 
 public class PhotonCameraWrapper {
     private PhotonCamera camera = new PhotonCamera("photonvision");
@@ -31,7 +29,6 @@ public class PhotonCameraWrapper {
         try {
             aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         var alliance = DriverStation.getAlliance()==Alliance.Blue ? OriginPosition.kBlueAllianceWallRightSide : OriginPosition.kRedAllianceWallRightSide;
