@@ -159,12 +159,12 @@ public class BetterSwerveDriveOdometry {
       var previous = m_previousModulePositions[index];
 
       var deltaDistanceInitial = current.distanceMeters - previous.distanceMeters;
-      var interpolatedAngle = previous.angle.interpolate(current.angle, 0.5).minus(m_zeroModuleStates[index].angle);
+      var changedAngle = current.angle.minus(m_zeroModuleStates[index].angle); // does this return (-pi, pi)? shoudln't matter since Twist2d does sin cos
     
       var deltaMatrix = new SimpleMatrix(3, 1);
       deltaMatrix.setColumn(0, 0, 
-        interpolatedAngle.getCos()*deltaDistanceInitial,
-        interpolatedAngle.getSin()*deltaDistanceInitial,
+        changedAngle.getCos()*deltaDistanceInitial,
+        changedAngle.getSin()*deltaDistanceInitial,
         0);
 
       var rotatedDeltaMatrix = rotationMatrix.mult(deltaMatrix);
@@ -173,9 +173,10 @@ public class BetterSwerveDriveOdometry {
         -Math.sqrt(Math.pow(rotatedDeltaMatrix.get(0, 0), 2) + Math.pow(rotatedDeltaMatrix.get(1, 0), 2));
 
       var deltaDistance = (roll.getDegrees() > 10 || pitch.getDegrees() > 10) ? finalDeltaDistance : deltaDistanceInitial;
+      var updatedAngle = (roll.getDegrees() > 10 || pitch.getDegrees() > 10) ? Rotation2d.fromRadians(Math.atan2(rotatedDeltaMatrix.get(0, 0), rotatedDeltaMatrix.get(1, 0))) : current.angle;
 
       moduleDeltas[index] =
-          new SwerveModulePosition(deltaDistance, current.angle);
+          new SwerveModulePosition(deltaDistance, updatedAngle);
       previous.distanceMeters = current.distanceMeters;
     }
 
