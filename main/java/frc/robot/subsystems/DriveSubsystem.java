@@ -149,8 +149,8 @@ public class DriveSubsystem extends SubsystemBase {
     return swervePoseEstimator.getEstimatedPosition();
   }
 
-  public ChassisSpeeds getChassisSpeeds() {
-    return speeds;
+  public ChassisSpeeds getCurrentChassisSpeeds() {
+    return Swerve.KINEMATICS.toChassisSpeeds(getSwerveModuleStates());
   }
 
   public boolean isPoseWithinArea(RectanglePoseArea area) {

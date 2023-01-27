@@ -26,7 +26,7 @@ public class GoToPose {
         Translation2d translation = pose.getTranslation();
         Rotation2d holonomic = pose.getRotation();
 
-        PathPoint currentPathPoint = PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getChassisSpeeds());
+        PathPoint currentPathPoint = PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
         
 
         List<PathPoint> path = new ArrayList<PathPoint>(){{
@@ -62,7 +62,7 @@ public class GoToPose {
 
     public GoToPose(PathPoint pathPoint, PathConstraints constraints, DriveSubsystem drive) {
         
-        PathPoint currentPathPoint = PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getChassisSpeeds());
+        PathPoint currentPathPoint = PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
 
         List<PathPoint> path = new ArrayList<PathPoint>(){{
             add(currentPathPoint);
