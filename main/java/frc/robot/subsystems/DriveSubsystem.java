@@ -104,7 +104,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateModuleTelemetry() {
     for(var module : swerveModules){ 
       cancoderEntries[module.moduleNumber].setDouble(module.getCancoderAngle().getDegrees());
-      SmartDashboard.putNumber("module " + module.moduleNumber + "cancoder deg", module.getCancoderAngle().getDegrees());
+      // SmartDashboard.putNumber("module " + module.moduleNumber + "cancoder deg", module.getCancoderAngle().getDegrees());
       integratedEntries[module.moduleNumber].setDouble(module.getPosition().angle.getDegrees());
       velEntries[module.moduleNumber].setDouble(module.getState().speedMetersPerSecond);
     }
@@ -309,6 +309,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putData(gyro);
     updateRobotPose();
     updateModuleTelemetry();
   }
