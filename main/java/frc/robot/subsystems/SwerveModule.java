@@ -104,8 +104,8 @@ public class SwerveModule {
      */
     public void setSpeed(SwerveModuleState desiredState) {
         double sp = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Swerve.wheelCircumference, Swerve.driveGearRatio);
-        SmartDashboard.putNumber("mod"+ moduleNumber +"speedsetpoint", sp);
-        SmartDashboard.putNumber("mod"+ moduleNumber +"speedmeasured", driveMotor.getSelectedSensorVelocity());
+        // SmartDashboard.putNumber("mod"+ moduleNumber +"speedsetpoint", sp);
+        // SmartDashboard.putNumber("mod"+ moduleNumber +"speedmeasured", driveMotor.getSelectedSensorVelocity());
         driveMotor.set(TalonFXControlMode.Velocity, sp);
     }
 
@@ -117,10 +117,10 @@ public class SwerveModule {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (4 * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
         // SmartDashboard.putNumber("mod"+moduleNumber+"initangle", angle.getDegrees());
         double a = Conversions.degreesToFalcon(angle.getDegrees(), Swerve.angleGearRatio);
-        SmartDashboard.putNumber("mod"+moduleNumber+"anglesetpoint", a);
-        SmartDashboard.putNumber("mod"+moduleNumber+"anglemeasurement", angleMotor.getSelectedSensorPosition());
+        // SmartDashboard.putNumber("mod"+moduleNumber+"anglesetpoint", a);
+        // SmartDashboard.putNumber("mod"+moduleNumber+"anglemeasurement", angleMotor.getSelectedSensorPosition());
         double b = angle.getRotations()>=0 ? Math.floor(angle.getRotations()) : Math.ceil(angle.getRotations());
-        SmartDashboard.putNumber("mod"+moduleNumber+"drifttrack", b);
+        // SmartDashboard.putNumber("mod"+moduleNumber+"drifttrack", b);
         angleMotor.set(ControlMode.Position, a);
         lastAngle = angle;
     }

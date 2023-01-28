@@ -32,8 +32,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private SwerveDrivePoseEstimator swervePoseEstimator;
-  private PIDController headingController = new PIDController(0.8, 0, 0);
+  private BetterSwerveDrivePoseEstimator swervePoseEstimator;
+  private PIDController headingController = new PIDController(0.118, 0.03, 0);
   private SwerveBalance swerveBalance = new SwerveBalance();
 
   /** Creates a new DriveSubsystem. */
@@ -48,7 +48,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     initializeTelemetry();
 
-    swervePoseEstimator = new SwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
+    swervePoseEstimator = new BetterSwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
     
@@ -114,8 +114,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Rotation2d of gyro yaw
    */
   public Rotation2d getGyroRotation2d() {
-    gyroRotEntry.setDouble(gyro.getYaw());
-    return Rotation2d.fromDegrees(gyro.getYaw());
+    gyroRotEntry.setDouble(-gyro.getYaw());
+    return Rotation2d.fromDegrees(-gyro.getYaw());
   }
 
   /**
@@ -190,8 +190,8 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateRobotPose() {
     swervePoseEstimator.update(
       getGyroRotation2d(),
-      // getGyroPitch(),
-      // getGyroRoll(),
+      getGyroPitch(),
+      getGyroRoll(),
       getSwervePositions()
       );
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
@@ -240,14 +240,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @param isFieldRelative the state of field relative
    */
   public void setSpeeds(double rad, double vx, double vy, boolean isFieldRelative) {
-    if (true) {
-      var updatedRad = false ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, updatedRad, getGyroRotation2d());
+    var updatedRad = rad==0 ? rad - headingController.calculate(Math.toRadians(gyro.getRate()), 0) : rad;
+    if (isFieldRelative) {
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, 
+      updatedRad,
+       getGyroRotation2d());
     } else {
-      speeds.omegaRadiansPerSecond = rad==0 ? headingController.calculate(Rotation2d.fromDegrees(gyro.getRate()).getRadians(), rad) : rad;
-      speeds.vxMetersPerSecond = vx;
-      speeds.vyMetersPerSecond = vy;
-    } 
+      speeds = new ChassisSpeeds(vx, vy, updatedRad);
+    }
   }
 
     /**
@@ -267,11 +267,13 @@ public class DriveSubsystem extends SubsystemBase {
    * update normal moduleStates
    */
   public void updateModuleStates() {
-    desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
-    // for (int i = 0; i < desiredModuleStates.length; i++) {
-    //   desiredModuleStates[i].angle = Rotation2d.fromRadians(desiredBetterModuleState[i].angle.getRadians() + desiredBetterModuleState[i].omegaRadPerSecond * Swerve.MODULE_STEER_FF_CL * 0.065);
-    //   desiredModuleStates[i].speedMetersPerSecond = desiredBetterModuleState[i].speedMetersPerSecond;
-    // }
+    // desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
+    var desiredBetterModuleState = Swerve.BETTER_KINEMATICS.toSwerveModuleStates(speeds);
+    for (int i = 0; i < desiredModuleStates.length; i++) {
+      SmartDashboard.putNumber("omega", desiredBetterModuleState[i].omegaRadPerSecond);
+      desiredModuleStates[i].angle = Rotation2d.fromRadians(desiredBetterModuleState[i].angle.getRadians() + desiredBetterModuleState[i].omegaRadPerSecond * Swerve.MODULE_STEER_FF_CL * 0.065);
+      desiredModuleStates[i].speedMetersPerSecond = desiredBetterModuleState[i].speedMetersPerSecond;
+    }
     SmartDashboard.putString("test3", desiredModuleStates.toString());
   }
 

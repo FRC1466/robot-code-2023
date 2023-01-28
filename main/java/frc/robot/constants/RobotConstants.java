@@ -92,24 +92,24 @@ public final class RobotConstants {
 
       public static final double 
         trackWidth = 0.4953,
-        wheelDiameter = 0.10033,
+        wheelDiameter = 0.10030,
         wheelCircumference = wheelDiameter * Math.PI;
 
       
       public final static BetterSwerveKinematics BETTER_KINEMATICS = new BetterSwerveKinematics(
-        new Translation2d(trackWidth/2, trackWidth/2), //frontleft
-        new Translation2d(trackWidth/2, -trackWidth/2), //frontright
-        new Translation2d(-trackWidth/2, trackWidth/2), //backleft
-        new Translation2d(-trackWidth/2, -trackWidth/2)); //backright
+        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(-trackWidth/2, -trackWidth/2), //frontright
+        new Translation2d(trackWidth/2, trackWidth/2), //backleft
+        new Translation2d(trackWidth/2, -trackWidth/2)); //backright
 
       public final static SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-        new Translation2d(trackWidth/2, trackWidth/2), //frontleft
-        new Translation2d(-trackWidth/2, trackWidth/2), //frontright
-        new Translation2d(trackWidth/2, -trackWidth/2), //backleft
-        new Translation2d(-trackWidth/2, -trackWidth/2)); //backright
+        new Translation2d(-trackWidth/2, trackWidth/2), //frontleft
+        new Translation2d(-trackWidth/2, -trackWidth/2), //frontright
+        new Translation2d(trackWidth/2, trackWidth/2), //backleft
+        new Translation2d(trackWidth/2, -trackWidth/2)); //backright
     
       public static final double 
-        driveGearRatio = 8.14, // refine this for pose estimation
+        driveGearRatio = 8.2138672, // refine this for pose estimation (-16822)
         angleGearRatio = 12.839355527714421;
 
       public static final int
@@ -129,7 +129,7 @@ public final class RobotConstants {
         slotIdx = 0,
         pidLoopIdx = 0,
         timeoutMS = 30;
-      public static final double MODULE_STEER_FF_CL = -0.3;
+      public static final double MODULE_STEER_FF_CL = -0.30;
   }
 
   public static final class OIConstants {
@@ -144,8 +144,8 @@ public final class RobotConstants {
       maxAccelerationMPS = 1.0;
 
     public static final Gains
-      thetaController = new Gains(5, 0, 0, 0, 0, 1),
-      translationController = new Gains(1, 0, 0, 0, 0, 1);
+      thetaController = new Gains(-20, 0.0, 0.0, 0, 0, 1),
+      translationController = new Gains(8, 1.0, 0, 0, 0, 1);
 
     public static final List<AprilTag> aprilList = new ArrayList<>(){{
       add(new AprilTag(1,
