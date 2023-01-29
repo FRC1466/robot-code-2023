@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -22,6 +24,8 @@ public class DriveCommand extends CommandBase {
     private double vy = 0;
     private double rad = 0;
     private int toggleModule = 0;
+
+    SlewRateLimiter filter = new SlewRateLimiter(Swerve.Limits.slew);
     
     /**
      * Default command for driving
@@ -45,18 +49,22 @@ public class DriveCommand extends CommandBase {
         initializeTelemetry();
     }
 
+    private double controllerInput(double input, double deadband, double scaler) {
+        return filter.calculate(MathUtil.applyDeadband(input, deadband)) * scaler;
+    }
+
     /**
      * local driving function
      */
     private void drive() {
         if (!controller.getRawButton(2)) {
-            vx = Math.abs(controller.getX())>0.02 ? controller.getX() * Swerve.Limits.vx : 0;
-            vy = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vy : 0;
-            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad : 0;
+            vx = controllerInput(controller.getY(), Swerve.Limits.vxDeadband, Swerve.Limits.vx);
+            vy = controllerInput(controller.getX(), Swerve.Limits.vyDeadband, Swerve.Limits.vy);
+            rad = controllerInput(controller.getZ(), Swerve.Limits.radDeadband, Swerve.Limits.rad);
         } else {
-            vx = Math.abs(controller.getX())>0.02 ? controller.getX() * Swerve.Limits.vx * 0.3 : 0;
-            vy = Math.abs(controller.getY())>0.02 ? controller.getY() * Swerve.Limits.vy * 0.3 : 0;
-            rad = Math.abs(controller.getZ())>0.10 ? -controller.getZ() * Swerve.Limits.rad * 0.3 : 0;
+            vx = controllerInput(controller.getY(), Swerve.Limits.vxDeadband, Swerve.Limits.vx * Swerve.Limits.reduced);
+            vy = controllerInput(controller.getX(), Swerve.Limits.vyDeadband, Swerve.Limits.vy * Swerve.Limits.reduced);
+            rad = controllerInput(controller.getZ(), Swerve.Limits.radDeadband, Swerve.Limits.rad * Swerve.Limits.reduced);
         }
 
         if (controller.getRawButton(4))

@@ -118,8 +118,13 @@ public final class RobotConstants {
       public static final class Limits {
         public static double 
           vx = 3.5,
+          vxDeadband = 0.02,
           vy = 3.5,
-          rad = 4.0;
+          vyDeadband = 0.02,
+          rad = -4.0,
+          radDeadband = 0.10,
+          slew = 0.5,
+          reduced = 0.3;
       } 
 
       public static final Gains 
