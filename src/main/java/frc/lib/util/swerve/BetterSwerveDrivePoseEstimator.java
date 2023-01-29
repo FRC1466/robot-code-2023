@@ -88,7 +88,8 @@ public class BetterSwerveDrivePoseEstimator {
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     m_kinematics = kinematics;
-    m_odometry = new BetterSwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
+    m_odometry =
+        new BetterSwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
 
     for (int i = 0; i < 3; ++i) {
       m_q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
@@ -201,7 +202,12 @@ public class BetterSwerveDrivePoseEstimator {
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
-      updateWithTime(entry.getKey(), entry.getValue().gyroAngle, entry.getValue().gyroPitch, entry.getValue().gyroRoll, entry.getValue().modulePositions);
+      updateWithTime(
+          entry.getKey(),
+          entry.getValue().gyroAngle,
+          entry.getValue().gyroPitch,
+          entry.getValue().gyroRoll,
+          entry.getValue().modulePositions);
     }
   }
 
@@ -250,8 +256,13 @@ public class BetterSwerveDrivePoseEstimator {
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose2d update(Rotation2d gyroAngle, Rotation2d gyroPitch, Rotation2d gyroRoll, SwerveModulePosition[] modulePositions) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, gyroPitch, gyroRoll, modulePositions);
+  public Pose2d update(
+      Rotation2d gyroAngle,
+      Rotation2d gyroPitch,
+      Rotation2d gyroRoll,
+      SwerveModulePosition[] modulePositions) {
+    return updateWithTime(
+        WPIUtilJNI.now() * 1.0e-6, gyroAngle, gyroPitch, gyroRoll, modulePositions);
   }
 
   /**
@@ -266,7 +277,11 @@ public class BetterSwerveDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, Rotation2d gyroPitch, Rotation2d gyroRoll, SwerveModulePosition[] modulePositions) {
+      double currentTimeSeconds,
+      Rotation2d gyroAngle,
+      Rotation2d gyroPitch,
+      Rotation2d gyroRoll,
+      SwerveModulePosition[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -284,7 +299,8 @@ public class BetterSwerveDrivePoseEstimator {
 
     m_poseBuffer.addSample(
         currentTimeSeconds,
-        new InterpolationRecord(getEstimatedPosition(), gyroAngle, gyroPitch, gyroRoll, internalModulePositions));
+        new InterpolationRecord(
+            getEstimatedPosition(), gyroAngle, gyroPitch, gyroRoll, internalModulePositions));
 
     return getEstimatedPosition();
   }
@@ -319,7 +335,11 @@ public class BetterSwerveDrivePoseEstimator {
      * @param wheelPositions The distances and rotations measured at each wheel.
      */
     private InterpolationRecord(
-        Pose2d poseMeters, Rotation2d gyro, Rotation2d gyroPitch, Rotation2d gyroRoll, SwerveModulePosition[] modulePositions) {
+        Pose2d poseMeters,
+        Rotation2d gyro,
+        Rotation2d gyroPitch,
+        Rotation2d gyroRoll,
+        SwerveModulePosition[] modulePositions) {
       this.poseMeters = poseMeters;
       this.gyroAngle = gyro;
       this.gyroPitch = gyroPitch;
@@ -370,7 +390,8 @@ public class BetterSwerveDrivePoseEstimator {
         Twist2d twist = m_kinematics.toTwist2d(moduleDeltas);
         twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
 
-        return new InterpolationRecord(poseMeters.exp(twist), gyro_lerp, gyroPitch_lerp, gyroRoll_lerp, modulePositions);
+        return new InterpolationRecord(
+            poseMeters.exp(twist), gyro_lerp, gyroPitch_lerp, gyroRoll_lerp, modulePositions);
       }
     }
 
@@ -394,4 +415,3 @@ public class BetterSwerveDrivePoseEstimator {
     }
   }
 }
-

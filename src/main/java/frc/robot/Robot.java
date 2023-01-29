@@ -4,12 +4,11 @@
 
 package frc.robot;
 
-import java.util.concurrent.TimeUnit;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.constants.ModuleConfigs;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,7 +21,6 @@ public class Robot extends TimedRobot {
   private RobotContainer robotContainer;
   private Command autonomousCommand;
   public static ModuleConfigs moduleConfigs;
-
 
   /**
    * This function is run when the robot is first started up and should be used for any

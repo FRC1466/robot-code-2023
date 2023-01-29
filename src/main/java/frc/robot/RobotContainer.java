@@ -6,24 +6,23 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.AdjustableTelemetry;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.autonomous.ComplexAuto;
 import frc.robot.commands.autonomous.GoToScoring;
 import frc.robot.commands.autonomous.PathBuilder;
 import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.OIConstants;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.subsystems.AdjustableTelemetry;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,14 +42,10 @@ public class RobotContainer {
 
   private final Joystick m_driverController = new Joystick(OIConstants.driverID);
 
-
-
   // the default commands
-  private final DriveCommand m_DriveCommand = new DriveCommand(m_drive, m_tele, m_driverController, isFieldRelative);
+  private final DriveCommand m_DriveCommand =
+      new DriveCommand(m_drive, m_tele, m_driverController, isFieldRelative);
   private final GoToScoring goToScoring = new GoToScoring(m_drive);
-
-
-
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -58,24 +53,25 @@ public class RobotContainer {
     configureButtonBindings();
     initializeChooser();
 
-    m_drive.setDefaultCommand(
-        m_DriveCommand
-    );
-
+    m_drive.setDefaultCommand(m_DriveCommand);
   }
 
   private void initializeChooser() {
     m_chooser.setDefaultOption("auto 1", new ComplexAuto(m_drive, m_tele, m_builder));
 
-    m_chooser.addOption("3 Score T1", 
-      m_builder.getSwerveCommand(
-        PathPlanner.loadPathGroup("3 Score T1", new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))
-      ));
+    m_chooser.addOption(
+        "3 Score T1",
+        m_builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "3 Score T1",
+                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
 
-    m_chooser.addOption("2 Score + Dock T1", 
-      m_builder.getSwerveCommand(
-        PathPlanner.loadPathGroup("2 Score + Dock T1", new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))
-      ));
+    m_chooser.addOption(
+        "2 Score + Dock T1",
+        m_builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "2 Score + Dock T1",
+                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
 
     SmartDashboard.putData("CHOOSE", m_chooser);
   }
@@ -88,22 +84,24 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
-    new JoystickButton(m_driverController, 3).onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
-    new JoystickButton(m_driverController, 7).whileTrue(goToScoring.getCommand(1, m_drive.getPose()));
-    new JoystickButton(m_driverController, 9).whileTrue(goToScoring.getCommand(2, m_drive.getPose()));
-    new JoystickButton(m_driverController, 11).whileTrue(goToScoring.getCommand(3, m_drive.getPose()));
-    new JoystickButton(m_driverController, 12).whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive));
+    new JoystickButton(m_driverController, 3)
+        .onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
+    new JoystickButton(m_driverController, 7)
+        .whileTrue(goToScoring.getCommand(1, m_drive.getPose()));
+    new JoystickButton(m_driverController, 9)
+        .whileTrue(goToScoring.getCommand(2, m_drive.getPose()));
+    new JoystickButton(m_driverController, 11)
+        .whileTrue(goToScoring.getCommand(3, m_drive.getPose()));
+    new JoystickButton(m_driverController, 12)
+        .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive));
   }
 
   /**
-   * Use this to pass the  autonomous command to the main {@link Robot} class.
+   * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-
-
   public Command getAuto() {
     return m_chooser.getSelected();
   }
-
 }

@@ -10,111 +10,104 @@ import frc.robot.constants.RobotConstants.OIConstants;
 import frc.robot.constants.RobotConstants.Swerve;
 
 public class AdjustableTelemetry {
-    private ShuffleboardTab tuningTab;
+  private ShuffleboardTab tuningTab;
 
-    private GenericEntry posPEntry;
-    private GenericEntry posIEntry;
-    private GenericEntry posDEntry;
-    private GenericEntry posFEntry;
-    private GenericEntry posIzoneEntry;
-    private GenericEntry velPEntry;
-    private GenericEntry velIEntry;
-    private GenericEntry velDEntry;
-    private GenericEntry velFEntry;
-    private GenericEntry velIzoneEntry;
-    private GenericEntry translationPEntry;
-    private GenericEntry translationIEntry;
-    private GenericEntry translationDEntry;
-    private GenericEntry thetaPEntry;
-    private GenericEntry thetaIEntry;
-    private GenericEntry thetaDEntry;
+  private GenericEntry posPEntry;
+  private GenericEntry posIEntry;
+  private GenericEntry posDEntry;
+  private GenericEntry posFEntry;
+  private GenericEntry posIzoneEntry;
+  private GenericEntry velPEntry;
+  private GenericEntry velIEntry;
+  private GenericEntry velDEntry;
+  private GenericEntry velFEntry;
+  private GenericEntry velIzoneEntry;
+  private GenericEntry translationPEntry;
+  private GenericEntry translationIEntry;
+  private GenericEntry translationDEntry;
+  private GenericEntry thetaPEntry;
+  private GenericEntry thetaIEntry;
+  private GenericEntry thetaDEntry;
 
-    private GenericEntry vxLimit;
-    private GenericEntry vyLimit;
-    private GenericEntry rotLimit;
+  private GenericEntry vxLimit;
+  private GenericEntry vyLimit;
+  private GenericEntry rotLimit;
 
-    /**
-     * initializes the adjustable telemetry
-     */
-    public AdjustableTelemetry() {
-        tuningTab = Shuffleboard.getTab("Tuning");
+  /** initializes the adjustable telemetry */
+  public AdjustableTelemetry() {
+    tuningTab = Shuffleboard.getTab("Tuning");
 
-        initializePIDUpdate();
-        initializeDriveLimits();
-    }
-    
-    private void initializePIDUpdate() {
+    initializePIDUpdate();
+    initializeDriveLimits();
+  }
 
-        ShuffleboardLayout positionPIDLayout = tuningTab
-            .getLayout("Position PID", BuiltInLayouts.kList)
-            .withPosition(0, 0)
-            .withSize(1, 5);
+  private void initializePIDUpdate() {
 
-        posPEntry = positionPIDLayout.add("P", Swerve.driveGainsPosition.P).getEntry();
-        posIEntry = positionPIDLayout.add("I", Swerve.driveGainsPosition.I).getEntry();
-        posDEntry = positionPIDLayout.add("D", Swerve.driveGainsPosition.D).getEntry();
-        posFEntry = positionPIDLayout.add("F", Swerve.driveGainsPosition.F).getEntry();
-        posIzoneEntry = positionPIDLayout.add("Izone", Swerve.driveGainsPosition.integralZone).getEntry();
+    ShuffleboardLayout positionPIDLayout =
+        tuningTab.getLayout("Position PID", BuiltInLayouts.kList).withPosition(0, 0).withSize(1, 5);
 
-        ShuffleboardLayout velocityPIDLayout = tuningTab
-            .getLayout("Velocity PID", BuiltInLayouts.kList)
-            .withPosition(1, 0)
-            .withSize(1, 5);
+    posPEntry = positionPIDLayout.add("P", Swerve.driveGainsPosition.P).getEntry();
+    posIEntry = positionPIDLayout.add("I", Swerve.driveGainsPosition.I).getEntry();
+    posDEntry = positionPIDLayout.add("D", Swerve.driveGainsPosition.D).getEntry();
+    posFEntry = positionPIDLayout.add("F", Swerve.driveGainsPosition.F).getEntry();
+    posIzoneEntry =
+        positionPIDLayout.add("Izone", Swerve.driveGainsPosition.integralZone).getEntry();
 
-        velPEntry = velocityPIDLayout.add("P", Swerve.driveGainsVelocity.P).getEntry();
-        velIEntry = velocityPIDLayout.add("I", Swerve.driveGainsVelocity.I).getEntry();
-        velDEntry = velocityPIDLayout.add("D", Swerve.driveGainsVelocity.D).getEntry();
-        velFEntry = velocityPIDLayout.add("F", Swerve.driveGainsVelocity.F).getEntry();
-        velIzoneEntry = velocityPIDLayout.add("Izone", Swerve.driveGainsVelocity.integralZone).getEntry();
+    ShuffleboardLayout velocityPIDLayout =
+        tuningTab.getLayout("Velocity PID", BuiltInLayouts.kList).withPosition(1, 0).withSize(1, 5);
 
-        ShuffleboardLayout autoPIDLayout = tuningTab
-            .getLayout("Auto PID", BuiltInLayouts.kList)
-            .withSize(1, 6);
+    velPEntry = velocityPIDLayout.add("P", Swerve.driveGainsVelocity.P).getEntry();
+    velIEntry = velocityPIDLayout.add("I", Swerve.driveGainsVelocity.I).getEntry();
+    velDEntry = velocityPIDLayout.add("D", Swerve.driveGainsVelocity.D).getEntry();
+    velFEntry = velocityPIDLayout.add("F", Swerve.driveGainsVelocity.F).getEntry();
+    velIzoneEntry =
+        velocityPIDLayout.add("Izone", Swerve.driveGainsVelocity.integralZone).getEntry();
 
-        translationPEntry = autoPIDLayout.add("P_t", AutoConstants.translationController.P).getEntry();
-        translationIEntry = autoPIDLayout.add("I_t", AutoConstants.translationController.I).getEntry();
-        translationDEntry = autoPIDLayout.add("D_t", AutoConstants.translationController.D).getEntry();
-        thetaPEntry = autoPIDLayout.add("P_r", AutoConstants.thetaController.P).getEntry();
-        thetaIEntry = autoPIDLayout.add("I_r", AutoConstants.thetaController.I).getEntry();
-        thetaDEntry = autoPIDLayout.add("D_r", AutoConstants.thetaController.D).getEntry();
-    } 
+    ShuffleboardLayout autoPIDLayout =
+        tuningTab.getLayout("Auto PID", BuiltInLayouts.kList).withSize(1, 6);
 
-    private void initializeDriveLimits() {
-        ShuffleboardLayout driveLimits = tuningTab
-            .getLayout("Drive Limits", BuiltInLayouts.kList)
-            .withSize(1, 4);
-        
-        vxLimit = driveLimits.add("vx", OIConstants.InputLimits.vx).getEntry();
-        vyLimit = driveLimits.add("vy", OIConstants.InputLimits.vy).getEntry();
-        rotLimit = driveLimits.add("rad", OIConstants.InputLimits.rad).getEntry();
-    }
+    translationPEntry = autoPIDLayout.add("P_t", AutoConstants.translationController.P).getEntry();
+    translationIEntry = autoPIDLayout.add("I_t", AutoConstants.translationController.I).getEntry();
+    translationDEntry = autoPIDLayout.add("D_t", AutoConstants.translationController.D).getEntry();
+    thetaPEntry = autoPIDLayout.add("P_r", AutoConstants.thetaController.P).getEntry();
+    thetaIEntry = autoPIDLayout.add("I_r", AutoConstants.thetaController.I).getEntry();
+    thetaDEntry = autoPIDLayout.add("D_r", AutoConstants.thetaController.D).getEntry();
+  }
 
-    public void updatePIDConstants() {
-        Swerve.driveGainsPosition.P = posPEntry.getDouble(0);
-        Swerve.driveGainsPosition.I = posIEntry.getDouble(0);
-        Swerve.driveGainsPosition.D = posDEntry.getDouble(0);
-        Swerve.driveGainsPosition.F = posFEntry.getDouble(0);
-        Swerve.driveGainsPosition.integralZone = posIzoneEntry.getDouble(0);
-    
-        Swerve.driveGainsVelocity.P = velPEntry.getDouble(0);
-        Swerve.driveGainsVelocity.I = velIEntry.getDouble(0);
-        Swerve.driveGainsVelocity.D = velDEntry.getDouble(0);
-        Swerve.driveGainsVelocity.F = velFEntry.getDouble(0);
-        Swerve.driveGainsVelocity.integralZone = velIzoneEntry.getDouble(0);
+  private void initializeDriveLimits() {
+    ShuffleboardLayout driveLimits =
+        tuningTab.getLayout("Drive Limits", BuiltInLayouts.kList).withSize(1, 4);
 
-        AutoConstants.translationController.P = translationPEntry.getDouble(0);
-        AutoConstants.translationController.I = translationIEntry.getDouble(0);
-        AutoConstants.translationController.D = translationDEntry.getDouble(0);
+    vxLimit = driveLimits.add("vx", OIConstants.InputLimits.vx).getEntry();
+    vyLimit = driveLimits.add("vy", OIConstants.InputLimits.vy).getEntry();
+    rotLimit = driveLimits.add("rad", OIConstants.InputLimits.rad).getEntry();
+  }
 
-        AutoConstants.thetaController.P = thetaPEntry.getDouble(0);
-        AutoConstants.thetaController.I = thetaIEntry.getDouble(0);
-        AutoConstants.thetaController.D = thetaDEntry.getDouble(0);
-    }
+  public void updatePIDConstants() {
+    Swerve.driveGainsPosition.P = posPEntry.getDouble(0);
+    Swerve.driveGainsPosition.I = posIEntry.getDouble(0);
+    Swerve.driveGainsPosition.D = posDEntry.getDouble(0);
+    Swerve.driveGainsPosition.F = posFEntry.getDouble(0);
+    Swerve.driveGainsPosition.integralZone = posIzoneEntry.getDouble(0);
 
-    public void updateDriveLimits() {
-        OIConstants.InputLimits.vx = vxLimit.getDouble(OIConstants.InputLimits.vx);
-        OIConstants.InputLimits.vy = vyLimit.getDouble(OIConstants.InputLimits.vy);
-        OIConstants.InputLimits.rad = rotLimit.getDouble(OIConstants.InputLimits.rad);
-    }
+    Swerve.driveGainsVelocity.P = velPEntry.getDouble(0);
+    Swerve.driveGainsVelocity.I = velIEntry.getDouble(0);
+    Swerve.driveGainsVelocity.D = velDEntry.getDouble(0);
+    Swerve.driveGainsVelocity.F = velFEntry.getDouble(0);
+    Swerve.driveGainsVelocity.integralZone = velIzoneEntry.getDouble(0);
 
+    AutoConstants.translationController.P = translationPEntry.getDouble(0);
+    AutoConstants.translationController.I = translationIEntry.getDouble(0);
+    AutoConstants.translationController.D = translationDEntry.getDouble(0);
+
+    AutoConstants.thetaController.P = thetaPEntry.getDouble(0);
+    AutoConstants.thetaController.I = thetaIEntry.getDouble(0);
+    AutoConstants.thetaController.D = thetaDEntry.getDouble(0);
+  }
+
+  public void updateDriveLimits() {
+    OIConstants.InputLimits.vx = vxLimit.getDouble(OIConstants.InputLimits.vx);
+    OIConstants.InputLimits.vy = vyLimit.getDouble(OIConstants.InputLimits.vy);
+    OIConstants.InputLimits.rad = rotLimit.getDouble(OIConstants.InputLimits.rad);
+  }
 }
