@@ -11,8 +11,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.constants.RobotConstants.Swerve;
 import frc.robot.subsystems.AdjustableTelemetry;
 
-import java.lang.Math;
-
 
 public class DriveCommand extends CommandBase {
     private final DriveSubsystem drive;
@@ -23,7 +21,6 @@ public class DriveCommand extends CommandBase {
     private double vx = 0;
     private double vy = 0;
     private double rad = 0;
-    private int pidIter = 0;
     private int toggleModule = 0;
     
     /**
@@ -77,14 +74,6 @@ public class DriveCommand extends CommandBase {
         
     }
 
-    /**
-     * Update PID system from SmartDashboard for quick and easy tuning
-     */
-    private void updatePID() {
-        tele.updatePIDConstants();
-        drive.updatePIDConfigs();
-    }
-
     private GenericEntry vxEntry;
     private GenericEntry vyEntry;
     private GenericEntry radEntry;
@@ -126,11 +115,5 @@ public class DriveCommand extends CommandBase {
         tele.updateDriveLimits();
         updateTelemetry();
         drive();
-        
-        // if (pidIter*20 > 5000) { // 5000ms PID update time
-        //     updatePID();
-        //     pidIter = 0;
-        // }
-        // pidIter++;
     }
 }

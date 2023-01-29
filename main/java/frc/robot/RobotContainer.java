@@ -49,10 +49,6 @@ public class RobotContainer {
 
   // the default commands
   private final DriveCommand m_DriveCommand = new DriveCommand(m_drive, m_tele, m_driverController, isFieldRelative);
-
-  private final GoToPose goToPose = new GoToPose(
-    new Pose2d(2.18, 1.74, new Rotation2d()), new Rotation2d(), 
-    new PathConstraints(2, 2), m_drive);
   private final GoToScoring goToScoring = new GoToScoring(m_drive);
 
 
