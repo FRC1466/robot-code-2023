@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.constants.RobotConstants.AutoConstants;
+import frc.robot.constants.RobotConstants.OIConstants;
 import frc.robot.constants.RobotConstants.Swerve;
 
 public class AdjustableTelemetry {
@@ -83,9 +84,9 @@ public class AdjustableTelemetry {
             .getLayout("Drive Limits", BuiltInLayouts.kList)
             .withSize(1, 4);
         
-        vxLimit = driveLimits.add("vx", Swerve.Limits.vx).getEntry();
-        vyLimit = driveLimits.add("vy", Swerve.Limits.vy).getEntry();
-        rotLimit = driveLimits.add("rad", Swerve.Limits.rad).getEntry();
+        vxLimit = driveLimits.add("vx", OIConstants.InputLimits.vx).getEntry();
+        vyLimit = driveLimits.add("vy", OIConstants.InputLimits.vy).getEntry();
+        rotLimit = driveLimits.add("rad", OIConstants.InputLimits.rad).getEntry();
     }
 
     public void updatePIDConstants() {
@@ -111,9 +112,9 @@ public class AdjustableTelemetry {
     }
 
     public void updateDriveLimits() {
-        Swerve.Limits.vx = vxLimit.getDouble(Swerve.Limits.vx);
-        Swerve.Limits.vy = vyLimit.getDouble(Swerve.Limits.vy);
-        Swerve.Limits.rad = rotLimit.getDouble(Swerve.Limits.rad);
+        OIConstants.InputLimits.vx = vxLimit.getDouble(OIConstants.InputLimits.vx);
+        OIConstants.InputLimits.vy = vyLimit.getDouble(OIConstants.InputLimits.vy);
+        OIConstants.InputLimits.rad = rotLimit.getDouble(OIConstants.InputLimits.rad);
     }
 
 }

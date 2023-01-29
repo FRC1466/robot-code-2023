@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,7 +16,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.AdjustableTelemetry;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.autonomous.ComplexAuto;
-import frc.robot.commands.autonomous.GoToPose;
 import frc.robot.commands.autonomous.GoToScoring;
 import frc.robot.commands.autonomous.PathBuilder;
 import frc.robot.constants.RobotConstants.AutoConstants;

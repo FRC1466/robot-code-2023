@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.constants.RobotConstants.Swerve;
+import frc.robot.constants.RobotConstants.OIConstants;
 import frc.robot.subsystems.AdjustableTelemetry;
 
 
@@ -26,9 +26,8 @@ public class DriveCommand extends CommandBase {
     private double rad = 0;
     private int toggleModule = 0;
 
-    private final SlewRateLimiter filter = new SlewRateLimiter(Swerve.Limits.slew);
-    private final Debouncer debouncer = new Debouncer(Swerve.Limits.debounce, Debouncer.DebounceType.kBoth);
-
+    private final SlewRateLimiter filter = new SlewRateLimiter(OIConstants.InputLimits.slew);
+    private final Debouncer debouncer = new Debouncer(OIConstants.InputLimits.debounce, Debouncer.DebounceType.kBoth);
     
     /**
      * Default command for driving
@@ -63,13 +62,13 @@ public class DriveCommand extends CommandBase {
      */
     private void drive() {
         if (!controller.getRawButton(2)) {
-            vx = controllerInput(controller.getY(), Swerve.Limits.vxDeadband, Swerve.Limits.vx);
-            vy = controllerInput(controller.getX(), Swerve.Limits.vyDeadband, Swerve.Limits.vy);
-            rad = controllerInput(controller.getZ(), Swerve.Limits.radDeadband, Swerve.Limits.rad);
+            vx = controllerInput(controller.getY(), OIConstants.InputLimits.vxDeadband, OIConstants.InputLimits.vx);
+            vy = controllerInput(controller.getX(), OIConstants.InputLimits.vyDeadband, OIConstants.InputLimits.vy);
+            rad = controllerInput(controller.getZ(), OIConstants.InputLimits.radDeadband, OIConstants.InputLimits.rad);
         } else {
-            vx = controllerInput(controller.getY(), Swerve.Limits.vxDeadband, Swerve.Limits.vx * Swerve.Limits.reduced);
-            vy = controllerInput(controller.getX(), Swerve.Limits.vyDeadband, Swerve.Limits.vy * Swerve.Limits.reduced);
-            rad = controllerInput(controller.getZ(), Swerve.Limits.radDeadband, Swerve.Limits.rad * Swerve.Limits.reduced);
+            vx = controllerInput(controller.getY(), OIConstants.InputLimits.vxDeadband, OIConstants.InputLimits.vx * OIConstants.InputLimits.reduced);
+            vy = controllerInput(controller.getX(), OIConstants.InputLimits.vyDeadband, OIConstants.InputLimits.vy * OIConstants.InputLimits.reduced);
+            rad = controllerInput(controller.getZ(), OIConstants.InputLimits.radDeadband, OIConstants.InputLimits.rad * OIConstants.InputLimits.reduced);
         }
 
         if (controller.getRawButton(4))

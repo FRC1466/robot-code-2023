@@ -115,19 +115,6 @@ public final class RobotConstants {
       public static final int
         gyroID = 20;
 
-      public static final class Limits {
-        public static double 
-          vx = 3.5,
-          vxDeadband = 0.02,
-          vy = 3.5,
-          vyDeadband = 0.02,
-          rad = -4.0,
-          radDeadband = 0.10,
-          slew = 0.5,
-          reduced = 0.3,
-          debounce = 0.1; // time in s
-      } 
-
       public static final Gains 
         driveGainsVelocity  = new Gains(0.15, 0, 2.0, 0,  0,  0.8),
         driveGainsPosition  = new Gains(0.050953, 0, 0.0014019, 0,  0,  0.6),
@@ -143,6 +130,19 @@ public final class RobotConstants {
     public static final int 
       driverID = 4,
       intakeID = 1;
+    
+    public static final class InputLimits {
+      public static double 
+        vx = 3.5,
+        vxDeadband = 0.02,
+        vy = 3.5,
+        vyDeadband = 0.02,
+        rad = -4.0,
+        radDeadband = 0.10,
+        slew = 0.5,
+        reduced = 0.3,
+        debounce = 0.1; // time in s
+    } 
   }
 
   public static final class AutoConstants {
