@@ -130,7 +130,8 @@ public final class RobotConstants {
 
       public static final Gains 
         driveGainsVelocity  = new Gains(0.15, 0, 2.0, 0,  0,  0.8),
-        driveGainsPosition  = new Gains(0.050953, 0, 0.0014019, 0,  0,  0.6);
+        driveGainsPosition  = new Gains(0.050953, 0, 0.0014019, 0,  0,  0.6),
+        headingGains = new Gains(0.118, 0.03, 0, 0, 0, 1.0);
       public static final int 
         slotIdx = 0,
         pidLoopIdx = 0,
@@ -148,6 +149,9 @@ public final class RobotConstants {
     public static final double
       maxSpeedMPS = 2.0,
       maxAccelerationMPS = 1.0;
+    
+    public static final double
+      balanceScale = 2.0;
 
     public static final Gains
       thetaController = new Gains(-20, 0.0, 0.0, 0, 0, 1),

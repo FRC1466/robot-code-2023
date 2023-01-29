@@ -1,17 +1,17 @@
 package frc.lib.util.swerve;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SwerveBalance {
-    private PIDController balanceController;
+    private double scale;
 
     /**
      * Initialize SwerveBalance class.
+     * @param scale the scale to apply the gradients by
      */
-    public SwerveBalance() {
-        balanceController = new PIDController(2.0, 0, 0);
+    public SwerveBalance(double scale) {
+        this.scale = scale;
     }
 
     /**
@@ -22,14 +22,11 @@ public class SwerveBalance {
      * @return ChassisSpeeds object to set to module states.
      */
     public ChassisSpeeds update(Rotation2d pitch, Rotation2d roll) {
-        var xGrad = -pitch.getSin()/pitch.getCos();
-        var yGrad = pitch.getCos()*roll.getSin()/roll.getCos();
+        var xGrad = -pitch.getTan(); // sin/cos pitch
+        var yGrad = pitch.getCos()*roll.getTan(); // sin/cos roll
 
-        var setpoint = Math.sqrt(xGrad*xGrad+yGrad*yGrad);
-        var pidOutput = balanceController.calculate(setpoint, 0);
-
-        var vxMetersPerSecond = xGrad * pidOutput;
-        var vyMetersPerSecond = yGrad * pidOutput;
+        var vxMetersPerSecond = xGrad * scale;
+        var vyMetersPerSecond = yGrad * scale;
         return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, 0);
     }
 }

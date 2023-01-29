@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RectanglePoseArea;
 import frc.lib.util.swerve.BetterSwerveDrivePoseEstimator;
 import frc.lib.util.swerve.SwerveBalance;
+import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.Swerve;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
@@ -31,9 +32,9 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private BetterSwerveDrivePoseEstimator swervePoseEstimator;
-  private PIDController headingController = new PIDController(0.118, 0.03, 0);
-  private SwerveBalance swerveBalance = new SwerveBalance();
+  private final BetterSwerveDrivePoseEstimator swervePoseEstimator;
+  private final PIDController headingController;
+  private final SwerveBalance swerveBalance;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -47,6 +48,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     initializeTelemetry();
 
+    headingController = new PIDController(Swerve.headingGains.P, Swerve.headingGains.I, Swerve.headingGains.D);
+    swerveBalance = new SwerveBalance(AutoConstants.balanceScale);
     swervePoseEstimator = new BetterSwerveDrivePoseEstimator(Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
