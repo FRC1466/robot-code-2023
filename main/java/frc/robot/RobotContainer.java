@@ -58,20 +58,28 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    initializeChooser();
 
-    Command auto1 = new ComplexAuto(m_drive, m_tele, m_builder);
-    Command auto2 = m_builder.getSwerveCommand(PathPlanner.loadPathGroup("3 Score T1", 
-    new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)));
-    m_chooser.setDefaultOption("auto 1", auto1);
-    m_chooser.addOption("auto 2", auto2);
-    SmartDashboard.putData("CHOOSE", m_chooser);
-
-    // Configure default commands
-    // Set the default drive command to split-stick arcade drive
     m_drive.setDefaultCommand(
         m_DriveCommand
     );
 
+  }
+
+  private void initializeChooser() {
+    m_chooser.setDefaultOption("auto 1", new ComplexAuto(m_drive, m_tele, m_builder));
+
+    m_chooser.addOption("3 Score T1", 
+      m_builder.getSwerveCommand(
+        PathPlanner.loadPathGroup("3 Score T1", new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))
+      ));
+
+    m_chooser.addOption("2 Score + Dock T1", 
+      m_builder.getSwerveCommand(
+        PathPlanner.loadPathGroup("2 Score + Dock T1", new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))
+      ));
+
+    SmartDashboard.putData("CHOOSE", m_chooser);
   }
 
   /**
