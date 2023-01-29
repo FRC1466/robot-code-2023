@@ -1,4 +1,4 @@
-[![CI](https://github.com/FRC1466/robot-code-2023/actions/workflows/main.yml/badge.svg)](https://github.com/FRC1466/robot-code-2023/actions/workflows/main.yml) [![.github/workflows/spotless.yml](https://github.com/FRC1466/robot-code-2023/actions/workflows/spotless.yml/badge.svg)](https://github.com/FRC1466/robot-code-2023/actions/workflows/spotless.yml)
+[![Gradle Build](https://github.com/FRC1466/robot-code-2023/actions/workflows/main.yml/badge.svg)](https://github.com/FRC1466/robot-code-2023/actions/workflows/main.yml) [![Spotless](https://github.com/FRC1466/robot-code-2023/actions/workflows/spotless.yml/badge.svg)](https://github.com/FRC1466/robot-code-2023/actions/workflows/spotless.yml)
 <br>
 
 Our robot code for the FRC 2023 Charged Up Season.
