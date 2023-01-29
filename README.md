@@ -2,7 +2,7 @@
 Our robot code for the FRC 2023 Charged Up Season
 
 # Installation
-Create a new project, then git clone into the src directory, removing what was already in it.
+Clone the repo, ensure you have libraries.
 
 We use three libraries:
 - https://maven.ctr-electronics.com/release/com/ctre/phoenix/Phoenix5-frc2023-latest.json
