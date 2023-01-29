@@ -124,7 +124,8 @@ public final class RobotConstants {
           rad = -4.0,
           radDeadband = 0.10,
           slew = 0.5,
-          reduced = 0.3;
+          reduced = 0.3,
+          debounce = 0.1; // time in s
       } 
 
       public static final Gains 

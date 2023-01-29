@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
@@ -25,7 +26,9 @@ public class DriveCommand extends CommandBase {
     private double rad = 0;
     private int toggleModule = 0;
 
-    SlewRateLimiter filter = new SlewRateLimiter(Swerve.Limits.slew);
+    private final SlewRateLimiter filter = new SlewRateLimiter(Swerve.Limits.slew);
+    private final Debouncer debouncer = new Debouncer(Swerve.Limits.debounce, Debouncer.DebounceType.kBoth);
+
     
     /**
      * Default command for driving
@@ -50,7 +53,9 @@ public class DriveCommand extends CommandBase {
     }
 
     private double controllerInput(double input, double deadband, double scaler) {
-        return filter.calculate(MathUtil.applyDeadband(input, deadband)) * scaler;
+        input = MathUtil.applyDeadband(input, deadband);
+        var output = debouncer.calculate(input>0) ? input : 0;
+        return filter.calculate(output) * scaler;
     }
 
     /**
