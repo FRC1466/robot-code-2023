@@ -30,6 +30,6 @@ public class SwerveBalance {
 
     var vxMetersPerSecond = xGrad * scale;
     var vyMetersPerSecond = yGrad * scale;
-    return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, 0);
+    return new ChassisSpeeds(vxMetersPerSecond, -vyMetersPerSecond, 0);
   }
 }

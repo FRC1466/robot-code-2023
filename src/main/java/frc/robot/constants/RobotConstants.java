@@ -111,7 +111,8 @@ public final class RobotConstants {
     public static final int driverID = 4, intakeID = 1;
 
     public static final class InputLimits {
-      public static double vx = 3.5,
+      public static double 
+          vx = -3.5,
           vxDeadband = 0.02,
           vy = 3.5,
           vyDeadband = 0.02,
@@ -126,7 +127,7 @@ public final class RobotConstants {
   public static final class AutoConstants {
     public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 1.0;
 
-    public static final double balanceScale = 2.0;
+    public static final double balanceScale = 4.0;
 
     public static final Gains thetaController = new Gains(-20, 0.0, 0.0, 0, 0, 1),
         translationController = new Gains(8, 1.0, 0, 0, 0, 1);

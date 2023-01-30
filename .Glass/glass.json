@@ -2,6 +2,21 @@
   "NetworkTables": {
     "Persistent Values": {
       "open": false
+    },
+    "Transitory Values": {
+      "open": false
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Telemetry/gyro/reset gyro position": "Command",
+      "/SmartDashboard/CHOOSE": "String Chooser",
+      "/SmartDashboard/PPSwerveControllerCommand_field": "Field2d",
+      "/SmartDashboard/Pigeon 2 [20]": "Gyro"
     }
   },
   "NetworkTables Settings": {

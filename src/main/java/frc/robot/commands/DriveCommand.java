@@ -54,7 +54,8 @@ public class DriveCommand extends CommandBase {
   private double controllerInput(double input, double deadband, double scaler) {
     input = MathUtil.applyDeadband(input, deadband);
     var output = debouncer.calculate(input > 0) ? input : 0;
-    return filter.calculate(output) * scaler;
+    // return filter.calculate(output) * scaler;
+    return input * scaler;
   }
 
   /** local driving function */

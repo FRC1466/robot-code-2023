@@ -65,6 +65,7 @@ public class GoToScoring {
   }
 
   public Command getCommand(int scorePosition, Pose2d pose) {
+    System.out.println("Hi");
     ScoringArea scoringArea = getBestScoringArea(pose);
     Command command;
     if (scoringArea != null) {
@@ -90,6 +91,7 @@ public class GoToScoring {
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
         default:
+          System.out.println("TESTING");
           goToPose =
               new GoToPose(
                   scoringArea.getRightPosition().getPathPoint(),

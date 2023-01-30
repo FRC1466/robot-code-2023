@@ -83,15 +83,16 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    Command command;
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
     new JoystickButton(m_driverController, 3)
         .onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
     new JoystickButton(m_driverController, 7)
-        .whileTrue(goToScoring.getCommand(1, m_drive.getPose()));
+        .whileTrue(new InstantCommand(() -> goToScoring.getCommand(1, m_drive.getPose()).schedule()));
     new JoystickButton(m_driverController, 9)
-        .whileTrue(goToScoring.getCommand(2, m_drive.getPose()));
+        .whileTrue(new InstantCommand(() -> goToScoring.getCommand(2, m_drive.getPose()).schedule()));
     new JoystickButton(m_driverController, 11)
-        .whileTrue(goToScoring.getCommand(3, m_drive.getPose()));
+        .whileTrue(new InstantCommand(() -> goToScoring.getCommand(3, m_drive.getPose()).schedule()));
     new JoystickButton(m_driverController, 12)
         .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive));
   }
