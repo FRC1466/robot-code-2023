@@ -9,7 +9,9 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.Gains;
@@ -201,10 +203,12 @@ public final class RobotConstants {
                         new Rotation3d())));
           }
         };
-    public static final double fieldLength = Units.inchesToMeters(651.25);
-    public static final double fieldWidth = Units.inchesToMeters(315.5);
+    public static final double fieldLength = 16.54175;
+    public static final double fieldWidth = 8.0137;
     public static final AprilTagFieldLayout apriltagFieldLayout =
         new AprilTagFieldLayout(aprilList, fieldLength, fieldWidth);
+    public static final Translation3d cameraTranslation = new Translation3d(0.5, 0.0, 0.5);
+    public static final Rotation3d cameraRotation = new Rotation3d();
   }
 
   public static final class IntakeConstants {}
