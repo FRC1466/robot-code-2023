@@ -15,8 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GoToScoring {
-  DriveSubsystem drive;
-  List<ScoringArea> scoreAreaList;
+  private DriveSubsystem drive;
+  private List<ScoringArea> scoreAreaList;
+
+  public enum POSITION {
+    RIGHT,
+    MIDDLE,
+    LEFT
+  }
 
   public GoToScoring(DriveSubsystem drive) {
     this.drive = drive;
@@ -64,42 +70,40 @@ public class GoToScoring {
     return bestArea;
   }
 
-  public Command getCommand(int scorePosition, Pose2d pose) {
-    System.out.println("Hi");
+  public Command getCommand(POSITION scorePosition, Pose2d pose) {
+    System.out.println("Scoring Position Scheduled");
     ScoringArea scoringArea = getBestScoringArea(pose);
     Command command;
     if (scoringArea != null) {
       GoToPose goToPose;
       switch (scorePosition) {
-        case 1:
+        case LEFT:
           goToPose =
               new GoToPose(
-                  scoringArea.getLeftPosition().getPathPoint(),
+                  scoringArea.getLeftPosition().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
+          command = goToPose.getCommand();
           break;
-        case 2:
+        case MIDDLE:
           goToPose =
               new GoToPose(
-                  scoringArea.getMiddlePosition().getPathPoint(),
+                  scoringArea.getMiddlePosition().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
-        case 3:
+          command = goToPose.getCommand();
+        case RIGHT:
           goToPose =
               new GoToPose(
-                  scoringArea.getRightPosition().getPathPoint(),
+                  scoringArea.getRightPosition().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
+          command = goToPose.getCommand();
         default:
-          System.out.println("TESTING");
-          goToPose =
-              new GoToPose(
-                  scoringArea.getRightPosition().getPathPoint(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
-                  drive);
+          System.out.println("Unavailable enum");
+          command = new InstantCommand();
           break;
       }
-      command = goToPose.getCommand();
     } else {
       command = new InstantCommand();
     }

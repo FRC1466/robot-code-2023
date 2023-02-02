@@ -16,16 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GoToPose {
-  PPSwerveControllerCommand ppSwerveCommand;
-  PathPlannerTrajectory traj;
+  private PPSwerveControllerCommand ppSwerveCommand;
+  private PathPlannerTrajectory traj;
 
   public GoToPose(
       Pose2d pose, Rotation2d heading, PathConstraints constraints, DriveSubsystem drive) {
     Translation2d translation = pose.getTranslation();
     Rotation2d holonomic = pose.getRotation();
 
-    PathPoint currentPathPoint =
-        PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
+    PathPoint currentPathPoint;
+    if (drive.getCurrentChassisSpeeds().vxMetersPerSecond > 0.2
+        || drive.getCurrentChassisSpeeds().vyMetersPerSecond > 0.2) {
+      currentPathPoint =
+          PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
+    } else {
+      currentPathPoint =
+          new PathPoint(
+              drive.getPose().getTranslation(),
+              translation.minus(drive.getPose().getTranslation()).getAngle(),
+              drive.getPose().getRotation());
+    }
 
     List<PathPoint> path =
         new ArrayList<PathPoint>() {
@@ -67,16 +77,26 @@ public class GoToPose {
             );
   }
 
-  public GoToPose(PathPoint pathPoint, PathConstraints constraints, DriveSubsystem drive) {
+  public GoToPose(Pose2d pose, PathConstraints constraints, DriveSubsystem drive) {
+    Translation2d translation = pose.getTranslation();
+    Rotation2d holonomic = pose.getRotation();
+    var heading = translation.minus(drive.getPose().getTranslation()).getAngle();
 
-    PathPoint currentPathPoint =
-        PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
+    PathPoint currentPathPoint;
+    if (drive.getCurrentChassisSpeeds().vxMetersPerSecond > 0.2
+        || drive.getCurrentChassisSpeeds().vyMetersPerSecond > 0.2) {
+      currentPathPoint =
+          PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
+    } else {
+      currentPathPoint =
+          new PathPoint(drive.getPose().getTranslation(), heading, drive.getPose().getRotation());
+    }
 
     List<PathPoint> path =
         new ArrayList<PathPoint>() {
           {
             add(currentPathPoint);
-            add(pathPoint);
+            add(new PathPoint(translation, heading, holonomic));
           }
         };
 

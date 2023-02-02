@@ -16,6 +16,11 @@ public class GoToLoadingZone {
   private DriveSubsystem drive;
   private LoadingArea loadingArea;
 
+  public enum LOADING_SIDE {
+    LEFT,
+    RIGHT
+  }
+
   public GoToLoadingZone(DriveSubsystem drive) {
     this.drive = drive;
     loadingArea =
@@ -26,33 +31,30 @@ public class GoToLoadingZone {
             new HolonomicPose2d(new Pose2d(15.75, 6.00, new Rotation2d()), new Rotation2d()));
   }
 
-  public Command getCommand(int loadingPosition, Pose2d pose) {
+  public Command getCommand(LOADING_SIDE loadingPosition, Pose2d pose) {
     Command command;
     if (loadingArea.isPoseWithinScoringArea(pose)) {
       GoToPose goToPose;
       switch (loadingPosition) {
-        case 1:
+        case LEFT:
           goToPose =
               new GoToPose(
-                  loadingArea.getDoubleSubstationLeft().getPathPoint(),
+                  loadingArea.getDoubleSubstationLeft().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
+          command = goToPose.getCommand();
           break;
-        case 2:
+        case RIGHT:
           goToPose =
               new GoToPose(
-                  loadingArea.getDoubleSubstationRight().getPathPoint(),
+                  loadingArea.getDoubleSubstationRight().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
+          command = goToPose.getCommand();
         default:
-          goToPose =
-              new GoToPose(
-                  loadingArea.getDoubleSubstationRight().getPathPoint(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
-                  drive);
+          command = new InstantCommand();
           break;
       }
-      command = goToPose.getCommand();
     } else {
       command = new InstantCommand();
     }
