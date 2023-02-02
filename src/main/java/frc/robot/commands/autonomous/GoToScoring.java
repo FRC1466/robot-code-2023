@@ -13,6 +13,7 @@ import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GoToScoring {
   private DriveSubsystem drive;
@@ -32,8 +33,8 @@ public class GoToScoring {
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
-                        new Translation2d(1.23, 3.53),
-                        new Translation2d(2.86, 5.33)), // diagonal y's should not overlap
+                        new Translation2d(1.23, 3.53), new Translation2d(2.86, 5.33)),
+                    // diagonal y's should not overlap
                     new HolonomicPose2d(new Pose2d(1.62, 4.95, new Rotation2d()), new Rotation2d()),
                     new HolonomicPose2d(new Pose2d(1.62, 4.40, new Rotation2d()), new Rotation2d()),
                     new HolonomicPose2d(
@@ -62,25 +63,28 @@ public class GoToScoring {
    * @param pose current pose of robot
    * @return either null if not in scoring area, or the scoring are if in scoring area
    */
-  private ScoringArea getBestScoringArea(Pose2d pose) {
+  private Optional<ScoringArea> getBestScoringArea(Pose2d pose) { // do an optional
     ScoringArea bestArea = null;
     for (ScoringArea area : scoreAreaList) {
       if (area.isPoseWithinScoringArea(pose)) bestArea = area;
     }
-    return bestArea;
+    if (bestArea == null) {
+      return Optional.empty();
+    }
+    return Optional.of(bestArea);
   }
 
   public Command getCommand(POSITION scorePosition, Pose2d pose) {
     System.out.println("Scoring Position Scheduled");
-    ScoringArea scoringArea = getBestScoringArea(pose);
+    Optional<ScoringArea> scoringArea = getBestScoringArea(pose);
     Command command;
-    if (scoringArea != null) {
+    if (!scoringArea.isEmpty()) {
       GoToPose goToPose;
       switch (scorePosition) {
         case LEFT:
           goToPose =
               new GoToPose(
-                  scoringArea.getLeftPosition().getPoseMeters(),
+                  scoringArea.get().getLeftPosition().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
@@ -88,21 +92,19 @@ public class GoToScoring {
         case MIDDLE:
           goToPose =
               new GoToPose(
-                  scoringArea.getMiddlePosition().getPoseMeters(),
+                  scoringArea.get().getMiddlePosition().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
         case RIGHT:
           goToPose =
               new GoToPose(
-                  scoringArea.getRightPosition().getPoseMeters(),
+                  scoringArea.get().getRightPosition().getPoseMeters(),
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
         default:
-          System.out.println("Unavailable enum");
-          command = new InstantCommand();
-          break;
+          throw new IllegalArgumentException("Unsupported enum");
       }
     } else {
       command = new InstantCommand();

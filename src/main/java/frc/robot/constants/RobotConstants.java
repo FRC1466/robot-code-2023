@@ -156,7 +156,12 @@ public final class RobotConstants {
                     3,
                     new Pose3d(
                         Units.inchesToMeters(610.77),
-                        Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
+                        Units.inchesToMeters(174.19), // FIRST's
+                        // diagram
+                        // has a
+                        // typo (it
+                        // says
+                        // 147.19)
                         Units.inchesToMeters(18.22),
                         new Rotation3d(0.0, 0.0, Math.PI))));
             add(
@@ -180,7 +185,12 @@ public final class RobotConstants {
                     6,
                     new Pose3d(
                         Units.inchesToMeters(40.45),
-                        Units.inchesToMeters(174.19), // FIRST's diagram has a typo (it says 147.19)
+                        Units.inchesToMeters(174.19), // FIRST's
+                        // diagram
+                        // has a
+                        // typo (it
+                        // says
+                        // 147.19)
                         Units.inchesToMeters(18.22),
                         new Rotation3d())));
             add(

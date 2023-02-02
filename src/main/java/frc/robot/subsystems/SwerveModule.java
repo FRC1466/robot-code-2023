@@ -118,8 +118,7 @@ public class SwerveModule {
     Rotation2d angle =
         (Math.abs(desiredState.speedMetersPerSecond) <= (4 * 0.01))
             ? lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+            : desiredState.angle;
     // SmartDashboard.putNumber("mod"+moduleNumber+"initangle", angle.getDegrees());
     double a = Conversions.degreesToFalcon(angle.getDegrees(), Swerve.angleGearRatio);
     SmartDashboard.putNumber("mod" + moduleNumber + "anglesetpoint", a);

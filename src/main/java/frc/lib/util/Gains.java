@@ -9,7 +9,7 @@ public class Gains {
   public double peakOutput;
 
   /**
-   * Create a new gains profile for PID
+   * Create a new gains profile for PID.
    *
    * @param P proportion
    * @param I integral

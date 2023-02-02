@@ -38,10 +38,7 @@ public class PhotonCameraWrapper {
             : OriginPosition.kRedAllianceWallRightSide;
     setOriginFlipX(alliance);
 
-    robotToCam =
-        new Transform3d(
-            AutoConstants.cameraTranslation,
-            AutoConstants.cameraRotation); // make as constants later
+    robotToCam = new Transform3d(AutoConstants.cameraTranslation, AutoConstants.cameraRotation);
     photonPoseEstimator =
         new PhotonPoseEstimator(
             aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
@@ -55,11 +52,8 @@ public class PhotonCameraWrapper {
       case kRedAllianceWallRightSide:
         aprilTagFieldLayout.setOrigin(
             new Pose3d(
-                new Translation3d(
-                    AutoConstants.fieldLength,
-                    0,
-                    0), // SPECIFIC TO CHARGED UP, PROBABLY CHANGE TO MAKE MORE MODULAR
-                new Rotation3d(0, Math.PI, 0)));
+                new Translation3d(AutoConstants.fieldLength, 0, 0), new Rotation3d(0, Math.PI, 0)));
+        // flips translation and rotation for apriltags
         break;
       default:
         throw new IllegalArgumentException("Unsupported enum value");

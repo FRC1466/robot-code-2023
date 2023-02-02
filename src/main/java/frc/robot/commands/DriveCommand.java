@@ -92,8 +92,6 @@ public class DriveCommand extends CommandBase {
 
     Boolean isFieldRelative =
         defaultFieldRelative ? !controller.getRawButton(6) : controller.getRawButton(6);
-    // if default is true, then when button is not pressed, its field relative, if false, then
-    // opposite
     drive.setSpeeds(rad, vx, vy, isFieldRelative);
 
     drive.updateModuleStates();

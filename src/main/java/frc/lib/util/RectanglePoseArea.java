@@ -7,6 +7,12 @@ public class RectanglePoseArea {
   private final Translation2d bottomLeft;
   private final Translation2d topRight;
 
+  /**
+   * Create a 2D rectangular area for pose calculations.
+   *
+   * @param bottomLeft bottom left corner of the rectangle.
+   * @param topRight top right corner of the rectangle.
+   */
   public RectanglePoseArea(Translation2d bottomLeft, Translation2d topRight) {
     this.bottomLeft = bottomLeft;
     this.topRight = topRight;

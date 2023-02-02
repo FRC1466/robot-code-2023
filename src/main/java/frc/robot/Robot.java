@@ -46,9 +46,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled
+    // commands, running already-scheduled commands, removing finished or
+    // interrupted commands,
+    // and running subsystem periodic() methods. This must be called from the
+    // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // Shuffleboard.update();
@@ -70,10 +73,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     /*
-     * String autoSelected = SmartDashboard.getString("Auto Selector",
-     * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-     * = new MyAutoCommand(); break; case "Default Auto": default:
-     * autonomousCommand = new ExampleCommand(); break; }
+     * String autoSelected = SmartDashboard.getString("Auto Selector", "Default");
+     * switch(autoSelected) { case "My Auto": autonomousCommand = new
+     * MyAutoCommand(); break; case "Default Auto": default: autonomousCommand = new
+     * ExampleCommand(); break; }
      */
 
     // schedule the autonomous command (example)

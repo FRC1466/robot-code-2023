@@ -45,9 +45,8 @@ public class GoToPose {
           }
         };
 
-    traj =
-        PathPlanner.generatePath(
-            constraints, path); // position, heading(direction of travel), holonomic rotation
+    traj = PathPlanner.generatePath(constraints, path);
+    // position, heading(direction of travel), holonomic rotation
 
     ppSwerveCommand =
         new PPSwerveControllerCommand(
@@ -57,20 +56,19 @@ public class GoToPose {
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
-                AutoConstants.translationController
-                    .D), // X controller. Tune these values for your robot. Leaving them 0 will only
-            // use feedforwards.
+                AutoConstants.translationController.D),
+            // X controller. Tune these values for your robot. Leaving them 0 will only use
+            // feedforwards.
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
-                AutoConstants.translationController
-                    .D), // Y controller (usually the same values as X controller)
+                AutoConstants.translationController.D),
+            // Y controller (usually the same values as X controller)
             new PIDController(
                 AutoConstants.thetaController.P,
                 AutoConstants.thetaController.I,
-                AutoConstants.thetaController
-                    .D), // Rotation controller. Tune these values for your robot. Leaving them 0
-            // will only use feedforwards.
+                AutoConstants.thetaController.D),
+            // Rotation controller.
             drive::setDesiredModuleStates, // Module states consumer
             true,
             drive // Requires this drive subsystem
@@ -100,9 +98,7 @@ public class GoToPose {
           }
         };
 
-    traj =
-        PathPlanner.generatePath(
-            constraints, path); // position, heading(direction of travel), holonomic rotation
+    traj = PathPlanner.generatePath(constraints, path);
 
     ppSwerveCommand =
         new PPSwerveControllerCommand(
@@ -112,20 +108,15 @@ public class GoToPose {
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
-                AutoConstants.translationController
-                    .D), // X controller. Tune these values for your robot. Leaving them 0 will only
-            // use feedforwards.
+                AutoConstants.translationController.D),
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
-                AutoConstants.translationController
-                    .D), // Y controller (usually the same values as X controller)
+                AutoConstants.translationController.D),
             new PIDController(
                 AutoConstants.thetaController.P,
                 AutoConstants.thetaController.I,
-                AutoConstants.thetaController
-                    .D), // Rotation controller. Tune these values for your robot. Leaving them 0
-            // will only use feedforwards.
+                AutoConstants.thetaController.D),
             drive::setDesiredModuleStates, // Module states consumer
             true,
             drive // Requires this drive subsystem

@@ -174,7 +174,8 @@ public class BetterSwerveDrivePoseEstimator {
    *     or sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    // Step 1: Get the pose odometry measured at the moment the vision measurement was made.
+    // Step 1: Get the pose odometry measured at the moment the vision measurement
+    // was made.
     var sample = m_poseBuffer.getSample(timestampSeconds);
 
     if (sample.isEmpty()) {
@@ -184,8 +185,10 @@ public class BetterSwerveDrivePoseEstimator {
     // Step 2: Measure the twist between the odometry pose and the vision pose.
     var twist = sample.get().poseMeters.log(visionRobotPoseMeters);
 
-    // Step 3: We should not trust the twist entirely, so instead we scale this twist by a Kalman
-    // gain matrix representing how much we trust vision measurements compared to our current pose.
+    // Step 3: We should not trust the twist entirely, so instead we scale this
+    // twist by a Kalman
+    // gain matrix representing how much we trust vision measurements compared to
+    // our current pose.
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
     // Step 4: Convert back to Twist2d.
@@ -198,7 +201,8 @@ public class BetterSwerveDrivePoseEstimator {
         sample.get().modulePositions,
         sample.get().poseMeters.exp(scaledTwist));
 
-    // Step 6: Replay odometry inputs between sample time and latest recorded sample to update the
+    // Step 6: Replay odometry inputs between sample time and latest recorded sample
+    // to update the
     // pose buffer and correct odometry.
     for (Map.Entry<Double, InterpolationRecord> entry :
         m_poseBuffer.getInternalBuffer().tailMap(timestampSeconds).entrySet()) {
@@ -365,7 +369,8 @@ public class BetterSwerveDrivePoseEstimator {
         // Find the new wheel distances.
         var modulePositions = new SwerveModulePosition[m_numModules];
 
-        // Find the distance travelled between this measurement and the interpolated measurement.
+        // Find the distance travelled between this measurement and the interpolated
+        // measurement.
         var moduleDeltas = new SwerveModulePosition[m_numModules];
 
         for (int i = 0; i < m_numModules; i++) {
@@ -386,7 +391,8 @@ public class BetterSwerveDrivePoseEstimator {
         var gyroPitch_lerp = gyroPitch.interpolate(endValue.gyroPitch, t);
         var gyroRoll_lerp = gyroRoll.interpolate(endValue.gyroRoll, t);
 
-        // Create a twist to represent this change based on the interpolated sensor inputs.
+        // Create a twist to represent this change based on the interpolated sensor
+        // inputs.
         Twist2d twist = m_kinematics.toTwist2d(moduleDeltas);
         twist.dtheta = gyro_lerp.minus(gyroAngle).getRadians();
 
