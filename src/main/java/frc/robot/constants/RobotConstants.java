@@ -9,7 +9,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -113,8 +112,7 @@ public final class RobotConstants {
     public static final int driverID = 4, intakeID = 1;
 
     public static final class InputLimits {
-      public static double 
-          vx = -3.5,
+      public static double vx = -3.5,
           vxDeadband = 0.02,
           vy = 3.5,
           vyDeadband = 0.02,

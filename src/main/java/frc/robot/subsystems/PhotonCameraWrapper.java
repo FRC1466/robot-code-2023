@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.RobotConstants.AutoConstants;
-
 import java.io.IOException;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -41,7 +40,8 @@ public class PhotonCameraWrapper {
 
     robotToCam =
         new Transform3d(
-            AutoConstants.cameraTranslation, AutoConstants.cameraRotation); // make as constants later
+            AutoConstants.cameraTranslation,
+            AutoConstants.cameraRotation); // make as constants later
     photonPoseEstimator =
         new PhotonPoseEstimator(
             aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
@@ -49,18 +49,21 @@ public class PhotonCameraWrapper {
 
   public void setOriginFlipX(OriginPosition origin) {
     switch (origin) {
-        case kBlueAllianceWallRightSide:
-          aprilTagFieldLayout.setOrigin(new Pose3d());
-          break;
-        case kRedAllianceWallRightSide:
-          aprilTagFieldLayout.setOrigin(
-              new Pose3d(
-                  new Translation3d(AutoConstants.fieldLength, 0, 0), // SPECIFIC TO CHARGED UP, PROBABLY CHANGE TO MAKE MORE MODULAR
-                  new Rotation3d(0, Math.PI, 0)));
-          break;
-        default:
-          throw new IllegalArgumentException("Unsupported enum value");
-      }
+      case kBlueAllianceWallRightSide:
+        aprilTagFieldLayout.setOrigin(new Pose3d());
+        break;
+      case kRedAllianceWallRightSide:
+        aprilTagFieldLayout.setOrigin(
+            new Pose3d(
+                new Translation3d(
+                    AutoConstants.fieldLength,
+                    0,
+                    0), // SPECIFIC TO CHARGED UP, PROBABLY CHANGE TO MAKE MORE MODULAR
+                new Rotation3d(0, Math.PI, 0)));
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported enum value");
+    }
   }
 
   public PhotonPipelineResult getLatest() {
