@@ -4,10 +4,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.RobotConstants.AutoConstants;
@@ -32,32 +29,15 @@ public class PhotonCameraWrapper {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    var alliance =
+    aprilTagFieldLayout.setOrigin(
         DriverStation.getAlliance() == Alliance.Blue
             ? OriginPosition.kBlueAllianceWallRightSide
-            : OriginPosition.kRedAllianceWallRightSide;
-    setOriginFlipX(alliance);
+            : OriginPosition.kRedAllianceWallRightSide);
 
     robotToCam = new Transform3d(AutoConstants.cameraTranslation, AutoConstants.cameraRotation);
     photonPoseEstimator =
         new PhotonPoseEstimator(
             aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
-  }
-
-  public void setOriginFlipX(OriginPosition origin) {
-    switch (origin) {
-      case kBlueAllianceWallRightSide:
-        aprilTagFieldLayout.setOrigin(new Pose3d());
-        break;
-      case kRedAllianceWallRightSide:
-        aprilTagFieldLayout.setOrigin(
-            new Pose3d(
-                new Translation3d(AutoConstants.fieldLength, 0, 0), new Rotation3d(0, Math.PI, 0)));
-        // flips translation and rotation for apriltags
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported enum value");
-    }
   }
 
   public PhotonPipelineResult getLatest() {
