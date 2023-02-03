@@ -170,7 +170,7 @@ public class BetterSwerveDriveOdometry {
 
       var rotatedDeltaMatrix = rotationMatrix.mult(deltaMatrix);
       var finalDeltaDistance =
-          BetterMath.absFunc(
+          BetterMath.signedAbsFunc(
               deltaDistanceInitial,
               () -> Math.hypot(rotatedDeltaMatrix.get(0, 0), rotatedDeltaMatrix.get(1, 0)));
 
