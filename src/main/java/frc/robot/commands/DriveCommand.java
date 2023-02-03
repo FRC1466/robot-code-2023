@@ -51,11 +51,11 @@ public class DriveCommand extends CommandBase {
     initializeTelemetry();
   }
 
-  private double controllerInput(double input, double deadband, double scaler) {
+  private double controllerInput(double input, double deadband, double scalar) {
     input = MathUtil.applyDeadband(input, deadband);
     var output = debouncer.calculate(input > 0) ? input : 0;
-    // return filter.calculate(output) * scaler;
-    return input * scaler;
+    // return filter.calculate(output) * scalar;
+    return input * scalar;
   }
 
   /** local driving function */

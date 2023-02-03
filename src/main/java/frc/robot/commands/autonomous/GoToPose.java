@@ -25,8 +25,10 @@ public class GoToPose {
     Rotation2d holonomic = pose.getRotation();
 
     PathPoint currentPathPoint;
-    if (drive.getCurrentChassisSpeeds().vxMetersPerSecond > 0.2
-        || drive.getCurrentChassisSpeeds().vyMetersPerSecond > 0.2) {
+    if (Math.hypot(
+            drive.getCurrentChassisSpeeds().vxMetersPerSecond,
+            drive.getCurrentChassisSpeeds().vyMetersPerSecond)
+        > 0.2) {
       currentPathPoint =
           PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
     } else {
@@ -81,8 +83,10 @@ public class GoToPose {
     var heading = translation.minus(drive.getPose().getTranslation()).getAngle();
 
     PathPoint currentPathPoint;
-    if (drive.getCurrentChassisSpeeds().vxMetersPerSecond > 0.2
-        || drive.getCurrentChassisSpeeds().vyMetersPerSecond > 0.2) {
+    if (Math.hypot(
+            drive.getCurrentChassisSpeeds().vxMetersPerSecond,
+            drive.getCurrentChassisSpeeds().vyMetersPerSecond)
+        > 0.2) {
       currentPathPoint =
           PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
     } else {

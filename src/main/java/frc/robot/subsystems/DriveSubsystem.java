@@ -139,10 +139,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public Rotation2d getGyroPlaneInclination() {
     return Rotation2d.fromRadians(
-        Math.atan(
-            Math.sqrt(
-                getGyroPitch().getTan() * getGyroPitch().getTan()
-                    + getGyroRoll().getTan() * getGyroRoll().getTan())));
+        Math.atan(Math.hypot(getGyroPitch().getTan(), getGyroRoll().getTan())));
   }
 
   /** resets gyro */

@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.lib.math.BetterMath;
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -169,18 +170,11 @@ public class BetterSwerveDriveOdometry {
 
       var rotatedDeltaMatrix = rotationMatrix.mult(deltaMatrix);
       var finalDeltaDistance =
-          deltaDistanceInitial >= 0
-              ? Math.sqrt(
-                  Math.pow(rotatedDeltaMatrix.get(0, 0), 2)
-                      + Math.pow(rotatedDeltaMatrix.get(1, 0), 2))
-              : -Math.sqrt(
-                  Math.pow(rotatedDeltaMatrix.get(0, 0), 2)
-                      + Math.pow(rotatedDeltaMatrix.get(1, 0), 2));
+          BetterMath.absFunc(
+              deltaDistanceInitial,
+              () -> Math.hypot(rotatedDeltaMatrix.get(0, 0), rotatedDeltaMatrix.get(1, 0)));
 
-      var planeInclination =
-          Math.toDegrees(
-              Math.atan(
-                  Math.sqrt(pitch.getTan() * pitch.getTan() + roll.getTan() * roll.getTan())));
+      var planeInclination = Math.toDegrees(Math.atan(Math.hypot(pitch.getTan(), roll.getTan())));
 
       var deltaDistance =
           (Math.abs(planeInclination) > 5) ? finalDeltaDistance : deltaDistanceInitial;

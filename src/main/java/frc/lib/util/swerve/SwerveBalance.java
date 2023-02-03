@@ -2,6 +2,7 @@ package frc.lib.util.swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.lib.math.BetterMath;
 
 public class SwerveBalance {
   private double scale;
@@ -11,8 +12,8 @@ public class SwerveBalance {
    * Initialize SwerveBalance class.
    *
    * @param scale The scalar to apply to the gradients.
-   * @param scalePow Weight the result to be nonlinear (faster to balance when farther away). Set
-   * to 1 to be linear. Must be greater than 0.
+   * @param scalePow Weight the result to be nonlinear (faster to balance when farther away). Set to
+   *     1 to be linear. Must be greater than 0.
    */
   public SwerveBalance(double scale, double scalePow) {
     if (scalePow <= 0) {
@@ -36,13 +37,10 @@ public class SwerveBalance {
     var yGrad = pitch.getCos() * roll.getTan(); // sin/cos roll
 
     var vxMetersPerSecond =
-        (xGrad >= 0)
-            ? Math.pow(Math.abs(xGrad * scale), scalePow)
-            : -Math.pow(Math.abs(xGrad * scale), scalePow);
+        BetterMath.absFunc(xGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
     var vyMetersPerSecond =
-        (xGrad >= 0)
-            ? Math.pow(Math.abs(yGrad * scale), scalePow)
-            : -Math.pow(Math.abs(yGrad * scale), scalePow);
+        BetterMath.absFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
+
     return new ChassisSpeeds(vxMetersPerSecond, -vyMetersPerSecond, 0);
   }
 }
