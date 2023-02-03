@@ -5,14 +5,18 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class SwerveBalance {
   private double scale;
+  private double scalePow;
 
   /**
    * Initialize SwerveBalance class.
    *
-   * @param scale the scale to apply the gradients by
+   * @param scale The scalar to apply to the gradients.
+   * @param scalePow Weight the result to be nonlinear (faster to balance when farther away). Set
+   * to 1 to be linear.
    */
-  public SwerveBalance(double scale) {
+  public SwerveBalance(double scale, double scalePow) {
     this.scale = scale;
+    this.scalePow = scalePow;
   }
 
   /**
@@ -28,8 +32,14 @@ public class SwerveBalance {
     var xGrad = -pitch.getTan(); // sin/cos pitch
     var yGrad = pitch.getCos() * roll.getTan(); // sin/cos roll
 
-    var vxMetersPerSecond = xGrad * scale;
-    var vyMetersPerSecond = yGrad * scale;
+    var vxMetersPerSecond =
+        (xGrad >= 0)
+            ? Math.pow(Math.abs(xGrad * scale), scalePow)
+            : -Math.pow(Math.abs(xGrad * scale), scalePow);
+    var vyMetersPerSecond =
+        (xGrad >= 0)
+            ? Math.pow(Math.abs(yGrad * scale), scalePow)
+            : -Math.pow(Math.abs(yGrad * scale), scalePow);
     return new ChassisSpeeds(vxMetersPerSecond, -vyMetersPerSecond, 0);
   }
 }

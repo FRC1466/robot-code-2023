@@ -50,7 +50,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     headingController =
         new PIDController(Swerve.headingGains.P, Swerve.headingGains.I, Swerve.headingGains.D);
-    swerveBalance = new SwerveBalance(AutoConstants.balanceScale);
+    swerveBalance = new SwerveBalance(AutoConstants.balanceScale, AutoConstants.balanceScalePow);
     swervePoseEstimator =
         new BetterSwerveDrivePoseEstimator(
             Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
@@ -135,6 +135,14 @@ public class DriveSubsystem extends SubsystemBase {
   public Rotation2d getGyroRoll() {
     gyroRollEntry.setDouble(gyro.getRoll());
     return Rotation2d.fromDegrees(gyro.getRoll());
+  }
+
+  public Rotation2d getGyroPlaneInclination() {
+    return Rotation2d.fromRadians(
+        Math.atan(
+            Math.sqrt(
+                getGyroPitch().getTan() * getGyroPitch().getTan()
+                    + getGyroRoll().getTan() * getGyroRoll().getTan())));
   }
 
   /** resets gyro */

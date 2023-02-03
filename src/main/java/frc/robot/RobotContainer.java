@@ -92,6 +92,7 @@ public class RobotContainer {
                 () ->
                     goToScoring
                         .getCommand(GoToScoring.POSITION.RIGHT, m_drive.getPose())
+                        .repeatedly()
                         .until(() -> m_driverController.getRawButtonReleased(7))
                         .schedule()));
     new JoystickButton(m_driverController, 9)
@@ -100,6 +101,7 @@ public class RobotContainer {
                 () ->
                     goToScoring
                         .getCommand(GoToScoring.POSITION.MIDDLE, m_drive.getPose())
+                        .repeatedly()
                         .until(() -> m_driverController.getRawButtonReleased(9))
                         .schedule()));
     new JoystickButton(m_driverController, 11)
@@ -108,10 +110,13 @@ public class RobotContainer {
                 () ->
                     goToScoring
                         .getCommand(GoToScoring.POSITION.LEFT, m_drive.getPose())
+                        .repeatedly()
                         .until(() -> m_driverController.getRawButtonReleased(11))
                         .schedule()));
     new JoystickButton(m_driverController, 12)
-        .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive));
+        .whileTrue(
+            new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive)
+                .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) > 2.5));
   }
 
   /**

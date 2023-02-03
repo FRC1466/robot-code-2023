@@ -141,20 +141,12 @@ public class BetterSwerveDriveOdometry {
     var yaw = gyroYaw.plus(m_gyroOffset);
 
     var rotationMatrix = new SimpleMatrix(3, 3);
-    var gyroZero = new Rotation2d(); // doing dist calcs robot relative
-    rotationMatrix.setRow(
-        0,
-        0,
-        gyroZero.getCos() * pitch.getCos(),
-        gyroZero.getCos() * pitch.getSin() * roll.getSin() - gyroZero.getSin() * roll.getCos(),
-        gyroZero.getCos() * pitch.getSin() * roll.getCos() + gyroZero.getSin() * roll.getSin());
 
+    // assumes that yaw is 0 (doing robot relative calculations)
     rotationMatrix.setRow(
-        1,
-        0,
-        gyroZero.getSin() * pitch.getCos(),
-        gyroZero.getSin() * pitch.getSin() * roll.getSin() + gyroZero.getCos() * roll.getCos(),
-        gyroZero.getSin() * pitch.getSin() * roll.getCos() - gyroZero.getCos() * roll.getSin());
+        0, 0, pitch.getCos(), pitch.getSin() * roll.getSin(), pitch.getSin() * roll.getCos());
+
+    rotationMatrix.setRow(1, 0, 0, roll.getCos(), -roll.getSin());
 
     rotationMatrix.setRow(
         2, 0, -pitch.getSin(), pitch.getCos() * roll.getSin(), pitch.getCos() * roll.getCos());
@@ -185,12 +177,15 @@ public class BetterSwerveDriveOdometry {
                   Math.pow(rotatedDeltaMatrix.get(0, 0), 2)
                       + Math.pow(rotatedDeltaMatrix.get(1, 0), 2));
 
+      var planeInclination =
+          Math.toDegrees(
+              Math.atan(
+                  Math.sqrt(pitch.getTan() * pitch.getTan() + roll.getTan() * roll.getTan())));
+
       var deltaDistance =
-          (roll.getDegrees() > 10 || pitch.getDegrees() > 10)
-              ? finalDeltaDistance
-              : deltaDistanceInitial;
+          (Math.abs(planeInclination) > 5) ? finalDeltaDistance : deltaDistanceInitial;
       var updatedAngle =
-          (roll.getDegrees() > 10 || pitch.getDegrees() > 10)
+          (Math.abs(planeInclination) > 5)
               ? m_zeroModuleStates[index].angle.plus(
                   Rotation2d.fromRadians(
                       Math.atan2(rotatedDeltaMatrix.get(0, 0), rotatedDeltaMatrix.get(1, 0))))
