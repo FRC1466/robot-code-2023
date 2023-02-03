@@ -107,7 +107,7 @@ public class RobotContainer {
             new InstantCommand(
                 () ->
                     goToScoring
-                        .getCommand(GoToScoring.POSITION.RIGHT, m_drive.getPose())
+                        .getCommand(GoToScoring.POSITION.LEFT, m_drive.getPose())
                         .until(() -> m_driverController.getRawButtonReleased(11))
                         .schedule()));
     new JoystickButton(m_driverController, 12)
