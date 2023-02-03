@@ -12,9 +12,12 @@ public class SwerveBalance {
    *
    * @param scale The scalar to apply to the gradients.
    * @param scalePow Weight the result to be nonlinear (faster to balance when farther away). Set
-   * to 1 to be linear.
+   * to 1 to be linear. Must be greater than 0.
    */
   public SwerveBalance(double scale, double scalePow) {
+    if (scalePow <= 0) {
+      throw new IllegalArgumentException("scalePow must be greater than 0");
+    }
     this.scale = scale;
     this.scalePow = scalePow;
   }
