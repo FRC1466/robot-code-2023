@@ -3,11 +3,14 @@
     "Persistent Values": {
       "open": false
     },
-    "Transitory Values": {
+    "Retained Values": {
       "open": false
     },
     "transitory": {
       "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       }
     },
