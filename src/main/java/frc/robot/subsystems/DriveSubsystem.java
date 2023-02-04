@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -20,7 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RectanglePoseArea;
-import frc.lib.util.swerve.BetterSwerveDrivePoseEstimator;
 import frc.lib.util.swerve.SwerveBalance;
 import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.Swerve;
@@ -31,7 +31,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private ChassisSpeeds speeds;
   private SwerveModuleState[] desiredModuleStates;
-  private final BetterSwerveDrivePoseEstimator swervePoseEstimator;
+  private final SwerveDrivePoseEstimator swervePoseEstimator;
   private final PIDController headingController;
   private final SwerveBalance swerveBalance;
 
@@ -52,7 +52,7 @@ public class DriveSubsystem extends SubsystemBase {
         new PIDController(Swerve.headingGains.P, Swerve.headingGains.I, Swerve.headingGains.D);
     swerveBalance = new SwerveBalance(AutoConstants.balanceScale, AutoConstants.balanceScalePow);
     swervePoseEstimator =
-        new BetterSwerveDrivePoseEstimator(
+        new SwerveDrivePoseEstimator(
             Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
@@ -192,7 +192,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** update the odometry of the robot with current pose of the robot */
   public void updateRobotPose() {
     swervePoseEstimator.update(
-        getGyroRotation2d(), getGyroPitch(), getGyroRoll(), getSwervePositions());
+        getGyroRotation2d(), /* getGyroPitch(), getGyroRoll(), */ getSwervePositions());
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
     odometryYEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getY());
     odometryDegEntry.setDouble(
@@ -276,9 +276,7 @@ public class DriveSubsystem extends SubsystemBase {
       desiredModuleStates[i].angle =
           Rotation2d.fromRadians(
               desiredBetterModuleState[i].angle.getRadians()
-                  + desiredBetterModuleState[i].omegaRadPerSecond
-                      * Swerve.MODULE_STEER_FF_CL
-                      * 0.065);
+                  + desiredBetterModuleState[i].omegaRadPerSecond * Swerve.LOOP_TIME);
       desiredModuleStates[i].speedMetersPerSecond =
           desiredBetterModuleState[i].speedMetersPerSecond;
     }
