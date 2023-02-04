@@ -114,7 +114,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 12)
         .whileTrue(
             new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive)
-                .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.5));
+                .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
   }
 
   /**
