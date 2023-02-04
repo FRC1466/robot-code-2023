@@ -117,8 +117,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Rotation2d of gyro yaw
    */
   public Rotation2d getGyroRotation2d() {
-    gyroRotEntry.setDouble(-gyro.getYaw());
-    return Rotation2d.fromDegrees(-gyro.getYaw());
+    gyroRotEntry.setDouble(gyro.getYaw());
+    return Rotation2d.fromDegrees(gyro.getYaw());
   }
 
   /**

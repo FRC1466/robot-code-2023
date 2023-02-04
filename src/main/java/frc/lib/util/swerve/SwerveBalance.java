@@ -36,11 +36,11 @@ public class SwerveBalance {
     var xGrad = -pitch.getTan(); // sin/cos pitch
     var yGrad = pitch.getCos() * roll.getTan(); // sin/cos roll
 
-    var vxMetersPerSecond =
-        BetterMath.signedAbsFunc(xGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
     var vyMetersPerSecond =
+        BetterMath.signedAbsFunc(xGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
+    var vxMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
 
-    return new ChassisSpeeds(vxMetersPerSecond, -vyMetersPerSecond, 0);
+    return new ChassisSpeeds(-vxMetersPerSecond, vyMetersPerSecond, 0);
   }
 }

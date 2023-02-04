@@ -140,6 +140,7 @@ public class BetterSwerveDriveOdometry {
 
     var moduleDeltas = new SwerveModulePosition[m_numModules];
     var yaw = gyroYaw.plus(m_gyroOffset);
+    roll = roll.unaryMinus();
 
     var rotationMatrix = new SimpleMatrix(3, 3);
 

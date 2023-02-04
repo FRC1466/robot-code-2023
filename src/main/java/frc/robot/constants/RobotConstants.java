@@ -34,7 +34,7 @@ public final class RobotConstants {
     /* Front Left Module - Module 0 */
     public static final class Mod0 {
       public static final int driveMotorID = 1, angleMotorID = 2, cancoderID = 9;
-      public static final boolean driveInvert = false, angleInvert = true;
+      public static final boolean driveInvert = false, angleInvert = false;
       public static final Rotation2d angleOffset =
           Rotation2d.fromDegrees(-18.27 - 5.1 + 90 - 28.485);
       public static final SwerveModuleConstants constants =
@@ -46,7 +46,7 @@ public final class RobotConstants {
     /* Front Right Module - Module 1 */
     public static final class Mod1 {
       public static final int driveMotorID = 3, angleMotorID = 4, cancoderID = 10;
-      public static final boolean driveInvert = false, angleInvert = true;
+      public static final boolean driveInvert = false, angleInvert = false;
       public static final Rotation2d angleOffset = Rotation2d.fromDegrees(3.34 + 90 - 180 - 21.885);
       public static final SwerveModuleConstants constants =
           new SwerveModuleConstants(
@@ -57,7 +57,7 @@ public final class RobotConstants {
     /* Back Left Module - Module 2 */
     public static final class Mod2 {
       public static final int driveMotorID = 5, angleMotorID = 6, cancoderID = 11;
-      public static final boolean driveInvert = false, angleInvert = true;
+      public static final boolean driveInvert = false, angleInvert = false;
       public static final Rotation2d angleOffset =
           Rotation2d.fromDegrees(-53.87 + 90 - (11.05 / 2) - 10.0);
       public static final SwerveModuleConstants constants =
@@ -69,7 +69,7 @@ public final class RobotConstants {
     /* Back Right Module - Module 3 */
     public static final class Mod3 {
       public static final int driveMotorID = 7, angleMotorID = 8, cancoderID = 12;
-      public static final boolean driveInvert = false, angleInvert = true;
+      public static final boolean driveInvert = false, angleInvert = false;
       public static final Rotation2d angleOffset =
           Rotation2d.fromDegrees(7.56 - 12.75 + 90 - 16 - 9.044 + 8.345);
       public static final SwerveModuleConstants constants =
@@ -83,17 +83,17 @@ public final class RobotConstants {
 
     public static final BetterSwerveKinematics BETTER_KINEMATICS =
         new BetterSwerveKinematics(
-            new Translation2d(-trackWidth / 2, trackWidth / 2), // frontleft
-            new Translation2d(-trackWidth / 2, -trackWidth / 2), // frontright
             new Translation2d(trackWidth / 2, trackWidth / 2), // backleft
-            new Translation2d(trackWidth / 2, -trackWidth / 2)); // backright
+            new Translation2d(trackWidth / 2, -trackWidth / 2), // backright
+            new Translation2d(-trackWidth / 2, trackWidth / 2), // frontleft
+            new Translation2d(-trackWidth / 2, -trackWidth / 2)); // frontright
 
     public static final SwerveDriveKinematics KINEMATICS =
         new SwerveDriveKinematics(
-            new Translation2d(-trackWidth / 2, trackWidth / 2), // frontleft
-            new Translation2d(-trackWidth / 2, -trackWidth / 2), // frontright
             new Translation2d(trackWidth / 2, trackWidth / 2), // backleft
-            new Translation2d(trackWidth / 2, -trackWidth / 2)); // backright
+            new Translation2d(trackWidth / 2, -trackWidth / 2), // backright
+            new Translation2d(-trackWidth / 2, trackWidth / 2), // frontleft
+            new Translation2d(-trackWidth / 2, -trackWidth / 2)); // frontright
 
     public static final double
         driveGearRatio = 8.2138672, // refine this for pose estimation (-16822)
@@ -105,7 +105,7 @@ public final class RobotConstants {
         driveGainsPosition = new Gains(0.050953, 0, 0.0014019, 0, 0, 0.6),
         headingGains = new Gains(0.118, 0.03, 0, 0, 0, 1.0);
     public static final int slotIdx = 0, pidLoopIdx = 0, timeoutMS = 30;
-    public static final double MODULE_STEER_FF_CL = -0.30;
+    public static final double MODULE_STEER_FF_CL = -0.30, LOOP_TIME = 0.02;
   }
 
   public static final class OIConstants {
@@ -114,7 +114,7 @@ public final class RobotConstants {
     public static final class InputLimits {
       public static double vx = -3.5,
           vxDeadband = 0.02,
-          vy = 3.5,
+          vy = -3.5,
           vyDeadband = 0.02,
           rad = -4.0,
           radDeadband = 0.10,
@@ -126,8 +126,8 @@ public final class RobotConstants {
 
   public static final class AutoConstants {
     public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 2.0;
-    public static final double balanceScale = 4.0, balanceScalePow = 2.0;
-    public static final Gains thetaController = new Gains(-20, 0.0, 0.0, 0, 0, 1),
+    public static final double balanceScale = 8.0, balanceScalePow = 2.0;
+    public static final Gains thetaController = new Gains(20, 0.0, 0.0, 0, 0, 1),
         translationController = new Gains(8, 1.0, 0, 0, 0, 1);
 
     public static final List<AprilTag> aprilList =
