@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.autonomous.ComplexAuto;
 import frc.robot.commands.autonomous.GoToScoring;
+import frc.robot.commands.autonomous.GoToScoring.POSITION;
 import frc.robot.commands.autonomous.PathBuilder;
 import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.OIConstants;
@@ -91,27 +92,24 @@ public class RobotContainer {
             new InstantCommand(
                 () ->
                     goToScoring
-                        .getCommand(GoToScoring.POSITION.RIGHT, m_drive.getPose())
-                        .repeatedly()
-                        .until(() -> m_driverController.getRawButtonReleased(7))
+                        .getCommand(POSITION.RIGHT, m_drive.getPose())
+                        // .until(() -> m_driverController.getRawButtonReleased(7))
                         .schedule()));
     new JoystickButton(m_driverController, 9)
         .onTrue(
             new InstantCommand(
                 () ->
                     goToScoring
-                        .getCommand(GoToScoring.POSITION.MIDDLE, m_drive.getPose())
-                        .repeatedly()
-                        .until(() -> m_driverController.getRawButtonReleased(9))
+                        .getCommand(POSITION.MIDDLE, m_drive.getPose())
+                        // .until(() -> m_driverController.getRawButtonReleased(9))
                         .schedule()));
     new JoystickButton(m_driverController, 11)
         .onTrue(
             new InstantCommand(
                 () ->
                     goToScoring
-                        .getCommand(GoToScoring.POSITION.LEFT, m_drive.getPose())
-                        .repeatedly()
-                        .until(() -> m_driverController.getRawButtonReleased(11))
+                        .getCommand(POSITION.LEFT, m_drive.getPose())
+                        // .until(() -> m_driverController.getRawButtonReleased(11))
                         .schedule()));
     new JoystickButton(m_driverController, 12)
         .whileTrue(

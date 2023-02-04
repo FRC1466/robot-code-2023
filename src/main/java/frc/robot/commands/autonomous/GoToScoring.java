@@ -96,6 +96,7 @@ public class GoToScoring {
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
+          break;
         case RIGHT:
           goToPose =
               new GoToPose(
@@ -103,7 +104,9 @@ public class GoToScoring {
                   new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
+          break;
         default:
+          System.out.println(scorePosition.toString());
           throw new IllegalArgumentException("Unsupported enum");
       }
     } else {
