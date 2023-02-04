@@ -109,7 +109,7 @@ public final class RobotConstants {
   }
 
   public static final class OIConstants {
-    public static final int driverID = 4, intakeID = 1;
+    public static final int driverID = 4, intakeID = 5;
 
     public static final class InputLimits {
       public static double vx = -3.5,
@@ -219,6 +219,10 @@ public final class RobotConstants {
 
   public static final class ArmConstants {
     public static final int armPort = 25;
-    public static final Gains armPosition = new Gains(0.5, 0, 0.0, 0, 0, 0.6);
+    public static final Gains armPosition = new Gains(0.1, 0, 0.0, 0, 0, 0.6);
+  }
+
+  public static final class GripperConstants {
+    public static final Gains gripperPosition = new Gains(0, 0, 0, 0, 0, 0.5);
   }
 }

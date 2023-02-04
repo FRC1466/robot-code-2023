@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,6 +25,7 @@ import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.OIConstants;
 import frc.robot.subsystems.AdjustableTelemetry;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VirtualFourBar;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -39,9 +41,12 @@ public class RobotContainer {
 
   // The robot's subsystems
   private final DriveSubsystem m_drive = new DriveSubsystem();
+  private final VirtualFourBar m_arm = new VirtualFourBar();
+
   private final PathBuilder m_builder = new PathBuilder(m_drive);
 
   private final Joystick m_driverController = new Joystick(OIConstants.driverID);
+  private final Joystick m_scoreController = new Joystick(OIConstants.intakeID);
 
   // the default commands
   private final DriveCommand m_DriveCommand =
@@ -55,6 +60,10 @@ public class RobotContainer {
     initializeChooser();
 
     m_drive.setDefaultCommand(m_DriveCommand);
+    m_arm.setDefaultCommand(
+        new RunCommand(
+            () -> m_arm.setArm(MathUtil.clamp((m_driverController.getRawAxis(3) + 1) / 2, 0, 0.7)),
+            m_arm));
   }
 
   private void initializeChooser() {
@@ -87,7 +96,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
     new JoystickButton(m_driverController, 3)
         .onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
-    new JoystickButton(m_driverController, 7)
+    new JoystickButton(m_scoreController, 7)
         .onTrue(
             new InstantCommand(
                 () ->
@@ -95,7 +104,7 @@ public class RobotContainer {
                         .getCommand(POSITION.RIGHT, m_drive.getPose())
                         // .until(() -> m_driverController.getRawButtonReleased(7))
                         .schedule()));
-    new JoystickButton(m_driverController, 9)
+    new JoystickButton(m_scoreController, 8)
         .onTrue(
             new InstantCommand(
                 () ->
@@ -103,7 +112,7 @@ public class RobotContainer {
                         .getCommand(POSITION.MIDDLE, m_drive.getPose())
                         // .until(() -> m_driverController.getRawButtonReleased(9))
                         .schedule()));
-    new JoystickButton(m_driverController, 11)
+    new JoystickButton(m_scoreController, 9)
         .onTrue(
             new InstantCommand(
                 () ->

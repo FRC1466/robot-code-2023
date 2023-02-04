@@ -2,22 +2,24 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.constants.RobotConstants.ArmConstants;
 
 public class VirtualFourBar extends SubsystemBase {
   private WPI_TalonFX armMotor;
-  private Encoder armEncoder;
+  private DutyCycleEncoder armEncoder;
   private PIDController armPID;
 
   public VirtualFourBar() {
     armMotor = new WPI_TalonFX(ArmConstants.armPort);
     configArmMotor();
 
-    armEncoder = new Encoder(0, 1);
-    armEncoder.setDistancePerPulse(1 / 256);
+    armEncoder = new DutyCycleEncoder(0);
+    armEncoder.setDistancePerRotation(1);
+    armEncoder.setPositionOffset(0);
 
     armPID =
         new PIDController(
@@ -32,5 +34,12 @@ public class VirtualFourBar extends SubsystemBase {
   public void setArm(double a) {
     var motorOutput = armPID.calculate(armEncoder.getDistance(), a);
     armMotor.setVoltage(motorOutput);
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putData(armEncoder);
+    SmartDashboard.putNumber("abs arm", armEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("norm arm", armEncoder.getDistance());
   }
 }
