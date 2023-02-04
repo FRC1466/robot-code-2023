@@ -118,7 +118,7 @@ public final class RobotConstants {
           vyDeadband = 0.02,
           rad = -4.0,
           radDeadband = 0.10,
-          slew = 0.5,
+          slew = 8.0,
           reduced = 0.3,
           debounce = 0.1; // time in s
     }
