@@ -217,5 +217,8 @@ public final class RobotConstants {
     public static final Rotation3d cameraRotation = new Rotation3d();
   }
 
-  public static final class IntakeConstants {}
+  public static final class ArmConstants {
+    public static final int armPort = 25;
+    public static final Gains armPosition = new Gains(0.5, 0, 0.0, 0, 0, 0.6);
+  }
 }
