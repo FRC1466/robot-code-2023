@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants.ModuleConfigs;
+import frc.robot.constants.MotorConfigs;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   private boolean isAutoDone;
   private RobotContainer robotContainer;
   private Command autonomousCommand;
-  public static ModuleConfigs moduleConfigs;
+  public static MotorConfigs moduleConfigs;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    moduleConfigs = new ModuleConfigs();
+    moduleConfigs = new MotorConfigs();
     robotContainer = new RobotContainer();
   }
 

@@ -5,18 +5,21 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
+import frc.robot.constants.RobotConstants.ArmConstants;
 import frc.robot.constants.RobotConstants.Swerve;
 
-public final class ModuleConfigs {
+public final class MotorConfigs {
 
   public TalonFXConfiguration swerveAngleConfig;
   public TalonFXConfiguration swerveDriveConfig;
+  public TalonFXConfiguration armConfig;
   public CANCoderConfiguration swerveCancoderConfig;
 
   /** create a set of configs for a swerve module */
-  public ModuleConfigs() {
+  public MotorConfigs() {
     swerveAngleConfig = new TalonFXConfiguration();
     swerveDriveConfig = new TalonFXConfiguration();
+    armConfig = new TalonFXConfiguration();
     swerveCancoderConfig = new CANCoderConfiguration();
 
     swerveAngleConfig.nominalOutputForward = 0;
@@ -46,5 +49,11 @@ public final class ModuleConfigs {
         SensorInitializationStrategy.BootToAbsolutePosition;
     swerveCancoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
     swerveCancoderConfig.sensorDirection = false;
+
+    swerveDriveConfig.nominalOutputForward = 0;
+    swerveDriveConfig.nominalOutputReverse = 0;
+    swerveDriveConfig.peakOutputForward = ArmConstants.armPosition.peakOutput;
+    swerveDriveConfig.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
+    swerveDriveConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
   }
 }
