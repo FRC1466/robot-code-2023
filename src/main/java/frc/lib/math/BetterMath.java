@@ -25,11 +25,11 @@ public class BetterMath {
   }
 
   /**
-   * Signage change for output of a function dependent on signage of a double. Commonly
-   * used for something like magnitude calculation of a vector where the magnitude has
-   * to be signed.
+   * Signage change for output of a function dependent on signage of a double. Commonly used for
+   * something like magnitude calculation of a vector where the magnitude has to be signed.
+   *
    * @param signage double where value doesn't matter, only signage does.
-   * @param func function f() that returns an output > 0. 
+   * @param func function f() that returns an output > 0.
    * @return mirrored output across x axis dependent on signage double,
    */
   public static double signedAbsFunc(double signage, DoubleSupplier func) {

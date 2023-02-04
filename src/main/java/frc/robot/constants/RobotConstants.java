@@ -214,7 +214,7 @@ public final class RobotConstants {
     public static final AprilTagFieldLayout apriltagFieldLayout =
         new AprilTagFieldLayout(aprilList, fieldLength, fieldWidth);
     public static final Translation3d cameraTranslation = new Translation3d(0.5, 0.0, 0.5);
-    public static final Rotation3d cameraRotation = new Rotation3d();
+    public static final Rotation3d cameraRotation = new Rotation3d(0, 0, 0);
   }
 
   public static final class ArmConstants {
