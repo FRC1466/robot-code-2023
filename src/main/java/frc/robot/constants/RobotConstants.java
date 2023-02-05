@@ -218,8 +218,8 @@ public final class RobotConstants {
   }
 
   public static final class ArmConstants {
-    public static final int armPort = 25;
-    public static final Gains armPosition = new Gains(0.1, 0, 0.0, 0, 0, 0.6);
+    public static final int armPort = 30;
+    public static final Gains armPosition = new Gains(-20.1, 0, 0.0, 0, 0, 0.6);
   }
 
   public static final class GripperConstants {

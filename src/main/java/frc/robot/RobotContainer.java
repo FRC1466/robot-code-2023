@@ -62,7 +62,7 @@ public class RobotContainer {
     m_drive.setDefaultCommand(m_DriveCommand);
     m_arm.setDefaultCommand(
         new RunCommand(
-            () -> m_arm.setArm(MathUtil.clamp((m_driverController.getRawAxis(3) + 1) / 2, 0, 0.7)),
+            () -> m_arm.setArm(MathUtil.clamp((m_driverController.getRawAxis(3)/2)+0.8, 0.6, 1.4)),
             m_arm));
   }
 

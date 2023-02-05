@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,7 +34,8 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public void setArm(double a) {
-    var motorOutput = armPID.calculate(armEncoder.getDistance(), a);
+    SmartDashboard.putNumber("setpoint", a);
+    var motorOutput = MathUtil.clamp(armPID.calculate(armEncoder.getDistance(), a), -12, 12);
     armMotor.setVoltage(motorOutput);
   }
 
