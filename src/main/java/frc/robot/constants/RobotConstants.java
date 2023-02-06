@@ -6,6 +6,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,6 +15,9 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.Gains;
+import frc.lib.util.HolonomicPose2d;
+import frc.lib.util.RectanglePoseArea;
+import frc.lib.util.chargedup.ScoringArea;
 import frc.lib.util.swerve.BetterSwerveKinematics;
 import frc.lib.util.swerve.SwerveModuleConstants;
 import java.util.ArrayList;
@@ -126,7 +130,7 @@ public final class RobotConstants {
 
   public static final class AutoConstants {
     public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 2.0;
-    public static final double balanceScale = 8.0, balanceScalePow = 2.0;
+    public static final double balanceScale = 6.0, balanceScalePow = 1.8;
     public static final Gains thetaController = new Gains(20, 0.0, 0.0, 0, 0, 1),
         translationController = new Gains(8, 1.0, 0, 0, 0, 1);
 
@@ -154,12 +158,7 @@ public final class RobotConstants {
                     3,
                     new Pose3d(
                         Units.inchesToMeters(610.77),
-                        Units.inchesToMeters(174.19), // FIRST's
-                        // diagram
-                        // has a
-                        // typo (it
-                        // says
-                        // 147.19)
+                        Units.inchesToMeters(174.19),
                         Units.inchesToMeters(18.22),
                         new Rotation3d(0.0, 0.0, Math.PI))));
             add(
@@ -183,12 +182,7 @@ public final class RobotConstants {
                     6,
                     new Pose3d(
                         Units.inchesToMeters(40.45),
-                        Units.inchesToMeters(174.19), // FIRST's
-                        // diagram
-                        // has a
-                        // typo (it
-                        // says
-                        // 147.19)
+                        Units.inchesToMeters(174.19),
                         Units.inchesToMeters(18.22),
                         new Rotation3d())));
             add(
@@ -209,6 +203,36 @@ public final class RobotConstants {
                         new Rotation3d())));
           }
         };
+    public static final List<ScoringArea> scoreAreaList =
+        new ArrayList<>() {
+          {
+            add(
+                new ScoringArea(
+                    new RectanglePoseArea(
+                        new Translation2d(1.23, 3.53), new Translation2d(2.86, 5.33)),
+                    // diagonal y's should not overlap
+                    new HolonomicPose2d(new Pose2d(1.62, 4.95, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(1.62, 4.40, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(1.62, 3.84, new Rotation2d()), new Rotation2d())));
+            add(
+                new ScoringArea(
+                    new RectanglePoseArea(
+                        new Translation2d(1.23, 1.90), new Translation2d(2.92, 3.52)),
+                    new HolonomicPose2d(new Pose2d(1.62, 3.30, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(1.62, 2.72, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(1.62, 2.19, new Rotation2d()), new Rotation2d())));
+            add(
+                new ScoringArea(
+                    new RectanglePoseArea(
+                        new Translation2d(1.23, 0.0), new Translation2d(2.89, 1.89)),
+                    new HolonomicPose2d(new Pose2d(1.62, 1.61, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(1.62, 1.03, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(1.62, 0.55, new Rotation2d()), new Rotation2d())));
+          }
+        };
     public static final double fieldLength = 16.54175;
     public static final double fieldWidth = 8.0137;
     public static final AprilTagFieldLayout apriltagFieldLayout =
@@ -219,7 +243,7 @@ public final class RobotConstants {
 
   public static final class ArmConstants {
     public static final int armPort = 30;
-    public static final Gains armPosition = new Gains(-20.1, 0, 0.0, 0, 0, 0.6);
+    public static final Gains armPosition = new Gains(30.1, 0, 0.0, 0, 0, 0.6);
   }
 
   public static final class GripperConstants {

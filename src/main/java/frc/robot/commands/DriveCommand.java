@@ -56,7 +56,7 @@ public class DriveCommand extends CommandBase {
 
   private double controllerInput(
       double input, double deadband, double scalar, SlewRateLimiter limiter) {
-    input = MathUtil.applyDeadband(input, deadband);
+    input = MathUtil.applyDeadband(input, deadband); // TODO: make a scaled deadband
     // var output = debouncer.calculate(input > 0) ? input : 0;
     return limiter.calculate(input) * scalar;
     // return input * scalar;

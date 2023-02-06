@@ -51,7 +51,6 @@ public class RobotContainer {
   // the default commands
   private final DriveCommand m_DriveCommand =
       new DriveCommand(m_drive, m_tele, m_driverController, isFieldRelative);
-  private final GoToScoring goToScoring = new GoToScoring(m_drive);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -64,7 +63,7 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_arm.setArm(
-                    MathUtil.clamp((m_driverController.getRawAxis(3) / 2) + 0.8, 0.6, 1.4)),
+                    MathUtil.clamp((m_driverController.getRawAxis(3) / 2.25) + 1.02, 0.62, 1.42)),
             m_arm));
   }
 
@@ -98,34 +97,11 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
     new JoystickButton(m_driverController, 3)
         .onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
-    new JoystickButton(m_scoreController, 7)
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    goToScoring
-                        .getCommand(POSITION.RIGHT, m_drive.getPose())
-                        // .until(() -> m_driverController.getRawButtonReleased(7))
-                        .schedule()));
-    new JoystickButton(m_scoreController, 8)
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    goToScoring
-                        .getCommand(POSITION.MIDDLE, m_drive.getPose())
-                        // .until(() -> m_driverController.getRawButtonReleased(9))
-                        .schedule()));
-    new JoystickButton(m_scoreController, 9)
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    goToScoring
-                        .getCommand(POSITION.LEFT, m_drive.getPose())
-                        // .until(() -> m_driverController.getRawButtonReleased(11))
-                        .schedule()));
+    new JoystickButton(m_scoreController, 7).onTrue(new GoToScoring(m_drive, POSITION.RIGHT));
+    new JoystickButton(m_scoreController, 8).onTrue(new GoToScoring(m_drive, POSITION.MIDDLE));
+    new JoystickButton(m_scoreController, 9).onTrue(new GoToScoring(m_drive, POSITION.LEFT));
     new JoystickButton(m_driverController, 12)
-        .whileTrue(
-            new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive)
-                .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
+        .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive));
   }
 
   /**
