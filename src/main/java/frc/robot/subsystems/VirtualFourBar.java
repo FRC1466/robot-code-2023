@@ -20,7 +20,7 @@ public class VirtualFourBar extends SubsystemBase {
 
     armEncoder = new DutyCycleEncoder(0);
     armEncoder.setDistancePerRotation(1);
-    armEncoder.setPositionOffset(0);
+    armEncoder.setPositionOffset(0.52);
 
     armPID =
         new PIDController(
@@ -35,7 +35,8 @@ public class VirtualFourBar extends SubsystemBase {
   public void setArm(double a) {
     SmartDashboard.putNumber("setpoint", a);
     var motorOutput = MathUtil.clamp(armPID.calculate(armEncoder.getDistance(), a), -12, 12);
-    armMotor.setVoltage(motorOutput);
+    SmartDashboard.putNumber("armPID output", motorOutput);
+    // armMotor.setVoltage(motorOutput);
   }
 
   @Override

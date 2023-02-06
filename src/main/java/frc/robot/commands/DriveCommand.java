@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.GenericEntry;
@@ -10,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.math.BetterMath;
 import frc.robot.constants.RobotConstants.OIConstants;
 import frc.robot.subsystems.AdjustableTelemetry;
 import frc.robot.subsystems.DriveSubsystem;
@@ -56,7 +56,9 @@ public class DriveCommand extends CommandBase {
 
   private double controllerInput(
       double input, double deadband, double scalar, SlewRateLimiter limiter) {
-    input = MathUtil.applyDeadband(input, deadband); // TODO: make a scaled deadband
+    // input = MathUtil.applyDeadband(input, deadband);
+    input =
+        Math.abs(input) > deadband ? input : BetterMath.signedAbsFunc(input, (x) -> Math.pow(x, 3));
     // var output = debouncer.calculate(input > 0) ? input : 0;
     return limiter.calculate(input) * scalar;
     // return input * scalar;

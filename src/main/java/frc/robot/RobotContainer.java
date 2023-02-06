@@ -63,7 +63,8 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_arm.setArm(
-                    MathUtil.clamp((m_driverController.getRawAxis(3) / 2.25) + 1.02, 0.62, 1.42)),
+                    MathUtil.clamp(
+                        (m_driverController.getRawAxis(3) / 2.25) + 0.50, 0.15, 0.86)), // 0.62 1.42
             m_arm));
   }
 
@@ -101,7 +102,7 @@ public class RobotContainer {
     new JoystickButton(m_scoreController, 8).onTrue(new GoToScoring(m_drive, POSITION.MIDDLE));
     new JoystickButton(m_scoreController, 9).onTrue(new GoToScoring(m_drive, POSITION.LEFT));
     new JoystickButton(m_driverController, 12)
-        .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive));
+        .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive).until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
   }
 
   /**

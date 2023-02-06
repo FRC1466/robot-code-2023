@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.lib.util.chargedup.ScoringArea;
 import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -99,5 +100,10 @@ public class GoToScoring extends CommandBase {
       currentCommand = getCommand(selectedPosition, drive.getPose());
       currentCommand.schedule();
     }
+  }
+
+  @Override
+  public WrapperCommand handleInterrupt(Runnable handler) {
+    return super.handleInterrupt(() -> currentCommand.cancel());
   }
 }
