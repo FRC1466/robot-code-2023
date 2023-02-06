@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.util.Gains;
 import frc.lib.util.HolonomicPose2d;
 import frc.lib.util.RectanglePoseArea;
+import frc.lib.util.chargedup.LoadingArea;
 import frc.lib.util.chargedup.ScoringArea;
 import frc.lib.util.swerve.BetterSwerveKinematics;
 import frc.lib.util.swerve.SwerveModuleConstants;
@@ -203,6 +204,13 @@ public final class RobotConstants {
                         new Rotation3d())));
           }
         };
+
+    public static final LoadingArea loadingArea =
+        new LoadingArea(
+            new RectanglePoseArea(new Translation2d(9.91, 6.82), new Translation2d(16.24, 7.97)),
+            new RectanglePoseArea(new Translation2d(13.24, 5.66), new Translation2d(16.51, 7.97)),
+            new HolonomicPose2d(new Pose2d(15.79, 7.34, new Rotation2d()), new Rotation2d()),
+            new HolonomicPose2d(new Pose2d(15.75, 6.00, new Rotation2d()), new Rotation2d()));
     public static final List<ScoringArea> scoreAreaList =
         new ArrayList<>() {
           {
