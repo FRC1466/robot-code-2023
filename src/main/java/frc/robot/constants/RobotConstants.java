@@ -131,7 +131,7 @@ public final class RobotConstants {
 
   public static final class AutoConstants {
     public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 2.0;
-    public static final double balanceScale = 6.0, balanceScalePow = 1.8;
+    public static final double balanceScale = 4.0, balanceScalePow = 1.8;
     public static final Gains thetaController = new Gains(20, 0.0, 0.0, 0, 0, 1),
         translationController = new Gains(8, 1.0, 0, 0, 0, 1);
 

@@ -98,11 +98,13 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
     new JoystickButton(m_driverController, 3)
         .onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
-    new JoystickButton(m_scoreController, 7).onTrue(new GoToScoring(m_drive, POSITION.RIGHT));
-    new JoystickButton(m_scoreController, 8).onTrue(new GoToScoring(m_drive, POSITION.MIDDLE));
-    new JoystickButton(m_scoreController, 9).onTrue(new GoToScoring(m_drive, POSITION.LEFT));
+    new JoystickButton(m_scoreController, 7).whileTrue(new GoToScoring(m_drive, POSITION.RIGHT));
+    new JoystickButton(m_scoreController, 8).whileTrue(new GoToScoring(m_drive, POSITION.MIDDLE));
+    new JoystickButton(m_scoreController, 9).whileTrue(new GoToScoring(m_drive, POSITION.LEFT));
     new JoystickButton(m_driverController, 12)
-        .whileTrue(new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive).until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
+        .whileTrue(
+            new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive)
+                .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
   }
 
   /**

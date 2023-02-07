@@ -41,6 +41,6 @@ public class SwerveBalance {
     var vxMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
 
-    return new ChassisSpeeds(vxMetersPerSecond, -vyMetersPerSecond, 0);
+    return new ChassisSpeeds(-vxMetersPerSecond, vyMetersPerSecond, 0);
   }
 }
