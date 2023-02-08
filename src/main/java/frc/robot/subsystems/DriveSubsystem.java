@@ -186,14 +186,15 @@ public class DriveSubsystem extends SubsystemBase {
   public void setDesiredModuleStates(SwerveModuleState[] states) {
     for (var module : swerveModules) {
       module.setDesiredState(states[module.moduleNumber]);
-    // var betterStates =
-    //     Swerve.BETTER_KINEMATICS.toSwerveModuleStates(Swerve.KINEMATICS.toChassisSpeeds(states));
-    // for (int i = 0; i < swerveModules.length; i++) {
-    //   states[i].angle =
-    //       Rotation2d.fromRadians(
-    //           betterStates[i].angle.getRadians()
-    //               + betterStates[i].omegaRadPerSecond * Swerve.LOOP_TIME);
-    //   swerveModules[i].setDesiredState(states[swerveModules[i].moduleNumber]);
+      // var betterStates =
+      //
+      // Swerve.BETTER_KINEMATICS.toSwerveModuleStates(Swerve.KINEMATICS.toChassisSpeeds(states));
+      // for (int i = 0; i < swerveModules.length; i++) {
+      //   states[i].angle =
+      //       Rotation2d.fromRadians(
+      //           betterStates[i].angle.getRadians()
+      //               + betterStates[i].omegaRadPerSecond * Swerve.LOOP_TIME);
+      //   swerveModules[i].setDesiredState(states[swerveModules[i].moduleNumber]);
     }
   }
 
