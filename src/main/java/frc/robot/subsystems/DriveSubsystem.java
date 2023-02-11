@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
-import frc.lib.util.swerve.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Quaternion;
@@ -25,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.RectanglePoseArea;
 import frc.lib.util.swerve.SwerveBalance;
+import frc.lib.util.swerve.SwerveDrivePoseEstimator;
 import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.constants.RobotConstants.Swerve;
 
@@ -141,7 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public Rotation3d getGyroRotation3d() {
-    var wxyz = new double[]{};
+    var wxyz = new double[] {};
     gyro.get6dQuaternion(wxyz);
     Quaternion q = new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]);
     return new Rotation3d(q);
@@ -210,8 +210,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** update the odometry of the robot with current pose of the robot */
   public void updateRobotPose() {
-    swervePoseEstimator.update(
-        getGyroRotation3d(), getSwervePositions());
+    swervePoseEstimator.update(getGyroRotation3d(), getSwervePositions());
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
     odometryYEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getY());
     odometryDegEntry.setDouble(
