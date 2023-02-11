@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -79,11 +80,16 @@ public class RobotContainer {
                 new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
 
     m_chooser.addOption(
-        "2 Score + Dock T1",
-        m_builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "2 Score + Dock T1",
-                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
+        "1 Score + Dock T2",
+        m_builder
+            .getSwerveCommand(
+                PathPlanner.loadPathGroup(
+                    "1 Score + Dock T2",
+                    new PathConstraints(
+                        AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)))
+            .andThen(
+                Commands.run(() -> m_drive.driveAutoBalancingFull(), m_drive)
+                    .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0)));
 
     SmartDashboard.putData("CHOOSE", m_chooser);
   }
@@ -101,7 +107,7 @@ public class RobotContainer {
     new JoystickButton(m_scoreController, 7).whileTrue(new GoToScoring(m_drive, POSITION.RIGHT));
     new JoystickButton(m_scoreController, 8).whileTrue(new GoToScoring(m_drive, POSITION.MIDDLE));
     new JoystickButton(m_scoreController, 9).whileTrue(new GoToScoring(m_drive, POSITION.LEFT));
-    new JoystickButton(m_driverController, 12)
+    new JoystickButton(m_driverController, 11)
         .whileTrue(
             new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive)
                 .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
