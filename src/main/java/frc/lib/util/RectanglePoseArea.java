@@ -31,7 +31,7 @@ public class RectanglePoseArea {
   }
 
   public double getMaxY() {
-    return topRight.getX();
+    return topRight.getY();
   }
 
   public Translation2d getBottomLeftPoint() {
