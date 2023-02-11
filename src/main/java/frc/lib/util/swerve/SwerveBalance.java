@@ -24,23 +24,24 @@ public class SwerveBalance {
   }
 
   /**
-   * Update ChassisSpeeds for balancing based on pitch and roll. Uses a rough gradient descent
-   * through the z function found in the last row of the rotation matrix calculatior for the
-   * transformation of a point.
+   * Update ChassisSpeeds for balancing based on pitch and roll. Create a plane through the z
+   * function found in the last row of the rotation matrix calculatior for the transformation of a
+   * point. Is essentially the derivative plane of a function in R3. Scales it according to
+   * constants in instance.
    *
    * @param pitch The pitch measurement of the gyro.
    * @param roll The roll measurement of the gyro.
    * @return ChassisSpeeds object to set to module states.
    */
   public ChassisSpeeds update(Rotation2d pitch, Rotation2d roll) {
-    var xGrad = -pitch.getTan(); // sin/cos pitch
-    var yGrad = pitch.getCos() * roll.getTan(); // sin/cos roll
+    var xGrad = -pitch.getTan();
+    var yGrad = -pitch.getCos() * roll.getTan();
 
     var vyMetersPerSecond =
         BetterMath.signedAbsFunc(xGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
     var vxMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
 
-    return new ChassisSpeeds(-vxMetersPerSecond, vyMetersPerSecond, 0);
+    return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, 0);
   }
 }
