@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
@@ -29,9 +28,6 @@ public class DriveCommand extends CommandBase {
   private final SlewRateLimiter filterY = new SlewRateLimiter(OIConstants.InputLimits.slew);
   private final SlewRateLimiter filterZ = new SlewRateLimiter(OIConstants.InputLimits.slew);
 
-  private final Debouncer debouncer =
-      new Debouncer(OIConstants.InputLimits.debounce, Debouncer.DebounceType.kBoth);
-
   /**
    * Default command for driving
    *
@@ -54,7 +50,7 @@ public class DriveCommand extends CommandBase {
     initializeTelemetry();
   }
 
-  private double controllerInput(
+  private double processControllerInput(
       double input, double deadband, double scalar, SlewRateLimiter limiter) {
     // input = MathUtil.applyDeadband(input, deadband);
     input =
@@ -68,38 +64,38 @@ public class DriveCommand extends CommandBase {
   private void drive() {
     if (!controller.getRawButton(2)) {
       vx =
-          controllerInput(
+          processControllerInput(
               controller.getY(),
               OIConstants.InputLimits.vxDeadband,
               OIConstants.InputLimits.vx,
               filterX);
       vy =
-          controllerInput(
+          processControllerInput(
               controller.getX(),
               OIConstants.InputLimits.vyDeadband,
               OIConstants.InputLimits.vy,
               filterY);
       rad =
-          controllerInput(
+          processControllerInput(
               controller.getZ(),
               OIConstants.InputLimits.radDeadband,
               OIConstants.InputLimits.rad,
               filterZ);
     } else {
       vx =
-          controllerInput(
+          processControllerInput(
               controller.getY(),
               OIConstants.InputLimits.vxDeadband,
               OIConstants.InputLimits.vx * OIConstants.InputLimits.reduced,
               filterX);
       vy =
-          controllerInput(
+          processControllerInput(
               controller.getX(),
               OIConstants.InputLimits.vyDeadband,
               OIConstants.InputLimits.vy * OIConstants.InputLimits.reduced,
               filterY);
       rad =
-          controllerInput(
+          processControllerInput(
               controller.getZ(),
               OIConstants.InputLimits.radDeadband,
               OIConstants.InputLimits.rad * OIConstants.InputLimits.reduced,
@@ -138,15 +134,6 @@ public class DriveCommand extends CommandBase {
     vyEntry.setDouble(vy);
     radEntry.setDouble(rad);
     moduleToggleEntry.setDouble(toggleModule);
-  }
-
-  /**
-   * set field relative
-   *
-   * @param i false or true
-   */
-  public void setDefaultFieldRelative(boolean i) {
-    defaultFieldRelative = i;
   }
 
   @Override

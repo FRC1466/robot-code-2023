@@ -4,16 +4,12 @@
 
 package frc.robot.constants;
 
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.util.Units;
 import frc.lib.util.Gains;
 import frc.lib.util.HolonomicPose2d;
 import frc.lib.util.RectanglePoseArea;
@@ -130,80 +126,10 @@ public final class RobotConstants {
   }
 
   public static final class AutoConstants {
-    public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 2.0;
-    public static final double balanceScale = 4.0, balanceScalePow = 1.8;
+    public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 3.0;
+    public static final double balanceScale = 6.0, balanceScalePow = 1.8;
     public static final Gains thetaController = new Gains(20, 0.0, 0.0, 0, 0, 1),
         translationController = new Gains(8, 1.0, 0, 0, 0, 1);
-
-    public static final List<AprilTag> aprilList =
-        new ArrayList<>() {
-          {
-            add(
-                new AprilTag(
-                    1,
-                    new Pose3d(
-                        Units.inchesToMeters(610.77),
-                        Units.inchesToMeters(42.19),
-                        Units.inchesToMeters(18.22),
-                        new Rotation3d(0.0, 0.0, Math.PI))));
-            add(
-                new AprilTag(
-                    2,
-                    new Pose3d(
-                        Units.inchesToMeters(610.77),
-                        Units.inchesToMeters(108.19),
-                        Units.inchesToMeters(18.22),
-                        new Rotation3d(0.0, 0.0, Math.PI))));
-            add(
-                new AprilTag(
-                    3,
-                    new Pose3d(
-                        Units.inchesToMeters(610.77),
-                        Units.inchesToMeters(174.19),
-                        Units.inchesToMeters(18.22),
-                        new Rotation3d(0.0, 0.0, Math.PI))));
-            add(
-                new AprilTag(
-                    4,
-                    new Pose3d(
-                        Units.inchesToMeters(636.96),
-                        Units.inchesToMeters(265.74),
-                        Units.inchesToMeters(27.38),
-                        new Rotation3d(0.0, 0.0, Math.PI))));
-            add(
-                new AprilTag(
-                    5,
-                    new Pose3d(
-                        Units.inchesToMeters(14.25),
-                        Units.inchesToMeters(265.74),
-                        Units.inchesToMeters(27.38),
-                        new Rotation3d())));
-            add(
-                new AprilTag(
-                    6,
-                    new Pose3d(
-                        Units.inchesToMeters(40.45),
-                        Units.inchesToMeters(174.19),
-                        Units.inchesToMeters(18.22),
-                        new Rotation3d())));
-            add(
-                new AprilTag(
-                    7,
-                    new Pose3d(
-                        Units.inchesToMeters(40.45),
-                        Units.inchesToMeters(108.19),
-                        Units.inchesToMeters(18.22),
-                        new Rotation3d())));
-            add(
-                new AprilTag(
-                    8,
-                    new Pose3d(
-                        Units.inchesToMeters(40.45),
-                        Units.inchesToMeters(42.19),
-                        Units.inchesToMeters(18.22),
-                        new Rotation3d())));
-          }
-        };
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -211,6 +137,7 @@ public final class RobotConstants {
             new RectanglePoseArea(new Translation2d(13.24, 5.66), new Translation2d(16.51, 7.97)),
             new HolonomicPose2d(new Pose2d(15.79, 7.34, new Rotation2d()), new Rotation2d()),
             new HolonomicPose2d(new Pose2d(15.75, 6.00, new Rotation2d()), new Rotation2d()));
+
     public static final List<ScoringArea> scoreAreaList =
         new ArrayList<>() {
           {
@@ -243,8 +170,6 @@ public final class RobotConstants {
         };
     public static final double fieldLength = 16.54175;
     public static final double fieldWidth = 8.0137;
-    public static final AprilTagFieldLayout apriltagFieldLayout =
-        new AprilTagFieldLayout(aprilList, fieldLength, fieldWidth);
     public static final Translation3d cameraTranslation = new Translation3d(0.5, 0.0, 0.5);
     public static final Rotation3d cameraRotation = new Rotation3d(0, 0, 0);
   }

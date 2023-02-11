@@ -13,7 +13,7 @@ public class BetterMath {
    * normal for x >=0, but negative on x < 0.
    *
    * @param input input of the function.
-   * @param func function defined to return f(x) >= 0 for all x >= 0. Can be defined outside of f(x)
+   * @param func function defined to return f(x) >= 0 for all x >= 0. Can be defined outside of x
    *     >=0 but this portion is not used.
    * @return signed output dependent on signage of input.
    */
@@ -30,7 +30,7 @@ public class BetterMath {
    *
    * @param signage double where value doesn't matter, only signage does.
    * @param func function f() that returns an output > 0.
-   * @return mirrored output across x axis dependent on signage double,
+   * @return mirrored output across x and y axis dependent on signage double.
    */
   public static double signedAbsFunc(double signage, DoubleSupplier func) {
     var absOutput = func.getAsDouble();

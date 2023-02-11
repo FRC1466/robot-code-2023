@@ -25,6 +25,7 @@ public class VirtualFourBar extends SubsystemBase {
     armPID =
         new PIDController(
             ArmConstants.armPosition.P, ArmConstants.armPosition.I, ArmConstants.armPosition.D);
+    armPID.setTolerance(0.01);
   }
 
   private void configArmMotor() {
@@ -35,8 +36,13 @@ public class VirtualFourBar extends SubsystemBase {
   public void setArm(double a) {
     SmartDashboard.putNumber("setpoint", a);
     var motorOutput = MathUtil.clamp(armPID.calculate(armEncoder.getDistance(), a), -12, 12);
+    SmartDashboard.putNumber("arm pid error", armPID.getPositionError());
     SmartDashboard.putNumber("armPID output", motorOutput);
     // armMotor.setVoltage(motorOutput);
+  }
+
+  public Boolean isAtSetpoint() {
+    return armPID.atSetpoint();
   }
 
   @Override
