@@ -6,9 +6,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import frc.lib.util.swerve.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -53,7 +56,7 @@ public class DriveSubsystem extends SubsystemBase {
     swerveBalance = new SwerveBalance(AutoConstants.balanceScale, AutoConstants.balanceScalePow);
     swervePoseEstimator =
         new SwerveDrivePoseEstimator(
-            Swerve.KINEMATICS, getGyroRotation2d(), getSwervePositions(), new Pose2d());
+            Swerve.KINEMATICS, getGyroRotation3d(), getSwervePositions(), new Pose3d());
     speeds = new ChassisSpeeds();
     desiredModuleStates = Swerve.KINEMATICS.toSwerveModuleStates(speeds);
 
@@ -137,6 +140,13 @@ public class DriveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(gyro.getRoll());
   }
 
+  public Rotation3d getGyroRotation3d() {
+    var wxyz = new double[]{};
+    gyro.get6dQuaternion(wxyz);
+    Quaternion q = new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]);
+    return new Rotation3d(q);
+  }
+
   public Rotation2d getGyroPlaneInclination() {
     return Rotation2d.fromRadians(
         Math.atan(Math.hypot(getGyroPitch().getTan(), getGyroRoll().getTan())));
@@ -201,7 +211,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** update the odometry of the robot with current pose of the robot */
   public void updateRobotPose() {
     swervePoseEstimator.update(
-        getGyroRotation2d(), /* getGyroPitch(), getGyroRoll(), */ getSwervePositions());
+        getGyroRotation3d(), getSwervePositions());
     odometryXEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getX());
     odometryYEntry.setDouble(swervePoseEstimator.getEstimatedPosition().getY());
     odometryDegEntry.setDouble(
