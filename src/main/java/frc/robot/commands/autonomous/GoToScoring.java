@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import frc.lib.util.chargedup.ScoringArea;
 import frc.robot.constants.RobotConstants.AutoConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -13,8 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class GoToScoring extends CommandBase {
-  private DriveSubsystem drive;
-  private List<ScoringArea> scoreAreaList = AutoConstants.scoreAreaList;
+  private final DriveSubsystem drive;
+  private final List<ScoringArea> scoreAreaList = AutoConstants.scoreAreaList;
+  private final POSITION selectedPosition;
   private Command currentCommand;
 
   public enum POSITION {
@@ -22,8 +22,6 @@ public class GoToScoring extends CommandBase {
     MIDDLE,
     RIGHT
   }
-
-  private POSITION selectedPosition;
 
   public GoToScoring(DriveSubsystem drive, POSITION selectedPosition) {
     this.drive = drive;
@@ -33,10 +31,12 @@ public class GoToScoring extends CommandBase {
   }
 
   /**
+   * Get best scoring area. Assumes scoring area zones do not overlap.
+   *
    * @param pose current pose of robot
    * @return either null if not in scoring area, or the scoring are if in scoring area
    */
-  private Optional<ScoringArea> getBestScoringArea(Pose2d pose) { // do an optional
+  private Optional<ScoringArea> getBestScoringArea(Pose2d pose) {
     ScoringArea bestArea = null;
     for (ScoringArea area : scoreAreaList) {
       if (area.isPoseWithinScoringArea(pose)) bestArea = area;
@@ -103,7 +103,9 @@ public class GoToScoring extends CommandBase {
   }
 
   @Override
-  public WrapperCommand handleInterrupt(Runnable handler) {
-    return super.handleInterrupt(() -> currentCommand.cancel());
+  public void end(boolean interrupted) {
+    if (interrupted) {
+      currentCommand.cancel();
+    }
   }
 }
