@@ -50,10 +50,10 @@ public final class MotorConfigs {
     swerveCancoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
     swerveCancoderConfig.sensorDirection = false;
 
-    swerveDriveConfig.nominalOutputForward = 0;
-    swerveDriveConfig.nominalOutputReverse = 0;
-    swerveDriveConfig.peakOutputForward = ArmConstants.armPosition.peakOutput;
-    swerveDriveConfig.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
-    swerveDriveConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    armConfig.nominalOutputForward = 0;
+    armConfig.nominalOutputReverse = 0;
+    armConfig.peakOutputForward = ArmConstants.armPosition.peakOutput;
+    armConfig.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
+    armConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
   }
 }

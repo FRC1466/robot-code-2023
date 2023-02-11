@@ -19,8 +19,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class PhotonCameraWrapper {
   private PhotonCamera camera = new PhotonCamera("photonvision");
   private AprilTagFieldLayout aprilTagFieldLayout;
-  PhotonPoseEstimator photonPoseEstimator;
-  Transform3d robotToCam;
+  private PhotonPoseEstimator photonPoseEstimator;
+  private Transform3d robotToCam;
 
   public PhotonCameraWrapper() {
     try {

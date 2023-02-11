@@ -43,6 +43,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_drive = new DriveSubsystem();
   private final VirtualFourBar m_arm = new VirtualFourBar();
+  // private final LED m_led = new LED();
 
   private final PathBuilder m_builder = new PathBuilder(m_drive);
 
@@ -67,6 +68,7 @@ public class RobotContainer {
                     MathUtil.clamp(
                         (m_driverController.getRawAxis(3) / 2.25) + 0.50, 0.15, 0.86)), // 0.62 1.42
             m_arm));
+    // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
   }
 
   private void initializeChooser() {

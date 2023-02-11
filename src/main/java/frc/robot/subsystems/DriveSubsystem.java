@@ -8,7 +8,6 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -141,10 +140,8 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public Rotation3d getGyroRotation3d() {
-    var wxyz = new double[] {};
-    gyro.get6dQuaternion(wxyz);
-    Quaternion q = new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]);
-    return new Rotation3d(q);
+    return new Rotation3d(
+        getGyroRoll().getRadians(), getGyroPitch().getRadians(), getGyroRotation2d().getRadians());
   }
 
   public Rotation2d getGyroPlaneInclination() {
