@@ -3,6 +3,7 @@ package frc.robot.subsystems.swervedrive2.swervelib.imu;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Communicates with the NavX as the IMU. */
 public class NavXSwerve extends SwerveIMU {
@@ -19,6 +20,7 @@ public class NavXSwerve extends SwerveIMU {
       /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
       /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
       gyro = new AHRS(SerialPort.Port.kMXP);
+      SmartDashboard.putData(gyro);
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
     }

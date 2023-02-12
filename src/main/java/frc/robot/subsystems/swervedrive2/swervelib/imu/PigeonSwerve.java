@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swervedrive2.swervelib.imu;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class PigeonSwerve extends SwerveIMU {
 
@@ -13,6 +14,7 @@ public class PigeonSwerve extends SwerveIMU {
    */
   public PigeonSwerve(int canid) {
     imu = new WPI_PigeonIMU(canid);
+    SmartDashboard.putData(imu);
   }
 
   /** Reset IMU to factory default. */

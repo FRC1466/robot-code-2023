@@ -47,7 +47,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/CHOOSE": "String Chooser",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Pigeon 2 [20]": "Gyro"
     },
     "windows": {
       "/SmartDashboard/CHOOSE": {
@@ -64,7 +65,25 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/Pigeon 2 [20]": {
+        "window": {
+          "visible": true
+        }
       }
     }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "Pigeon 2 [20]": {
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
