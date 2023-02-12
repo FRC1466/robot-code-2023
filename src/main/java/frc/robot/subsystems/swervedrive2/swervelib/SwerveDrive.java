@@ -4,7 +4,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import frc.robot.subsystems.swervedrive2.swervelib.math.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -73,11 +75,11 @@ public class SwerveDrive {
 
     swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
         kinematics,
-        getYaw(),
+        getGyroRotation3d(),
         getModulePositions(),
-        new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)),
-        VecBuilder.fill(0.1, 0.1, 0.1), // x,y,heading in radians; state std dev, higher=less weight
-        VecBuilder.fill(0.9, 1.0, 0.9)); // x,y,heading in radians; Vision measurement std dev, higher=less weight
+        new Pose3d(),
+        VecBuilder.fill(0.1, 0.1, 0.1, 0.1), // x,y,z,heading in radians; state std dev, higher=less weight
+        VecBuilder.fill(0.9, 1.0, 0.9, 0.9)); // x,y,z,heading in radians; Vision measurement std dev, higher=less weight
 
     zeroGyro();
   }
@@ -193,7 +195,7 @@ public class SwerveDrive {
    * @param pose The pose to set the odometry to
    */
   public void resetOdometry(Pose2d pose) {
-    swerveDrivePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
+    swerveDrivePoseEstimator.resetPosition(getGyroRotation3d(), getModulePositions(), new Pose3d(pose));
   }
 
   /**
@@ -286,6 +288,10 @@ public class SwerveDrive {
     }
   }
 
+  public Rotation3d getGyroRotation3d() {
+    return new Rotation3d(getRoll().getRadians(), getPitch().getRadians(), getYaw().getRadians());
+  }
+
   /**
    * Sets the drive motors to brake/coast mode.
    *
@@ -336,7 +342,7 @@ public class SwerveDrive {
   /** Update odometry should be run every loop. */
   public void updateOdometry() {
     // Update odometry
-    swerveDrivePoseEstimator.update(getYaw(), getModulePositions());
+    swerveDrivePoseEstimator.update(getGyroRotation3d(), getModulePositions());
 
     // Update angle accumulator if the robot is simulated
     if (!Robot.isReal()) {
