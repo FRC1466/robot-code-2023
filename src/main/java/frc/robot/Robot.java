@@ -25,6 +25,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     instance = this;
+    armConfig = new ArmConfig();
   }
 
   public static Robot getInstance() {
@@ -43,7 +44,6 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }
     robotContainer = new RobotContainer();
-    armConfig = new ArmConfig();
   }
 
   /**
