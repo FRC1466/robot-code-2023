@@ -122,12 +122,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void setDesiredModuleStates(SwerveModuleState[] desiredStates) {
-    var adjStates = new SwerveModuleState2[desiredStates.length];
-    for (var i = 0; i < desiredStates.length; i++) {
-      adjStates[i] =
-          new SwerveModuleState2(desiredStates[i].speedMetersPerSecond, desiredStates[i].angle, 0);
-    }
-    swerveDrive.setModuleStates(adjStates, false);
+    swerveDrive.setModuleStates((SwerveModuleState2[]) desiredStates, false);
   }
 
   /**

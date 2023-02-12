@@ -50,6 +50,11 @@
       "/SmartDashboard/Field": "Field2d"
     },
     "windows": {
+      "/SmartDashboard/CHOOSE": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "XModules": {
           "length": 0.10000000149011612,

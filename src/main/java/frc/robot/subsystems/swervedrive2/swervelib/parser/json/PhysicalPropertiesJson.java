@@ -52,44 +52,50 @@ public class PhysicalPropertiesJson {
         encoderPulsePerRotation.drive,
         encoderPulsePerRotation.angle);
   }
+}
 
-  /** Used to store doubles for motor configuration. */
-  class MotorConfigDouble {
+/** Used to store doubles for motor configuration. */
+class MotorConfigDouble {
 
-    /** Drive motor. */
-    public double drive;
-    /** Angle motor. */
-    public double angle;
+  /** Drive motor. */
+  public double drive;
+  /** Angle motor. */
+  public double angle;
 
-    /**
-     * Default constructor.
-     *
-     * @param angle Angle data.
-     * @param drive Drive data.
-     */
-    MotorConfigDouble(double angle, double drive) {
-      this.angle = angle;
-      this.drive = drive;
-    }
+  /** Default constructor. */
+  public MotorConfigDouble() {}
+
+  /**
+   * Default constructor.
+   *
+   * @param angle Angle data.
+   * @param drive Drive data.
+   */
+  public MotorConfigDouble(double angle, double drive) {
+    this.angle = angle;
+    this.drive = drive;
   }
+}
 
-  /** Used to store ints for motor configuration. */
-  class MotorConfigInt {
+/** Used to store ints for motor configuration. */
+class MotorConfigInt {
 
-    /** Drive motor. */
-    public int drive;
-    /** Angle motor. */
-    public int angle;
+  /** Drive motor. */
+  public int drive;
+  /** Angle motor. */
+  public int angle;
 
-    /**
-     * Default constructor with values.
-     *
-     * @param drive Drive data.
-     * @param angle Angle data.
-     */
-    MotorConfigInt(int drive, int angle) {
-      this.angle = angle;
-      this.drive = drive;
-    }
+  /** Default constructor. */
+  public MotorConfigInt() {}
+
+  /**
+   * Default constructor with values.
+   *
+   * @param drive Drive data.
+   * @param angle Angle data.
+   */
+  public MotorConfigInt(int drive, int angle) {
+    this.angle = angle;
+    this.drive = drive;
   }
 }

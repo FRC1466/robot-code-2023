@@ -86,6 +86,7 @@ public class RobotContainer {
   }
 
   private void initializeChooser() {
+
     chooser.setDefaultOption(
         "Default Test",
         builder.getSwerveCommand(
@@ -128,9 +129,9 @@ public class RobotContainer {
     driverController
         .button(3)
         .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d()), drivebase));
-    scoreController.button(7).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
-    scoreController.button(8).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
-    scoreController.button(9).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
+    scoreController.button(1).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
+    scoreController.button(2).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
+    scoreController.button(3).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
     driverController
         .button(11)
         .whileTrue(

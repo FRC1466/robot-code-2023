@@ -32,6 +32,7 @@ public class SwerveModuleConfiguration {
   public SwerveModulePhysicalCharacteristics physicalCharacteristics;
   /** The drive motor and angle motor of this swerve module. */
   public SwerveMotor driveMotor;
+
   public SwerveMotor angleMotor;
   /** The Absolute Encoder for the swerve module. */
   public SwerveAbsoluteEncoder absoluteEncoder;
