@@ -1,4 +1,4 @@
-name: Spotless
+name: Java Formatting
 
 on: [push]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -16,4 +16,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - run: ./gradlew spotlessCheck -PjavaFormat
+      - run: ./gradlew pmdMain -PjavaFormat
+      - run: ./gradlew checkstyleMain -PjavaFormat
+      - run: ./gradlew spotbugsMain -PjavaFormat
+      
