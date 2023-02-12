@@ -21,6 +21,15 @@ public class Robot extends TimedRobot {
   private RobotContainer robotContainer;
   private Command autonomousCommand;
   public static MotorConfigs moduleConfigs;
+  private static Robot instance;
+
+  public Robot() {
+    instance = this;
+  }
+
+  public static Robot getInstance() {
+    return instance;
+  }
 
   /**
    * This function is run when the robot is first started up and should be used for any
