@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
@@ -14,16 +13,20 @@ public class TalonFXSwerve extends SwerveMotor {
 
   /** SparkMAX Instance. */
   public WPI_TalonFX motor;
-  /** Integrated encoder. */
-  public TalonFXPIDSetConfiguration pid;
   /** Factory default already occurred. */
   private boolean factoryDefaultOccurred = false;
+  /**
+   * PID wrapped or not, min and max pid output to use in degrees since Talon can't do it
+   * automatically
+   */
+  private boolean isPIDWrapped = false;
 
-  private double positionConversionFactor;
-  private double velocityConversionFactor;
   private double minPIDInput;
   private double maxPIDInput;
-  private boolean isPIDWrapped;
+  /** Conversion factors for pos and velocity since Talon can't do it automatically */
+  private double positionConversionFactor;
+
+  private double velocityConversionFactor;
 
   /**
    * Initialize the swerve motor.
@@ -38,7 +41,6 @@ public class TalonFXSwerve extends SwerveMotor {
     clearStickyFaults();
 
     motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
-    motor.getPIDConfigs(pid);
   }
 
   /**
@@ -241,11 +243,12 @@ public class TalonFXSwerve extends SwerveMotor {
   public double getPosition() {
     var position =
         isDriveMotor
-            ? motor.getSelectedSensorPosition()/positionConversionFactor
+            ? motor.getSelectedSensorPosition() / positionConversionFactor
             : MathUtil.inputModulus(
-                motor.getSelectedSensorPosition(),
-                -positionConversionFactor / 2,
-                positionConversionFactor / 2)/positionConversionFactor; // lsdhjflsj
+                    motor.getSelectedSensorPosition(),
+                    -positionConversionFactor / 2,
+                    positionConversionFactor / 2)
+                / positionConversionFactor;
     return position / positionConversionFactor;
   }
 
