@@ -1,3 +1,6 @@
+buildscript {
+}
+
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2023.3.2"
@@ -74,6 +77,20 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
+build {
+    if (project.hasProperty('javaFormat')) {
+        pmdMain.enabled = true;
+        checkstyleMain.enabled = true;
+        spotbugsMain.enabled = true;
+        spotlessCheck.enabled = true;
+    } else {
+        pmdMain.enabled = false;
+        checkstyleMain.enabled = false;
+        spotbugsMain.enabled = false;
+        spotlessCheck.enabled = false;
+    }
+}
+
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
@@ -107,6 +124,8 @@ checkstyle {
     configDirectory = file("${project.rootDir}/styleguide")
     config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }
+
+
 
 pmd {
     toolVersion = '6.44.0'
