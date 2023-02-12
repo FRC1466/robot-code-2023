@@ -8,7 +8,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,17 +16,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.DriveCommand;
-import frc.robot.commands.autonomous.ComplexAuto;
-import frc.robot.commands.autonomous.GoToScoring;
-import frc.robot.commands.autonomous.GoToScoring.POSITION;
-import frc.robot.commands.autonomous.PathBuilder;
-import frc.robot.constants.RobotConstants.AutoConstants;
-import frc.robot.constants.RobotConstants.OIConstants;
-import frc.robot.subsystems.AdjustableTelemetry;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.commands.swervedrive2.auto.GoToScoring;
+import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
+import frc.robot.commands.swervedrive2.auto.PathBuilder;
+import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.VirtualFourBar;
+import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
+import java.io.File;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -37,30 +37,44 @@ import frc.robot.subsystems.VirtualFourBar;
 public class RobotContainer {
   private SendableChooser<Command> m_chooser = new SendableChooser<>();
 
-  private final boolean isFieldRelative = true;
-  private final AdjustableTelemetry m_tele = new AdjustableTelemetry();
-
   // The robot's subsystems
-  private final DriveSubsystem m_drive = new DriveSubsystem();
+  private final SwerveSubsystem drivebase =
+      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final VirtualFourBar m_arm = new VirtualFourBar();
   // private final LED m_led = new LED();
 
-  private final PathBuilder m_builder = new PathBuilder(m_drive);
+  private final PathBuilder m_builder = new PathBuilder(drivebase);
 
-  private final Joystick m_driverController = new Joystick(OIConstants.driverID);
-  private final Joystick m_scoreController = new Joystick(OIConstants.intakeID);
+  private final CommandJoystick m_driverController = new CommandJoystick(OIConstants.driverID);
+  private final CommandJoystick m_scoreController = new CommandJoystick(OIConstants.intakeID);
 
   // the default commands
-  private final DriveCommand m_DriveCommand =
-      new DriveCommand(m_drive, m_tele, m_driverController, isFieldRelative);
+  private final TeleopDrive closedFieldRel;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    closedFieldRel =
+        new TeleopDrive(
+            drivebase,
+            () ->
+                (Math.abs(m_driverController.getY()) > OIConstants.InputLimits.vyDeadband)
+                    ? m_driverController.getY()
+                    : 0,
+            () ->
+                (Math.abs(m_driverController.getX()) > OIConstants.InputLimits.vxDeadband)
+                    ? m_driverController.getX()
+                    : 0,
+            () ->
+                (Math.abs(m_driverController.getZ()) > OIConstants.InputLimits.radDeadband)
+                    ? m_driverController.getZ()
+                    : 0,
+            () -> true,
+            false);
     // Configure the button bindings
     configureButtonBindings();
     initializeChooser();
 
-    m_drive.setDefaultCommand(m_DriveCommand);
+    drivebase.setDefaultCommand(closedFieldRel);
     m_arm.setDefaultCommand(
         new RunCommand(
             () ->
@@ -72,7 +86,12 @@ public class RobotContainer {
   }
 
   private void initializeChooser() {
-    m_chooser.setDefaultOption("auto 1", new ComplexAuto(m_drive, m_tele, m_builder));
+    m_chooser.setDefaultOption(
+        "Default Test",
+        m_builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "Test Path",
+                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
 
     m_chooser.addOption(
         "3 Score T1",
@@ -90,8 +109,10 @@ public class RobotContainer {
                     new PathConstraints(
                         AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)))
             .andThen(
-                Commands.run(() -> m_drive.driveAutoBalancingFull(), m_drive)
-                    .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0)));
+                Commands.run(
+                        () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
+                        drivebase)
+                    .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0)));
 
     SmartDashboard.putData("CHOOSE", m_chooser);
   }
@@ -103,16 +124,20 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_drive.resetGyro()));
-    new JoystickButton(m_driverController, 3)
-        .onTrue(new InstantCommand(() -> m_drive.resetPose(new Pose2d())));
-    new JoystickButton(m_scoreController, 7).whileTrue(new GoToScoring(m_drive, POSITION.RIGHT));
-    new JoystickButton(m_scoreController, 8).whileTrue(new GoToScoring(m_drive, POSITION.MIDDLE));
-    new JoystickButton(m_scoreController, 9).whileTrue(new GoToScoring(m_drive, POSITION.LEFT));
-    new JoystickButton(m_driverController, 11)
+    m_driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
+    m_driverController
+        .button(3)
+        .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d()), drivebase));
+    m_scoreController.button(7).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
+    m_scoreController.button(8).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
+    m_scoreController.button(9).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
+    m_driverController
+        .button(11)
         .whileTrue(
-            new RunCommand(() -> m_drive.driveAutoBalancingFull(), m_drive)
-                .until(() -> Math.abs(m_drive.getGyroPlaneInclination().getDegrees()) < 2.0));
+            Commands.run(
+                    () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
+                    drivebase)
+                .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
   }
 
   /**

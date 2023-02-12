@@ -1,7 +1,7 @@
 package frc.lib.util.swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.lib.math.BetterMath;
 
 public class SwerveBalance {
@@ -33,7 +33,7 @@ public class SwerveBalance {
    * @param roll The roll measurement of the gyro.
    * @return ChassisSpeeds object to set to module states.
    */
-  public ChassisSpeeds update(Rotation2d pitch, Rotation2d roll) {
+  public Translation2d update(Rotation2d pitch, Rotation2d roll) {
     var xGrad = -pitch.getTan();
     var yGrad = -pitch.getCos() * roll.getTan();
 
@@ -42,6 +42,6 @@ public class SwerveBalance {
     var vxMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
 
-    return new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, 0);
+    return new Translation2d(vxMetersPerSecond, vyMetersPerSecond);
   }
 }

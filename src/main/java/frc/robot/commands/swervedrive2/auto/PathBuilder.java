@@ -1,20 +1,20 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.swervedrive2.auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import frc.robot.constants.RobotConstants.AutoConstants;
-import frc.robot.constants.RobotConstants.Swerve;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Swerve;
+import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.HashMap;
 import java.util.List;
 
 public class PathBuilder {
   private SwerveAutoBuilder autoBuilder;
 
-  public PathBuilder(DriveSubsystem drive) {
+  public PathBuilder(SwerveSubsystem drivebase) {
 
     HashMap<String, Command> eventMap = new HashMap<>();
     eventMap.put("marker1", new PrintCommand("Passed marker 1"));
@@ -22,8 +22,8 @@ public class PathBuilder {
 
     autoBuilder =
         new SwerveAutoBuilder(
-            drive::getPose, // Functional interface to feed supplier
-            drive::resetPose,
+            drivebase::getPose, // Functional interface to feed supplier
+            drivebase::resetOdometry,
             Swerve.KINEMATICS,
             // Position controllers
             new PIDConstants(
@@ -34,10 +34,10 @@ public class PathBuilder {
                 AutoConstants.thetaController.P,
                 AutoConstants.thetaController.I,
                 AutoConstants.thetaController.D),
-            drive::setDesiredModuleStates,
+            drivebase::setDesiredModuleStates,
             eventMap,
             true,
-            drive);
+            drivebase);
   }
 
   public Command getSwerveCommand(List<PathPlannerTrajectory> path) {

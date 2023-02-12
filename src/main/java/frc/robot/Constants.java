@@ -2,14 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.constants;
+package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import frc.lib.util.Gains;
 import frc.lib.util.HolonomicPose2d;
 import frc.lib.util.RectanglePoseArea;
@@ -28,7 +31,12 @@ import java.util.List;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class RobotConstants {
+public final class Constants {
+
+  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+  public static final double CHASSIS_MASS = ROBOT_MASS;
+  public static final Translation3d CHASSIS_CG = new Translation3d(0, 0, Units.inchesToMeters(8));
+  public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
 
   public static final class Swerve {
     /* Module Specific Constants */
@@ -177,6 +185,19 @@ public final class RobotConstants {
   public static final class ArmConstants {
     public static final int armPort = 30;
     public static final Gains armPosition = new Gains(-30.1, 0, 0.0, 0, 0, 0.6);
+
+    public static final class ArmConfig {
+      public TalonFXConfiguration config;
+
+      public ArmConfig() {
+        config = new TalonFXConfiguration();
+        config.nominalOutputForward = 0;
+        config.nominalOutputReverse = 0;
+        config.peakOutputForward = ArmConstants.armPosition.peakOutput;
+        config.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
+        config.initializationStrategy = SensorInitializationStrategy.BootToZero;
+      }
+    }
   }
 
   public static final class GripperConstants {

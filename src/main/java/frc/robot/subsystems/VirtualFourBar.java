@@ -6,8 +6,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
-import frc.robot.constants.RobotConstants.ArmConstants;
 
 public class VirtualFourBar extends SubsystemBase {
   private WPI_TalonFX armMotor;
@@ -30,7 +30,7 @@ public class VirtualFourBar extends SubsystemBase {
 
   private void configArmMotor() {
     armMotor.configFactoryDefault();
-    armMotor.configAllSettings(Robot.moduleConfigs.armConfig);
+    armMotor.configAllSettings(Robot.armConfig.config);
   }
 
   public void setArm(double a) {

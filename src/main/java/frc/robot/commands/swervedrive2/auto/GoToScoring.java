@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.swervedrive2.auto;
 
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -6,13 +6,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.util.chargedup.ScoringArea;
-import frc.robot.constants.RobotConstants.AutoConstants;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.List;
 import java.util.Optional;
 
 public class GoToScoring extends CommandBase {
-  private final DriveSubsystem drive;
+  private final SwerveSubsystem drive;
   private final List<ScoringArea> scoreAreaList = AutoConstants.scoreAreaList;
   private final POSITION selectedPosition;
   private Command currentCommand;
@@ -23,7 +23,7 @@ public class GoToScoring extends CommandBase {
     RIGHT
   }
 
-  public GoToScoring(DriveSubsystem drive, POSITION selectedPosition) {
+  public GoToScoring(SwerveSubsystem drive, POSITION selectedPosition) {
     this.drive = drive;
     addRequirements(drive);
     this.selectedPosition = selectedPosition;

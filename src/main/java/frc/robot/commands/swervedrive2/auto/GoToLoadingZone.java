@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.swervedrive2.auto;
 
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib.util.chargedup.LoadingArea;
-import frc.robot.constants.RobotConstants.AutoConstants;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 
 public class GoToLoadingZone extends CommandBase {
-  private final DriveSubsystem drive;
+  private final SwerveSubsystem drive;
   private final LoadingArea loadingArea = AutoConstants.loadingArea;
   private final LOADING_SIDE selectedLoadingSide;
   private Command currentCommand;
@@ -20,7 +20,7 @@ public class GoToLoadingZone extends CommandBase {
     RIGHT
   }
 
-  public GoToLoadingZone(LOADING_SIDE selectedLoadingSide, DriveSubsystem drive) {
+  public GoToLoadingZone(LOADING_SIDE selectedLoadingSide, SwerveSubsystem drive) {
     this.drive = drive;
     addRequirements(drive);
     this.selectedLoadingSide = selectedLoadingSide;

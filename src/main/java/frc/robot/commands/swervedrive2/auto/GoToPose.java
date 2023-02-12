@@ -1,4 +1,4 @@
-package frc.robot.commands.autonomous;
+package frc.robot.commands.swervedrive2.auto;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -9,9 +9,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.constants.RobotConstants.AutoConstants;
-import frc.robot.constants.RobotConstants.Swerve;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Swerve;
+import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,17 +20,16 @@ public class GoToPose {
   private PathPlannerTrajectory traj;
 
   public GoToPose(
-      Pose2d pose, Rotation2d heading, PathConstraints constraints, DriveSubsystem drive) {
+      Pose2d pose, Rotation2d heading, PathConstraints constraints, SwerveSubsystem drive) {
     Translation2d translation = pose.getTranslation();
     Rotation2d holonomic = pose.getRotation();
 
     PathPoint currentPathPoint;
     if (Math.hypot(
-            drive.getCurrentChassisSpeeds().vxMetersPerSecond,
-            drive.getCurrentChassisSpeeds().vyMetersPerSecond)
+            drive.getFieldVelocity().vxMetersPerSecond, drive.getFieldVelocity().vyMetersPerSecond)
         > 0.2) {
       currentPathPoint =
-          PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
+          PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getFieldVelocity());
     } else {
       currentPathPoint =
           new PathPoint(
@@ -77,18 +76,17 @@ public class GoToPose {
             );
   }
 
-  public GoToPose(Pose2d pose, PathConstraints constraints, DriveSubsystem drive) {
+  public GoToPose(Pose2d pose, PathConstraints constraints, SwerveSubsystem drive) {
     Translation2d translation = pose.getTranslation();
     Rotation2d holonomic = pose.getRotation();
     var heading = translation.minus(drive.getPose().getTranslation()).getAngle();
 
     PathPoint currentPathPoint;
     if (Math.hypot(
-            drive.getCurrentChassisSpeeds().vxMetersPerSecond,
-            drive.getCurrentChassisSpeeds().vyMetersPerSecond)
+            drive.getFieldVelocity().vxMetersPerSecond, drive.getFieldVelocity().vyMetersPerSecond)
         > 0.2) {
       currentPathPoint =
-          PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getCurrentChassisSpeeds());
+          PathPoint.fromCurrentHolonomicState(drive.getPose(), drive.getFieldVelocity());
     } else {
       currentPathPoint =
           new PathPoint(drive.getPose().getTranslation(), heading, drive.getPose().getRotation());
