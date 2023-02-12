@@ -9,7 +9,7 @@ public class SwerveDriveConfiguration {
 
   /** Swerve Module locations. */
   public Translation2d[] moduleLocationsMeters;
-  /** Swerve IMU */
+  /** Swerve IMU. */
   public SwerveIMU imu;
   /** Invert the imu measurements. */
   public boolean invertedIMU = false;

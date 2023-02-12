@@ -6,7 +6,12 @@ import edu.wpi.first.math.controller.PIDController;
 public class PIDFConfig {
 
   /** PIDF Values and integral zone. */
-  public double p, i, d, f, iz;
+  public double p;
+
+  public double i;
+  public double d;
+  public double f;
+  public double iz;
 
   /** Used when parsing PIDF values from JSON. */
   public PIDFConfig() {}

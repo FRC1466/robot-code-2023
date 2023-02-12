@@ -19,7 +19,9 @@ public class SwerveModule {
   /** Angle offset from the absolute encoder. */
   private final double angleOffset;
   /** Swerve Motors. */
-  private final SwerveMotor angleMotor, driveMotor;
+  private final SwerveMotor angleMotor;
+
+  private final SwerveMotor driveMotor;
   /** Absolute encoder for swerve drive. */
   private final SwerveAbsoluteEncoder absoluteEncoder;
   /**
@@ -32,7 +34,13 @@ public class SwerveModule {
   /** Last angle set for the swerve module. */
   public double lastAngle;
   /** Current state. */
-  public double angle, omega, speed, fakePos, lastTime, dt;
+  public double angle;
+
+  public double omega;
+  public double speed;
+  public double fakePos;
+  public double lastTime;
+  public double dt;
   /** Timer for simulation. */
   private Timer time;
 
@@ -134,16 +142,16 @@ public class SwerveModule {
 
     // Prevents module rotation if speed is less than 1%
     double angle =
-        (Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01)
+        Math.abs(desiredState.speedMetersPerSecond) <= configuration.maxSpeed * 0.01
             ? lastAngle
-            : desiredState.angle.getDegrees());
+            : desiredState.angle.getDegrees();
     angleMotor.setReference(
         angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
     lastAngle = angle;
 
     if (!Robot.isReal()) {
       dt = time.get() - lastTime;
-      fakePos += (speed * dt);
+      fakePos += speed * dt;
       lastTime = time.get();
     }
 
@@ -184,6 +192,11 @@ public class SwerveModule {
     return new SwerveModuleState2(velocity, azimuth, omega);
   }
 
+  /**
+   * Get the Swerve Module Position.
+   *
+   * @return Current SwerveModule position.
+   */
   public SwerveModulePosition getPosition() {
     double position;
     Rotation2d azimuth;

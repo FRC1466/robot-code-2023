@@ -22,6 +22,7 @@ public class PhotonCameraWrapper {
   private PhotonPoseEstimator photonPoseEstimator;
   private Transform3d robotToCam;
 
+  /** Create a new PhotonCameraWrapper to interface with photonvision camera. */
   public PhotonCameraWrapper() {
     try {
       aprilTagFieldLayout =

@@ -6,7 +6,7 @@ public class SwerveControllerConfiguration {
 
   /** Maximum robot speed in meters per second. */
   public final double maxSpeed;
-  /** Maximum angular velocity in rad/s */
+  /** Maximum angular velocity in rad/s. */
   public final double maxAngularVelocity;
   /** PIDF for the heading of the robot. */
   public final PIDFConfig headingPIDF;

@@ -111,7 +111,7 @@ public class SparkMaxSwerve extends SwerveMotor {
   @Override
   public void configurePIDF(PIDFConfig config) {
     int pidSlot =
-        isDriveMotor ? SparkMAX_slotIdx.Velocity.ordinal() : SparkMAX_slotIdx.Position.ordinal();
+        isDriveMotor ? SparkMAXslotIdx.Velocity.ordinal() : SparkMAXslotIdx.Position.ordinal();
     pid.setP(config.p, pidSlot);
     pid.setI(config.i, pidSlot);
     pid.setD(config.d, pidSlot);
@@ -135,19 +135,19 @@ public class SparkMaxSwerve extends SwerveMotor {
   /**
    * Set the CAN status frames.
    *
-   * @param CANStatus0 Applied Output, Faults, Sticky Faults, Is Follower
-   * @param CANStatus1 Motor Velocity, Motor Temperature, Motor Voltage, Motor Current
-   * @param CANStatus2 Motor Position
-   * @param CANStatus3 Analog Sensor Voltage, Analog Sensor Velocity, Analog Sensor Position
-   * @param CANStatus4 Alternate Encoder Velocity, Alternate Encoder Position
+   * @param canStatus0 Applied Output, Faults, Sticky Faults, Is Follower
+   * @param canStatus1 Motor Velocity, Motor Temperature, Motor Voltage, Motor Current
+   * @param canStatus2 Motor Position
+   * @param canStatus3 Analog Sensor Voltage, Analog Sensor Velocity, Analog Sensor Position
+   * @param canStatus4 Alternate Encoder Velocity, Alternate Encoder Position
    */
   public void configureCANStatusFrames(
-      int CANStatus0, int CANStatus1, int CANStatus2, int CANStatus3, int CANStatus4) {
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, CANStatus0);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, CANStatus1);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, CANStatus2);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, CANStatus3);
-    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, CANStatus4);
+      int canStatus0, int canStatus1, int canStatus2, int canStatus3, int canStatus4) {
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, canStatus0);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, canStatus1);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, canStatus2);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, canStatus3);
+    motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, canStatus4);
     // TODO: Configure Status Frame 5 and 6 if necessary
     //  https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
   }
@@ -197,7 +197,7 @@ public class SparkMaxSwerve extends SwerveMotor {
   @Override
   public void setReference(double setpoint, double feedforward) {
     int pidSlot =
-        isDriveMotor ? SparkMAX_slotIdx.Velocity.ordinal() : SparkMAX_slotIdx.Position.ordinal();
+        isDriveMotor ? SparkMAXslotIdx.Velocity.ordinal() : SparkMAXslotIdx.Position.ordinal();
     pid.setReference(
         setpoint,
         isDriveMotor ? ControlType.kVelocity : ControlType.kPosition,
@@ -236,7 +236,7 @@ public class SparkMaxSwerve extends SwerveMotor {
   }
 
   /** REV Slots for PID configuration. */
-  enum SparkMAX_slotIdx {
+  enum SparkMAXslotIdx {
     Position,
     Velocity,
     Simulation

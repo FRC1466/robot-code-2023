@@ -13,6 +13,7 @@ public class Gripper extends SubsystemBase {
   private SparkMaxPIDController pidController;
   private RelativeEncoder encoder;
 
+  /** Create a new Gripper subsystem. */
   public Gripper() {
     gripperMotor = new CANSparkMax(24, MotorType.kBrushless);
     pidController = gripperMotor.getPIDController();

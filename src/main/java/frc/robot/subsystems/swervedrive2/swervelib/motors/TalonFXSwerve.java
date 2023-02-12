@@ -17,13 +17,13 @@ public class TalonFXSwerve extends SwerveMotor {
   private boolean factoryDefaultOccurred = false;
   /**
    * PID wrapped or not, min and max pid output to use in degrees since Talon can't do it
-   * automatically
+   * automatically.
    */
   private boolean isPIDWrapped = false;
 
   private double minPIDInput;
   private double maxPIDInput;
-  /** Conversion factors for pos and velocity since Talon can't do it automatically */
+  /** Conversion factors for pos and velocity since Talon can't do it automatically. */
   private double positionConversionFactor;
 
   private double velocityConversionFactor;
@@ -143,8 +143,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void configurePIDF(PIDFConfig config) {
-    int pidSlot =
-        isDriveMotor ? Talon_slotIdx.Velocity.ordinal() : Talon_slotIdx.Position.ordinal();
+    int pidSlot = isDriveMotor ? TalonslotIdx.Velocity.ordinal() : TalonslotIdx.Position.ordinal();
     motor.config_kP(pidSlot, config.p);
     motor.config_kI(pidSlot, config.i);
     motor.config_kD(pidSlot, config.d);
@@ -263,7 +262,7 @@ public class TalonFXSwerve extends SwerveMotor {
   }
 
   /** CTRE Slots for PID configuration. */
-  enum Talon_slotIdx {
+  enum TalonslotIdx {
     Position,
     Velocity,
     Simulation

@@ -14,6 +14,7 @@ public class VirtualFourBar extends SubsystemBase {
   private DutyCycleEncoder armEncoder;
   private PIDController armPID;
 
+  /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
     armMotor = new WPI_TalonFX(ArmConstants.armPort);
     configArmMotor();
@@ -28,11 +29,17 @@ public class VirtualFourBar extends SubsystemBase {
     armPID.setTolerance(0.01);
   }
 
+  /** Configure arm motor. */
   private void configArmMotor() {
     armMotor.configFactoryDefault();
     armMotor.configAllSettings(Robot.armConfig.config);
   }
 
+  /**
+   * Set arm with PID.
+   *
+   * @param a setpoint in encoder units.
+   */
   public void setArm(double a) {
     SmartDashboard.putNumber("setpoint", a);
     var motorOutput = MathUtil.clamp(armPID.calculate(armEncoder.getDistance(), a), -12, 12);
@@ -41,6 +48,11 @@ public class VirtualFourBar extends SubsystemBase {
     // armMotor.setVoltage(motorOutput);
   }
 
+  /**
+   * If the arm is at setpoint.
+   *
+   * @return if arm is at setpoint.
+   */
   public Boolean isAtSetpoint() {
     return armPID.atSetpoint();
   }

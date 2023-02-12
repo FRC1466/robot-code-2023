@@ -35,18 +35,18 @@ import java.io.File;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private SendableChooser<Command> chooser = new SendableChooser<>();
 
   // The robot's subsystems
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  private final VirtualFourBar m_arm = new VirtualFourBar();
+  private final VirtualFourBar arm = new VirtualFourBar();
   // private final LED m_led = new LED();
 
-  private final PathBuilder m_builder = new PathBuilder(drivebase);
+  private final PathBuilder builder = new PathBuilder(drivebase);
 
-  private final CommandJoystick m_driverController = new CommandJoystick(OIConstants.driverID);
-  private final CommandJoystick m_scoreController = new CommandJoystick(OIConstants.intakeID);
+  private final CommandJoystick driverController = new CommandJoystick(OIConstants.driverID);
+  private final CommandJoystick scoreController = new CommandJoystick(OIConstants.intakeID);
 
   // the default commands
   private final TeleopDrive closedFieldRel;
@@ -57,16 +57,16 @@ public class RobotContainer {
         new TeleopDrive(
             drivebase,
             () ->
-                (Math.abs(m_driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                    ? m_driverController.getY()
+                (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
+                    ? driverController.getY()
                     : 0,
             () ->
-                (Math.abs(m_driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                    ? m_driverController.getX()
+                (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
+                    ? driverController.getX()
                     : 0,
             () ->
-                (Math.abs(m_driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? m_driverController.getZ()
+                (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
+                    ? driverController.getZ()
                     : 0,
             () -> true,
             false);
@@ -75,34 +75,34 @@ public class RobotContainer {
     initializeChooser();
 
     drivebase.setDefaultCommand(closedFieldRel);
-    m_arm.setDefaultCommand(
+    arm.setDefaultCommand(
         new RunCommand(
             () ->
-                m_arm.setArm(
+                arm.setArm(
                     MathUtil.clamp(
-                        (m_driverController.getRawAxis(3) / 2.25) + 0.50, 0.15, 0.86)), // 0.62 1.42
-            m_arm));
+                        (driverController.getRawAxis(3) / 2.25) + 0.50, 0.15, 0.86)), // 0.62 1.42
+            arm));
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
   }
 
   private void initializeChooser() {
-    m_chooser.setDefaultOption(
+    chooser.setDefaultOption(
         "Default Test",
-        m_builder.getSwerveCommand(
+        builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
                 "Test Path",
                 new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
 
-    m_chooser.addOption(
+    chooser.addOption(
         "3 Score T1",
-        m_builder.getSwerveCommand(
+        builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
                 "3 Score T1",
                 new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
 
-    m_chooser.addOption(
+    chooser.addOption(
         "1 Score + Dock T2",
-        m_builder
+        builder
             .getSwerveCommand(
                 PathPlanner.loadPathGroup(
                     "1 Score + Dock T2",
@@ -114,7 +114,7 @@ public class RobotContainer {
                         drivebase)
                     .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0)));
 
-    SmartDashboard.putData("CHOOSE", m_chooser);
+    SmartDashboard.putData("CHOOSE", chooser);
   }
 
   /**
@@ -124,14 +124,14 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    m_driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
-    m_driverController
+    driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
+    driverController
         .button(3)
         .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d()), drivebase));
-    m_scoreController.button(7).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
-    m_scoreController.button(8).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
-    m_scoreController.button(9).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
-    m_driverController
+    scoreController.button(7).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
+    scoreController.button(8).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
+    scoreController.button(9).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
+    driverController
         .button(11)
         .whileTrue(
             Commands.run(
@@ -146,6 +146,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAuto() {
-    return m_chooser.getSelected();
+    return chooser.getSelected();
   }
 }
