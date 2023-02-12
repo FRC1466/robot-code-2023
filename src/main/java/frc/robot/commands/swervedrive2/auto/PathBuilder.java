@@ -6,7 +6,6 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.Swerve;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +23,7 @@ public class PathBuilder {
         new SwerveAutoBuilder(
             drivebase::getPose, // Functional interface to feed supplier
             drivebase::resetOdometry,
-            Swerve.KINEMATICS,
+            drivebase.getKinematics(),
             // Position controllers
             new PIDConstants(
                 AutoConstants.translationController.P,

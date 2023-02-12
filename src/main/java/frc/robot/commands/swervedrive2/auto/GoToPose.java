@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.Swerve;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class GoToPose {
         new PPSwerveControllerCommand(
             traj,
             drive::getPose, // Pose supplier
-            Swerve.KINEMATICS, // SwerveDriveKinematics
+            drive.getKinematics(), // SwerveDriveKinematics
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
@@ -106,7 +105,7 @@ public class GoToPose {
         new PPSwerveControllerCommand(
             traj,
             drive::getPose, // Pose supplier
-            Swerve.KINEMATICS, // SwerveDriveKinematics
+            drive.getKinematics(), // SwerveDriveKinematics
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
