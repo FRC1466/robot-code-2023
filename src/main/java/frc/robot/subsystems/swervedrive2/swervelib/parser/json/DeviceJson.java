@@ -8,6 +8,7 @@ import frc.robot.subsystems.swervedrive2.swervelib.imu.PigeonSwerve;
 import frc.robot.subsystems.swervedrive2.swervelib.imu.SwerveIMU;
 import frc.robot.subsystems.swervedrive2.swervelib.motors.SparkMaxSwerve;
 import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
+import frc.robot.subsystems.swervedrive2.swervelib.motors.TalonFXSwerve;
 
 /** Device JSON parsed class. Used to access the JSON data. */
 public class DeviceJson {
@@ -49,7 +50,7 @@ public class DeviceJson {
       case "pigeon2":
         return new Pigeon2Swerve(id, canbus != null ? canbus : "");
       default:
-        throw new RuntimeException(type + " is not a recognized absolute encoder type.");
+        throw new RuntimeException(type + " is not a recognized imu type.");
     }
   }
 
@@ -63,6 +64,9 @@ public class DeviceJson {
     if (type.equals("sparkmax")) {
       return new SparkMaxSwerve(id, isDriveMotor);
     }
-    throw new RuntimeException(type + " is not a recognized absolute encoder type.");
+    if (type.equals("talon")) {
+      return new TalonFXSwerve(id, isDriveMotor);
+    }
+    throw new RuntimeException(type + " is not a recognized motor type.");
   }
 }
