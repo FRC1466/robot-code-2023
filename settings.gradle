@@ -25,3 +25,5 @@ pluginManagement {
         }
     }
 }
+
+startParameter.excludedTaskNames=["pmdMain", "checkstyleMain", "spotbugsMain", "spotlessCheck"]
