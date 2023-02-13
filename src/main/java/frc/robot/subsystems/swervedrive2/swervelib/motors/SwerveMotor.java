@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swervedrive2.swervelib.motors;
 
+import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
 
 public abstract class SwerveMotor {
@@ -14,8 +15,14 @@ public abstract class SwerveMotor {
   public abstract void clearStickyFaults();
 
   /**
-   * Configure the integrated encoder for the swerve module. Sets the conversion factors for
-   * position and velocity.
+   * Set the absolute encoder to be a compatible absolute encoder.
+   *
+   * @param encoder The encoder to use.
+   */
+  public abstract SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder);
+
+  /**
+   * Configure the integrated encoder for the swerve module. Sets the conversion factors for position and velocity.
    *
    * @param positionConversionFactor The conversion factor to apply for position.
    */
@@ -110,4 +117,18 @@ public abstract class SwerveMotor {
    * @param rampRate Time in seconds to go from 0 to full throttle.
    */
   public abstract void setLoopRampRate(double rampRate);
+
+  /**
+   * Get the motor object from the module.
+   *
+   * @return Motor object.
+   */
+  public abstract Object getMotor();
+
+  /**
+   * Queries whether the absolute encoder is directly attached to the motor controller.
+   *
+   * @return connected absolute encoder state.
+   */
+  public abstract boolean isAttachedAbsoluteEncoder();
 }

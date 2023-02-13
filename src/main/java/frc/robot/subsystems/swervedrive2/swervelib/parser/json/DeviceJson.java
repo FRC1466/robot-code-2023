@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swervedrive2.swervelib.parser.json;
 
 import frc.robot.subsystems.swervedrive2.swervelib.encoders.CANCoderSwerve;
+import frc.robot.subsystems.swervedrive2.swervelib.encoders.SparkMaxEncoderSwerve;
 import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.robot.subsystems.swervedrive2.swervelib.imu.NavXSwerve;
 import frc.robot.subsystems.swervedrive2.swervelib.imu.Pigeon2Swerve;
@@ -28,6 +29,7 @@ public class DeviceJson {
   public SwerveAbsoluteEncoder createEncoder() {
     switch (type) {
       case "integrated":
+      case "attached":
         return null;
       case "cancoder":
         return new CANCoderSwerve(id, canbus != null ? canbus : "");
@@ -68,5 +70,20 @@ public class DeviceJson {
       return new TalonFXSwerve(id, isDriveMotor);
     }
     throw new RuntimeException(type + " is not a recognized motor type.");
+  }
+
+  /**
+   * Create a {@link SwerveAbsoluteEncoder} from the data port on the motor controller.
+   *
+   * @param motor The motor to create the absolute encoder from.
+   * @return {@link SwerveAbsoluteEncoder} from the motor controller.
+   */
+  public SwerveAbsoluteEncoder createIntegratedEncoder(SwerveMotor motor)
+  {
+    if (type.equals("sparkmax"))
+    {
+      return new SparkMaxEncoderSwerve(motor);
+    }
+    throw new RuntimeException("Could not create absolute encoder from data port of " + type + " id " + id);
   }
 }

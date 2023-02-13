@@ -146,14 +146,13 @@ public class SwerveModuleConfiguration {
    * @param isDriveMotor For the drive motor.
    * @return Position encoder conversion factor.
    */
-  public double getPositionEncoderConversion(boolean isDriveMotor) {
-    return isDriveMotor
-        ? calculateMetersPerRotation(
-            physicalCharacteristics.wheelDiameter,
-            physicalCharacteristics.driveGearRatio,
-            physicalCharacteristics.driveEncoderPulsePerRotation)
-        : calculateDegreesPerEncoderUnit(
-            physicalCharacteristics.angleGearRatio,
-            physicalCharacteristics.angleEncoderPulsePerRotation);
+  public double getPositionEncoderConversion(boolean isDriveMotor)
+  {
+    return isDriveMotor ? calculateMetersPerRotation(physicalCharacteristics.wheelDiameter,
+                                                     physicalCharacteristics.driveGearRatio,
+                                                     physicalCharacteristics.driveEncoderPulsePerRotation)
+                                                     : calculateDegreesPerEncoderUnit(
+                                                      angleMotor.isAttachedAbsoluteEncoder() ? 1 : physicalCharacteristics.angleGearRatio,
+                                                      physicalCharacteristics.angleEncoderPulsePerRotation);
   }
 }

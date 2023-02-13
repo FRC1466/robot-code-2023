@@ -61,4 +61,15 @@ public class NavXSwerve extends SwerveIMU {
     yprArray[1] = gyro.getPitch();
     yprArray[2] = gyro.getRoll();
   }
+
+  /**
+   * Get the instantiated IMU object.
+   *
+   * @return IMU object.
+   */
+  @Override
+  public Object getIMU()
+  {
+    return gyro;
+  }
 }

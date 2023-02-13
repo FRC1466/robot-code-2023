@@ -1,6 +1,8 @@
 package frc.robot.subsystems.swervedrive2.swervelib.parser.json;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
+import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModuleConfiguration;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModulePhysicalCharacteristics;
@@ -35,21 +37,23 @@ public class ModuleJson {
    * @param physicalCharacteristics Physical characteristics of the swerve module.
    * @return {@link SwerveModuleConfiguration} based on the provided data and parsed data.
    */
-  public SwerveModuleConfiguration createModuleConfiguration(
-      PIDFConfig anglePIDF,
-      PIDFConfig velocityPIDF,
-      double maxSpeed,
-      SwerveModulePhysicalCharacteristics physicalCharacteristics) {
-    return new SwerveModuleConfiguration(
-        drive.createMotor(true),
-        angle.createMotor(false),
-        encoder.createEncoder(),
-        absoluteEncoderOffset,
-        Units.inchesToMeters(location.x),
-        Units.inchesToMeters(location.y),
-        anglePIDF,
-        velocityPIDF,
-        maxSpeed,
-        physicalCharacteristics);
+  public SwerveModuleConfiguration createModuleConfiguration(PIDFConfig anglePIDF, PIDFConfig velocityPIDF,
+                                                             double maxSpeed,
+                                                             SwerveModulePhysicalCharacteristics physicalCharacteristics)
+  {
+    SwerveMotor           angleMotor = angle.createMotor(false);
+    SwerveAbsoluteEncoder absEncoder = encoder.createEncoder();
+
+    // If the absolute encoder is attached.
+    if (absEncoder == null)
+    {
+      absEncoder = angle.createIntegratedEncoder(angleMotor);
+      angleMotor.setAbsoluteEncoder(absEncoder);
+    }
+
+    return new SwerveModuleConfiguration(drive.createMotor(true), angleMotor, absEncoder,
+                                         absoluteEncoderOffset, Units.inchesToMeters(location.x),
+                                         Units.inchesToMeters(location.y), anglePIDF, velocityPIDF, maxSpeed,
+                                         physicalCharacteristics);
   }
 }

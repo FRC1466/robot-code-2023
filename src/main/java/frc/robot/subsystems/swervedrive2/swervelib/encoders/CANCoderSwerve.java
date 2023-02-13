@@ -67,4 +67,15 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder {
   public double getAbsolutePosition() {
     return encoder.getAbsolutePosition();
   }
+
+  /**
+   * Get the instantiated absolute encoder Object.
+   *
+   * @return Absolute encoder object.
+   */
+  @Override
+  public Object getAbsoluteEncoder()
+  {
+    return encoder;
+  }
 }
