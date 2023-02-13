@@ -79,9 +79,9 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 arm.setArm(
-                    MathUtil.clamp(
-                        (driverController.getRawAxis(3) / 2.25) + 0.50, 0.15, 0.86)), // 0.62 1.42
+                    -scoreController.getRawAxis(1) * Math.PI/2 + Math.PI/2), // 0.62 1.42
             arm));
+    // arm.setDefaultCommand(Commands.run(()-> arm.setArmPercent(scoreController.getRawAxis(1)/3), arm));
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
   }
 
