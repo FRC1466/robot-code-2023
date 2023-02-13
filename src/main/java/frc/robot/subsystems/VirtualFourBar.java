@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -28,11 +27,11 @@ public class VirtualFourBar extends SubsystemBase {
   private final DCMotor m_armGearbox;
   private final SingleJointedArmSim armSim;
   private final DutyCycleEncoderSim m_encoderSim;
-    // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-    private final Mechanism2d m_mech2d;
-    private final MechanismRoot2d m_armPivot;
-    private final MechanismLigament2d m_armTower;
-    private final MechanismLigament2d m_arm;
+  // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+  private final Mechanism2d m_mech2d;
+  private final MechanismRoot2d m_armPivot;
+  private final MechanismLigament2d m_armTower;
+  private final MechanismLigament2d m_arm;
 
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
@@ -50,22 +49,28 @@ public class VirtualFourBar extends SubsystemBase {
 
     m_armGearbox = DCMotor.getFalcon500(1);
     armSim =
-    new SingleJointedArmSim(
-        m_armGearbox, 16, 0.731599134, 0.6858, -Math.PI/2, 3 * Math.PI / 2, true, VecBuilder.fill(1 / 256));
+        new SingleJointedArmSim(
+            m_armGearbox,
+            16,
+            0.731599134,
+            0.6858,
+            -Math.PI / 2,
+            3 * Math.PI / 2,
+            true,
+            VecBuilder.fill(1 / 256));
     m_encoderSim = new DutyCycleEncoderSim(armEncoder);
-      // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-      m_mech2d = new Mechanism2d(60, 60);
-      m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
-      m_armTower =
-          m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
-      m_arm =
-          m_armPivot.append(
-              new MechanismLigament2d(
-                  "Arm",
-                  30,
-                  Units.radiansToDegrees(armSim.getAngleRads()),
-                  6,
-                  new Color8Bit(Color.kYellow)));
+    // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
+    m_mech2d = new Mechanism2d(60, 60);
+    m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+    m_armTower = m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
+    m_arm =
+        m_armPivot.append(
+            new MechanismLigament2d(
+                "Arm",
+                30,
+                Units.radiansToDegrees(armSim.getAngleRads()),
+                6,
+                new Color8Bit(Color.kYellow)));
 
     SmartDashboard.putData("Arm Sim", m_mech2d);
   }

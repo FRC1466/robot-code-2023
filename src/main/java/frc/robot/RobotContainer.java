@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -58,15 +57,15 @@ public class RobotContainer {
             drivebase,
             () ->
                 (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                    ? driverController.getY()
+                    ? driverController.getY() * 0.6
                     : 0,
             () ->
                 (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                    ? driverController.getX()
+                    ? driverController.getX() * 0.6
                     : 0,
             () ->
                 (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? driverController.getZ()
+                    ? -driverController.getZ() * 0.6
                     : 0,
             () -> true,
             false);
@@ -78,10 +77,10 @@ public class RobotContainer {
     arm.setDefaultCommand(
         new RunCommand(
             () ->
-                arm.setArm(
-                    -scoreController.getRawAxis(1) * Math.PI/2 + Math.PI/2), // 0.62 1.42
+                arm.setArm(-scoreController.getRawAxis(1) * Math.PI / 2 + Math.PI / 2), // 0.62 1.42
             arm));
-    // arm.setDefaultCommand(Commands.run(()-> arm.setArmPercent(scoreController.getRawAxis(1)/3), arm));
+    // arm.setDefaultCommand(Commands.run(()-> arm.setArmPercent(scoreController.getRawAxis(1)/3),
+    // arm));
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
   }
 

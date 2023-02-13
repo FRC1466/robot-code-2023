@@ -7,12 +7,14 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
 
 public class TalonFXSwerve extends SwerveMotor {
 
   /** SparkMAX Instance. */
   public WPI_TalonFX motor;
+  public int m_id = 0;
   /** Factory default already occurred. */
   private boolean factoryDefaultOccurred = false;
   /**
@@ -36,6 +38,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   public TalonFXSwerve(int id, boolean isDriveMotor) {
     this.isDriveMotor = isDriveMotor;
+    m_id = id;
     motor = new WPI_TalonFX(id);
     factoryDefaults();
     clearStickyFaults();
@@ -70,6 +73,32 @@ public class TalonFXSwerve extends SwerveMotor {
         MathUtil.inputModulus(
             inputValue, interval * numFinal + offset, interval * (numFinal + 1) + offset);
     return output;
+  }
+
+  
+  private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+    double lowerBound;
+    double upperBound;
+    double lowerOffset = scopeReference % 360;
+    if (lowerOffset >= 0) {
+      lowerBound = scopeReference - lowerOffset;
+      upperBound = scopeReference + (360 - lowerOffset);
+    } else {
+      upperBound = scopeReference - lowerOffset;
+      lowerBound = scopeReference - (360 + lowerOffset);
+    }
+    while (newAngle < lowerBound) {
+      newAngle += 360;
+    }
+    while (newAngle > upperBound) {
+      newAngle -= 360;
+    }
+    if (newAngle - scopeReference > 180) {
+      newAngle -= 360;
+    } else if (newAngle - scopeReference < -180) {
+      newAngle += 360;
+    }
+    return newAngle;
   }
 
   /**
@@ -208,14 +237,12 @@ public class TalonFXSwerve extends SwerveMotor {
   public void setReference(double setpoint, double feedforward) {
     setpoint =
         !isDriveMotor && isPIDWrapped
-            ? placeInAppropriateScope(
-                motor.getSelectedSensorPosition() / positionConversionFactor,
-                setpoint,
-                minPIDInput,
-                maxPIDInput)
+            ? placeInAppropriate0To360Scope(
+                motor.getSelectedSensorPosition() * positionConversionFactor,
+                setpoint)
             : setpoint;
     setpoint =
-        isDriveMotor ? setpoint * velocityConversionFactor : setpoint * positionConversionFactor;
+        isDriveMotor ? setpoint / velocityConversionFactor : setpoint / positionConversionFactor;
     motor.set(
         isDriveMotor ? TalonFXControlMode.Velocity : TalonFXControlMode.Position,
         setpoint,
@@ -240,15 +267,14 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getPosition() {
-    var position =
-        isDriveMotor
-            ? motor.getSelectedSensorPosition() / positionConversionFactor
-            : MathUtil.inputModulus(
-                    motor.getSelectedSensorPosition(),
-                    -positionConversionFactor / 2,
-                    positionConversionFactor / 2)
-                / positionConversionFactor;
-    return position / positionConversionFactor;
+    var position = motor.getSelectedSensorPosition() % (360 / positionConversionFactor);
+        // isDriveMotor
+        //     ? motor.getSelectedSensorPosition()
+        //     : MathUtil.wrap(
+        //             motor.getSelectedSensorPosition(),
+        //             -positionConversionFactor / 2,
+        //             positionConversionFactor / 2);
+    return position * positionConversionFactor;
   }
 
   /**

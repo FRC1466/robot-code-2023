@@ -1,7 +1,7 @@
 package frc.robot.subsystems.swervedrive2.swervelib.parser;
 
 import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateAngleKV;
-import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateDegreesPerSteeringRotation;
+import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateDegreesPerEncoderTick;
 import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateMaxAcceleration;
 import static frc.robot.subsystems.swervedrive2.swervelib.math.SwerveMath.calculateMetersPerRotation;
 
@@ -152,7 +152,7 @@ public class SwerveModuleConfiguration {
             physicalCharacteristics.wheelDiameter,
             physicalCharacteristics.driveGearRatio,
             physicalCharacteristics.driveEncoderPulsePerRotation)
-        : calculateDegreesPerSteeringRotation(
+        : calculateDegreesPerEncoderTick(
             physicalCharacteristics.angleGearRatio,
             physicalCharacteristics.angleEncoderPulsePerRotation);
   }
