@@ -1,6 +1,10 @@
 package frc.robot.subsystems.swervedrive2.swervelib.encoders;
 
-public abstract class SwerveAbsoluteEncoder {
+/**
+ * Swerve abstraction class to define a standard interface with absolute encoders for swerve modules..
+ */
+public abstract class SwerveAbsoluteEncoder
+{
 
   /** Reset the encoder to factory defaults. */
   public abstract void factoryDefault();

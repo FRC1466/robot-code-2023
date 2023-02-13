@@ -1,6 +1,10 @@
 package frc.robot.subsystems.swervedrive2.swervelib.imu;
 
-public abstract class SwerveIMU {
+/**
+ * Swerve IMU abstraction to define a standard interface with a swerve drive.
+ */
+public abstract class SwerveIMU
+{
 
   /** Reset IMU to factory default. */
   public abstract void factoryDefault();

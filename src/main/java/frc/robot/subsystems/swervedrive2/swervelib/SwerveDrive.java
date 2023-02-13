@@ -22,7 +22,11 @@ import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveDriveConfigurati
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwerveDrive {
+/**
+ * Swerve Drive class representing and controlling the swerve drive.
+ */
+public class SwerveDrive
+{
 
   //
   // Swerve base kinematics object

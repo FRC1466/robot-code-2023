@@ -10,28 +10,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.robot.subsystems.swervedrive2.swervelib.motors.SwerveMotor;
 
-public class SwerveModuleConfiguration {
-
-  /** Angle offset in degrees for the Swerve Module. */
-  public final double angleOffset;
-  /** Whether the absolute encoder is inverted. */
-  public final boolean absoluteEncoderInverted;
-  /** Whether the drive motor is inverted. */
-  public final boolean driveMotorInverted;
-  /** Maximum robot speed in meters per second. */
-  public final double maxSpeed;
-  /** PIDF configuration options for the angle motor closed-loop PID controller. */
-  public PIDFConfig anglePIDF;
-  /** PIDF configuration options for the drive motor closed-loop PID controller. */
-  public PIDFConfig velocityPIDF;
-  /** Angle volt-meter-per-second. */
-  public double angleKV;
-  /** Swerve module location relative to the robot. */
-  public Translation2d moduleLocation;
-  /** Physical characteristics of the swerve module. */
-  public SwerveModulePhysicalCharacteristics physicalCharacteristics;
-  /** The drive motor and angle motor of this swerve module. */
-  public SwerveMotor driveMotor;
+/**
+ * Swerve Module configuration class which is used to configure
+ * {@link frc.robot.subsystems.swervedrive2.swervelib.SwerveModule}.
+ */
+public class SwerveModuleConfiguration
+{
 
   /**
    * Angle offset in degrees for the Swerve Module.

@@ -11,7 +11,11 @@ import com.revrobotics.SparkMaxPIDController;
 import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
 
-public class SparkMaxSwerve extends SwerveMotor {
+/**
+ * An implementation of {@link CANSparkMax} as a {@link SwerveMotor}.
+ */
+public class SparkMaxSwerve extends SwerveMotor
+{
 
   /**
    * SparkMAX Instance.

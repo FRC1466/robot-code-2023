@@ -11,7 +11,11 @@ import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveDriveConfigurati
 import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveModuleConfiguration;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveParser;
 
-public class SwerveMath {
+/**
+ * Mathematical functions which pertain to swerve drive.
+ */
+public class SwerveMath
+{
 
   /**
    * Calculate the angle kV which will be multiplied by the radians per second for the feedforward.
