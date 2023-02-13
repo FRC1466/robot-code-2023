@@ -132,8 +132,8 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor) {
-    this.positionConversionFactor = positionConversionFactor * 2048;
-    this.velocityConversionFactor = positionConversionFactor * 2048 / 600;
+    this.positionConversionFactor = positionConversionFactor;
+    this.velocityConversionFactor = positionConversionFactor / 600;
   }
 
   /**
