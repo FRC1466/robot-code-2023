@@ -8,9 +8,19 @@ import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveControllerConfig
 /** Controller class used to convert raw inputs into robot speeds. */
 public class SwerveController {
 
-  public final SwerveControllerConfiguration config;
-  private final PIDController thetaController; // TODO: Switch to ProfilePIDController
-  public double lastAngle;
+  /**
+   * {@link SwerveControllerConfiguration} object storing data to generate the {@link PIDController} for controlling the
+   * robot heading, and deadband for heading joystick.
+   */
+  public final  SwerveControllerConfiguration config;
+  /**
+   * PID Controller for the robot heading.
+   */
+  private final PIDController                 thetaController; // TODO: Switch to ProfilePIDController
+  /**
+   * Last angle to robot was set to.
+   */
+  public        double                        lastAngle;
 
   /**
    * Construct the SwerveController object which is used for determining the speeds of the robot
