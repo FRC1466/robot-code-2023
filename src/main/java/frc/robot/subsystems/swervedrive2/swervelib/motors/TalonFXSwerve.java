@@ -6,6 +6,8 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import frc.robot.subsystems.swervedrive2.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
 
 public class TalonFXSwerve extends SwerveMotor {
@@ -112,6 +114,36 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void clearStickyFaults() {
     motor.clearStickyFaults();
+  }
+
+  /**
+   * Get the motor object from the module.
+   *
+   * @return Motor object.
+   */
+  @Override
+  public Object getMotor() {
+    return motor;
+  }
+
+  /**
+   * Queries whether the absolute encoder is directly attached to the motor controller.
+   *
+   * @return connected absolute encoder state.
+   */
+  @Override
+  public boolean isAttachedAbsoluteEncoder() {
+    return false;
+  }
+
+  /**
+   * Set the absolute encoder to be a compatible absolute encoder.
+   *
+   * @param encoder The encoder to use.
+   */
+  @Override
+  public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder) {
+    return this;
   }
 
   /**
