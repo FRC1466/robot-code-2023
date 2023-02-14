@@ -69,7 +69,7 @@ public class SwerveMath {
    *     integrated.
    * @return Degrees per steering rotation for the angle motor.
    */
-  public static double calculateDegreesPerEncoderTick(
+  public static double calculateDegreesPerEncoderUnit(
       double angleGearRatio, double pulsePerRotation) {
     return 360 / (angleGearRatio * pulsePerRotation);
   }

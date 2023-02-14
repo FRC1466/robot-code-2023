@@ -6,25 +6,16 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.swervedrive2.swervelib.parser.PIDFConfig;
 
 public class TalonFXSwerve extends SwerveMotor {
 
   /** SparkMAX Instance. */
   public WPI_TalonFX motor;
+
   public int m_id = 0;
   /** Factory default already occurred. */
   private boolean factoryDefaultOccurred = false;
-  /**
-   * PID wrapped or not, min and max pid output to use in degrees since Talon can't do it
-   * automatically.
-   */
-  private boolean isPIDWrapped = false;
-
-  private double minPIDInput;
-  private double maxPIDInput;
   /** Conversion factors for pos and velocity since Talon can't do it automatically. */
   private double positionConversionFactor;
 
@@ -46,36 +37,6 @@ public class TalonFXSwerve extends SwerveMotor {
     motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
   }
 
-  /**
-   * Put angle within a scope (ex. 22 deg put into 720-1080 with a scope of (0, 360)).
-   *
-   * <p>Assumes the general equation of some possible point of the interval is (interval*num)+offset
-   * where offset is the positive offset from 0. First we solve for an initial number to scale down
-   * the (scopeMin, scopeMax) to a standard interval that includes 0 (we solve for the offset here).
-   * Then we formulate the interval including the reference r to be (interval*num+offset,
-   * interval*(num+1)+offset) and r = interval*num+offset + a where a is an arbitary value. So, num
-   * = (r-a-offset)/interval, which we can simply floor to compensate for the a (since -a/interval
-   * is of (-1, 0)). Then we can find values to use with {@link MathUtil.inputModulus}.
-   *
-   * @param scopeReference Current Angle
-   * @param input Target Angle
-   * @param scopeMin minimum for defined scope
-   * @param scopeMax maximum for defined scope
-   * @return Closest angle within scope
-   */
-  private double placeInAppropriateScope(
-      double scopeReference, double inputValue, double scopeMin, double scopeMax) {
-    double interval = scopeMax - scopeMin;
-    int numInitial = (int) Math.floor(scopeMax / (scopeMax - scopeMin));
-    double offset = scopeMin - interval * numInitial;
-    int numFinal = (int) Math.floor((scopeReference - offset) / interval);
-    double output =
-        MathUtil.inputModulus(
-            inputValue, interval * numFinal + offset, interval * (numFinal + 1) + offset);
-    return output;
-  }
-
-  
   private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
     double lowerBound;
     double upperBound;
@@ -187,11 +148,7 @@ public class TalonFXSwerve extends SwerveMotor {
    * @param maxInput Maximum PID input.
    */
   @Override
-  public void configurePIDWrapping(double minInput, double maxInput) {
-    isPIDWrapped = true;
-    minPIDInput = minInput;
-    maxPIDInput = maxInput;
-  }
+  public void configurePIDWrapping(double minInput, double maxInput) {}
 
   /**
    * Set the idle mode.
@@ -236,10 +193,9 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void setReference(double setpoint, double feedforward) {
     setpoint =
-        !isDriveMotor && isPIDWrapped
+        !isDriveMotor
             ? placeInAppropriate0To360Scope(
-                motor.getSelectedSensorPosition() * positionConversionFactor,
-                setpoint)
+                motor.getSelectedSensorPosition() * positionConversionFactor, setpoint)
             : setpoint;
     setpoint =
         isDriveMotor ? setpoint / velocityConversionFactor : setpoint / positionConversionFactor;
@@ -267,13 +223,10 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getPosition() {
-    var position = motor.getSelectedSensorPosition() % (360 / positionConversionFactor);
-        // isDriveMotor
-        //     ? motor.getSelectedSensorPosition()
-        //     : MathUtil.wrap(
-        //             motor.getSelectedSensorPosition(),
-        //             -positionConversionFactor / 2,
-        //             positionConversionFactor / 2);
+    var position =
+        isDriveMotor
+            ? motor.getSelectedSensorPosition() / positionConversionFactor
+            : motor.getSelectedSensorPosition() % (360 / positionConversionFactor);
     return position * positionConversionFactor;
   }
 
