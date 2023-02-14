@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants.MotorConfigs;
+import frc.robot.Constants.ArmConstants.ArmConfig;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,7 +20,17 @@ public class Robot extends TimedRobot {
   private boolean isAutoDone;
   private RobotContainer robotContainer;
   private Command autonomousCommand;
-  public static MotorConfigs moduleConfigs;
+  public static Robot instance;
+  public static ArmConfig armConfig;
+
+  public Robot() {
+    instance = this;
+    armConfig = new ArmConfig();
+  }
+
+  public static Robot getInstance() {
+    return instance;
+  }
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -33,7 +43,6 @@ public class Robot extends TimedRobot {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    moduleConfigs = new MotorConfigs();
     robotContainer = new RobotContainer();
   }
 
@@ -68,7 +77,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAuto();
+    System.out.println("AUTO START");
   }
+
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousPeriodic() {
@@ -81,9 +92,10 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
 
-    if ((autonomousCommand != null) && (!isAutoDone)) {
+    if (autonomousCommand != null && !isAutoDone) {
       autonomousCommand.schedule();
       isAutoDone = true;
+      System.out.println("AUTO SCHEDULE");
     }
   }
 

@@ -16,7 +16,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - run: ./gradlew pmdMain
-      - run: ./gradlew checkstyleMain
-      - run: ./gradlew spotbugsMain
+      - run: ./gradlew pmdMain -PjavaFormat
+      - run: ./gradlew checkstyleMain -PjavaFormat
+      - run: ./gradlew spotbugsMain -PjavaFormat
       

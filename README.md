@@ -3,6 +3,9 @@
 
 Our robot code for the FRC 2023 Charged Up Season.
 
+Uses YAGSL, documented [here](https://github.com/BroncBotz3481/YAGSL/wiki). The JSON documentation can also be
+found [here](docs/README.md).
+
 # Installation
 Clone the repo, ensure you have libraries. Open with WPILib 2023.
 

@@ -6,13 +6,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.RobotConstants.GripperConstants;
+import frc.robot.Constants.GripperConstants;
 
 public class Gripper extends SubsystemBase {
   private CANSparkMax gripperMotor;
   private SparkMaxPIDController pidController;
   private RelativeEncoder encoder;
 
+  /** Create a new Gripper subsystem. */
   public Gripper() {
     gripperMotor = new CANSparkMax(24, MotorType.kBrushless);
     pidController = gripperMotor.getPIDController();
