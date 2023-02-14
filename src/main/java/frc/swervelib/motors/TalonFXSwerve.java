@@ -238,7 +238,7 @@ public class TalonFXSwerve extends SwerveMotor {
   }
 
   /**
-   * Get the velocity of the integrated encoder in RPM.
+   * Get the velocity of the integrated encoder in MPS.
    *
    * @return velocity
    */
