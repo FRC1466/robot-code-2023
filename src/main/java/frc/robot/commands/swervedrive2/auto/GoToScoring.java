@@ -7,9 +7,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
-import frc.webblib.util.chargedup.ScoringArea;
 import java.util.List;
 import java.util.Optional;
+import webblib.util.chargedup.ScoringArea;
 
 public class GoToScoring extends CommandBase {
   private final SwerveSubsystem drive;

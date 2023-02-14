@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
-import frc.webblib.util.chargedup.LoadingArea;
+import webblib.util.chargedup.LoadingArea;
 
 public class GoToLoadingZone extends CommandBase {
   private final SwerveSubsystem drive;

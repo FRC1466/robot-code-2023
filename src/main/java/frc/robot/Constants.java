@@ -12,13 +12,13 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import frc.webblib.util.Gains;
-import frc.webblib.util.HolonomicPose2d;
-import frc.webblib.util.RectanglePoseArea;
-import frc.webblib.util.chargedup.LoadingArea;
-import frc.webblib.util.chargedup.ScoringArea;
 import java.util.ArrayList;
 import java.util.List;
+import webblib.util.Gains;
+import webblib.util.HolonomicPose2d;
+import webblib.util.RectanglePoseArea;
+import webblib.util.chargedup.LoadingArea;
+import webblib.util.chargedup.ScoringArea;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
