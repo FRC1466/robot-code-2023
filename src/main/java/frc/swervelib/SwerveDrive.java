@@ -137,7 +137,7 @@ public class SwerveDrive {
 
     // Sets states
     for (SwerveModule module : swerveModules) {
-      module.setDesiredState(desiredStates[module.moduleNumber], false); // Todo: Send isOpenLoop
+      module.setDesiredState(desiredStates[module.moduleNumber], isOpenLoop);
       SmartDashboard.putNumber(
           "Module " + module.moduleNumber + " Speed Setpoint: ",
           desiredStates[module.moduleNumber].speedMetersPerSecond);
@@ -147,16 +147,13 @@ public class SwerveDrive {
     }
   }
 
-    /**
-   * Lock the swerve drive to prevent it from moving.
-   */
-  public void lock()
-  {
-    double[]             angles        = new double[]{45, -45, -45, 45};
+  /** Lock the swerve drive to prevent it from moving. */
+  public void lock() {
+    double[] angles = new double[] {45, -45, -45, 45};
     SwerveModuleState2[] moduleState2s = new SwerveModuleState2[swerveModules.length];
-    for (int i = 0; i < moduleState2s.length; i++)
-    {
-      swerveModules[i].lastAngle = angles[i % 4]; // Override jittering to ensure module is set to angle.
+    for (int i = 0; i < moduleState2s.length; i++) {
+      swerveModules[i].lastAngle =
+          angles[i % 4]; // Override jittering to ensure module is set to angle.
       moduleState2s[i] = new SwerveModuleState2(0, Rotation2d.fromDegrees(angles[i % 4]), 0);
     }
     setModuleStates(moduleState2s, false);
