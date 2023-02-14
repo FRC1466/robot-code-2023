@@ -6,49 +6,32 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import frc.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.swervelib.parser.PIDFConfig;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
+/** An implementation of {@link CANSparkMax} as a {@link SwerveMotor}. */
+public class SparkMaxSwerve extends SwerveMotor {
 
-/**
- * An implementation of {@link CANSparkMax} as a {@link SwerveMotor}.
- */
-public class SparkMaxSwerve extends SwerveMotor
-{
-
-  /**
-   * SparkMAX Instance.
-   */
-  public  CANSparkMax           motor;
-  /**
-   * Integrated encoder.
-   */
-  public  RelativeEncoder       encoder;
-  /**
-   * Absolute encoder attached to the SparkMax (if exists)
-   */
-  public  AbsoluteEncoder       absoluteEncoder;
-  /**
-   * Closed-loop PID controller.
-   */
-  public  SparkMaxPIDController pid;
-  /**
-   * Factory default already occurred.
-   */
-  private boolean               factoryDefaultOccurred = false;
-
+  /** SparkMAX Instance. */
+  public CANSparkMax motor;
+  /** Integrated encoder. */
+  public RelativeEncoder encoder;
+  /** Absolute encoder attached to the SparkMax (if exists) */
+  public AbsoluteEncoder absoluteEncoder;
+  /** Closed-loop PID controller. */
+  public SparkMaxPIDController pid;
+  /** Factory default already occurred. */
+  private boolean factoryDefaultOccurred = false;
 
   /**
    * Initialize the swerve motor.
    *
-   * @param motor        The SwerveMotor as a SparkMax object.
+   * @param motor The SwerveMotor as a SparkMax object.
    * @param isDriveMotor Is the motor being initialized a drive motor?
    */
-  public SparkMaxSwerve(CANSparkMax motor, boolean isDriveMotor)
-  {
+  public SparkMaxSwerve(CANSparkMax motor, boolean isDriveMotor) {
     this.motor = motor;
     this.isDriveMotor = isDriveMotor;
     factoryDefaults();
@@ -65,11 +48,10 @@ public class SparkMaxSwerve extends SwerveMotor
   /**
    * Initialize the {@link SwerveMotor} as a {@link CANSparkMax} connected to a Brushless Motor.
    *
-   * @param id           CAN ID of the SparkMax.
+   * @param id CAN ID of the SparkMax.
    * @param isDriveMotor Is the motor being initialized a drive motor?
    */
-  public SparkMaxSwerve(int id, boolean isDriveMotor)
-  {
+  public SparkMaxSwerve(int id, boolean isDriveMotor) {
     this(new CANSparkMax(id, MotorType.kBrushless), isDriveMotor);
   }
 
@@ -111,8 +93,7 @@ public class SparkMaxSwerve extends SwerveMotor
    * @return Motor object.
    */
   @Override
-  public Object getMotor()
-  {
+  public Object getMotor() {
     return motor;
   }
 
@@ -122,14 +103,11 @@ public class SparkMaxSwerve extends SwerveMotor
    * @return connected absolute encoder state.
    */
   @Override
-  public boolean isAttachedAbsoluteEncoder()
-  {
+  public boolean isAttachedAbsoluteEncoder() {
     return absoluteEncoder != null;
   }
 
-  /**
-   * Configure the factory defaults.
-   */
+  /** Configure the factory defaults. */
   @Override
   public void factoryDefaults() {
     if (!factoryDefaultOccurred) {
@@ -151,10 +129,8 @@ public class SparkMaxSwerve extends SwerveMotor
    * @return The {@link SwerveMotor} for easy instantiation.
    */
   @Override
-  public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder)
-  {
-    if (encoder.getAbsoluteEncoder() instanceof AbsoluteEncoder)
-    {
+  public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder) {
+    if (encoder.getAbsoluteEncoder() instanceof AbsoluteEncoder) {
       absoluteEncoder = (AbsoluteEncoder) encoder.getAbsoluteEncoder();
       pid.setFeedbackDevice(absoluteEncoder);
     }
@@ -162,22 +138,21 @@ public class SparkMaxSwerve extends SwerveMotor
   }
 
   /**
-   * Configure the integrated encoder for the swerve module. Sets the conversion factors for position and velocity.
+   * Configure the integrated encoder for the swerve module. Sets the conversion factors for
+   * position and velocity.
    *
    * @param positionConversionFactor The conversion factor to apply.
    */
   @Override
-  public void configureIntegratedEncoder(double positionConversionFactor)
-  {
-    if (absoluteEncoder == null)
-    {
+  public void configureIntegratedEncoder(double positionConversionFactor) {
+    if (absoluteEncoder == null) {
       encoder.setPositionConversionFactor(positionConversionFactor);
       encoder.setVelocityConversionFactor(positionConversionFactor / 60);
 
-      // Taken from https://github.com/frc3512/SwerveBot-2022/blob/9d31afd05df6c630d5acb4ec2cf5d734c9093bf8/src/main/java/frc/lib/util/CANSparkMaxUtil.java#L67
+      // Taken from
+      // https://github.com/frc3512/SwerveBot-2022/blob/9d31afd05df6c630d5acb4ec2cf5d734c9093bf8/src/main/java/frc/lib/util/CANSparkMaxUtil.java#L67
       configureCANStatusFrames(10, 20, 20, 500, 500);
-    } else
-    {
+    } else {
       absoluteEncoder.setPositionConversionFactor(positionConversionFactor);
       absoluteEncoder.setVelocityConversionFactor(positionConversionFactor / 60);
     }
@@ -292,8 +267,7 @@ public class SparkMaxSwerve extends SwerveMotor
    * @return velocity
    */
   @Override
-  public double getVelocity()
-  {
+  public double getVelocity() {
     return absoluteEncoder == null ? encoder.getVelocity() : absoluteEncoder.getVelocity();
   }
 
@@ -303,8 +277,7 @@ public class SparkMaxSwerve extends SwerveMotor
    * @return Position
    */
   @Override
-  public double getPosition()
-  {
+  public double getPosition() {
     return absoluteEncoder == null ? encoder.getPosition() : absoluteEncoder.getPosition();
   }
 
@@ -314,10 +287,8 @@ public class SparkMaxSwerve extends SwerveMotor
    * @param position Integrated encoder position.
    */
   @Override
-  public void setPosition(double position)
-  {
-    if (absoluteEncoder == null)
-    {
+  public void setPosition(double position) {
+    if (absoluteEncoder == null) {
       encoder.setPosition(position);
     }
   }

@@ -68,8 +68,7 @@ public class NavXSwerve extends SwerveIMU {
    * @return IMU object.
    */
   @Override
-  public Object getIMU()
-  {
+  public Object getIMU() {
     return gyro;
   }
 }

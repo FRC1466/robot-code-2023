@@ -1,10 +1,7 @@
 package frc.swervelib.parser;
 
-/**
- * Configuration class which stores physical characteristics shared between every swerve module.
- */
-public class SwerveModulePhysicalCharacteristics
-{
+/** Configuration class which stores physical characteristics shared between every swerve module. */
+public class SwerveModulePhysicalCharacteristics {
 
   /** Wheel diameter in meters. */
   public final double wheelDiameter;

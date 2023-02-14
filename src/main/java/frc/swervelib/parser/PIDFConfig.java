@@ -6,30 +6,18 @@ import frc.swervelib.parser.deserializer.PIDFRange;
 /** Hold the PIDF and Integral Zone values for a PID. */
 public class PIDFConfig {
 
-  /**
-   * Proportional Gain for PID.
-   */
+  /** Proportional Gain for PID. */
   public double p;
-  /**
-   * Integral Gain for PID.
-   */
+  /** Integral Gain for PID. */
   public double i;
-  /**
-   * Derivative Gain for PID.
-   */
+  /** Derivative Gain for PID. */
   public double d;
-  /**
-   * Feedforward value for PID.
-   */
+  /** Feedforward value for PID. */
   public double f;
-  /**
-   * Integral zone for PID.
-   */
+  /** Integral zone for PID. */
   public double iz;
 
-  /**
-   * The PIDF output range.
-   */
+  /** The PIDF output range. */
   public PIDFRange output = new PIDFRange();
 
   /** Used when parsing PIDF values from JSON. */
@@ -94,4 +82,3 @@ public class PIDFConfig {
     return new PIDController(p, i, d);
   }
 }
-

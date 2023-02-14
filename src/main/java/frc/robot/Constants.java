@@ -17,7 +17,6 @@ import frc.webblib.util.HolonomicPose2d;
 import frc.webblib.util.RectanglePoseArea;
 import frc.webblib.util.chargedup.LoadingArea;
 import frc.webblib.util.chargedup.ScoringArea;
-
 import java.util.ArrayList;
 import java.util.List;
 

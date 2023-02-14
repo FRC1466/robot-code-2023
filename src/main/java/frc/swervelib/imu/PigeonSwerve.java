@@ -3,11 +3,8 @@ package frc.swervelib.imu;
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * SwerveIMU interface for the Pigeon.
- */
-public class PigeonSwerve extends SwerveIMU
-{
+/** SwerveIMU interface for the Pigeon. */
+public class PigeonSwerve extends SwerveIMU {
 
   WPI_PigeonIMU imu;
 
@@ -59,8 +56,7 @@ public class PigeonSwerve extends SwerveIMU
    * @return IMU object.
    */
   @Override
-  public Object getIMU()
-  {
+  public Object getIMU() {
     return imu;
   }
 }

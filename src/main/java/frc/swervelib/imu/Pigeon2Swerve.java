@@ -4,11 +4,8 @@ import com.ctre.phoenix.sensors.Pigeon2Configuration;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * SwerveIMU interface for the Pigeon2
- */
-public class Pigeon2Swerve extends SwerveIMU
-{
+/** SwerveIMU interface for the Pigeon2 */
+public class Pigeon2Swerve extends SwerveIMU {
 
   /** Pigeon2 IMU device. */
   WPI_Pigeon2 imu;
@@ -73,8 +70,7 @@ public class Pigeon2Swerve extends SwerveIMU
    * @return IMU object.
    */
   @Override
-  public Object getIMU()
-  {
+  public Object getIMU() {
     return imu;
   }
 }

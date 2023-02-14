@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
 import frc.swervelib.encoders.SwerveAbsoluteEncoder;
 import frc.swervelib.parser.PIDFConfig;
 

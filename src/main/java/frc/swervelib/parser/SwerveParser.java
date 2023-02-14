@@ -10,7 +10,6 @@ import frc.swervelib.parser.json.ModuleJson;
 import frc.swervelib.parser.json.PIDFPropertiesJson;
 import frc.swervelib.parser.json.PhysicalPropertiesJson;
 import frc.swervelib.parser.json.SwerveDriveJson;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;

@@ -11,11 +11,8 @@ import frc.swervelib.parser.SwerveDriveConfiguration;
 import frc.swervelib.parser.SwerveModuleConfiguration;
 import frc.swervelib.parser.SwerveParser;
 
-/**
- * Mathematical functions which pertain to swerve drive.
- */
-public class SwerveMath
-{
+/** Mathematical functions which pertain to swerve drive. */
+public class SwerveMath {
 
   /**
    * Calculate the angle kV which will be multiplied by the radians per second for the feedforward.

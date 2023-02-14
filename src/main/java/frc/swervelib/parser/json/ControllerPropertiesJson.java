@@ -4,10 +4,7 @@ import frc.swervelib.parser.PIDFConfig;
 import frc.swervelib.parser.SwerveControllerConfiguration;
 import frc.swervelib.parser.SwerveDriveConfiguration;
 
-/**
- * {@link frc.swervelib.SwerveController} parsed class. Used to access
- * the JSON data.
- */
+/** {@link frc.swervelib.SwerveController} parsed class. Used to access the JSON data. */
 public class ControllerPropertiesJson {
 
   /**

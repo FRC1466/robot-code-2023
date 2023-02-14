@@ -19,53 +19,31 @@ import frc.swervelib.math.SwerveKinematics2;
 import frc.swervelib.math.SwerveModuleState2;
 import frc.swervelib.parser.SwerveControllerConfiguration;
 import frc.swervelib.parser.SwerveDriveConfiguration;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Swerve Drive class representing and controlling the swerve drive.
- */
-public class SwerveDrive
-{
+/** Swerve Drive class representing and controlling the swerve drive. */
+public class SwerveDrive {
 
   //
   // Swerve base kinematics object
-  /**
-   * Swerve Kinematics object utilizing second order kinematics.
-   */
-  public final  SwerveKinematics2        kinematics;
-  /**
-   * Swerve drive configuration.
-   */
-  public final  SwerveDriveConfiguration swerveDriveConfiguration;
-  /**
-   * Swerve odometry.
-   */
-  public final  SwerveDrivePoseEstimator swerveDrivePoseEstimator;
-  /**
-   * Swerve modules.
-   */
-  private final SwerveModule[]           swerveModules;
-  /**
-   * Field object.
-   */
-  public        Field2d                  field = new Field2d();
-  /**
-   * Swerve controller for controlling heading of the robot.
-   */
-  public        SwerveController         swerveController;
-  /**
-   * Swerve IMU device for sensing the heading of the robot.
-   */
-  private       SwerveIMU                imu;
-  /**
-   * The current angle of the robot and last time odometry during simulations.
-   */
-  private       double                   angle, lastTime;
-  /**
-   * Time during simulations.
-   */
+  /** Swerve Kinematics object utilizing second order kinematics. */
+  public final SwerveKinematics2 kinematics;
+  /** Swerve drive configuration. */
+  public final SwerveDriveConfiguration swerveDriveConfiguration;
+  /** Swerve odometry. */
+  public final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+  /** Swerve modules. */
+  private final SwerveModule[] swerveModules;
+  /** Field object. */
+  public Field2d field = new Field2d();
+  /** Swerve controller for controlling heading of the robot. */
+  public SwerveController swerveController;
+  /** Swerve IMU device for sensing the heading of the robot. */
+  private SwerveIMU imu;
+  /** The current angle of the robot and last time odometry during simulations. */
+  private double angle, lastTime;
+  /** Time during simulations. */
   private Timer timer;
 
   /**

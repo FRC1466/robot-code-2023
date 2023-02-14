@@ -3,11 +3,10 @@ package frc.swervelib.parser;
 import static frc.swervelib.math.SwerveMath.calculateMaxAngularVelocity;
 
 /**
- * Swerve Controller configuration class which is used to configure
- * {@link frc.swervelib.SwerveController}.
+ * Swerve Controller configuration class which is used to configure {@link
+ * frc.swervelib.SwerveController}.
  */
-public class SwerveControllerConfiguration
-{
+public class SwerveControllerConfiguration {
 
   /** Maximum robot speed in meters per second. */
   public final double maxSpeed;

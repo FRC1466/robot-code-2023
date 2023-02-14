@@ -9,40 +9,23 @@ import frc.swervelib.parser.SwerveModulePhysicalCharacteristics;
 import frc.swervelib.parser.json.modules.BoolMotorJson;
 import frc.swervelib.parser.json.modules.LocationJson;
 
-/**
- * {@link frc.swervelib.SwerveModule} JSON parsed class. Used to
- * access the JSON data.
- */
+/** {@link frc.swervelib.SwerveModule} JSON parsed class. Used to access the JSON data. */
 public class ModuleJson {
 
-  /**
-   * Drive motor device configuration.
-   */
-  public DeviceJson    drive;
-  /**
-   * Angle motor device configuration.
-   */
-  public DeviceJson    angle;
-  /**
-   * Absolute encoder device configuration.
-   */
-  public DeviceJson    encoder;
-  /**
-   * Defines which motors are inverted.
-   */
+  /** Drive motor device configuration. */
+  public DeviceJson drive;
+  /** Angle motor device configuration. */
+  public DeviceJson angle;
+  /** Absolute encoder device configuration. */
+  public DeviceJson encoder;
+  /** Defines which motors are inverted. */
   public BoolMotorJson inverted;
-  /**
-   * Absolute encoder offset from 0 in degrees.
-   */
-  public double        absoluteEncoderOffset;
-  /**
-   * Absolute encoder inversion state.
-   */
-  public boolean       absoluteEncoderInverted = false;
-  /**
-   * The location of the swerve module from the center of the robot in inches.
-   */
-  public LocationJson  location;
+  /** Absolute encoder offset from 0 in degrees. */
+  public double absoluteEncoderOffset;
+  /** Absolute encoder inversion state. */
+  public boolean absoluteEncoderInverted = false;
+  /** The location of the swerve module from the center of the robot in inches. */
+  public LocationJson location;
 
   /**
    * Create the swerve module configuration based off of parsed data.
@@ -53,24 +36,33 @@ public class ModuleJson {
    * @param physicalCharacteristics Physical characteristics of the swerve module.
    * @return {@link SwerveModuleConfiguration} based on the provided data and parsed data.
    */
-  public SwerveModuleConfiguration createModuleConfiguration(PIDFConfig anglePIDF, PIDFConfig velocityPIDF,
-                                                             double maxSpeed,
-                                                             SwerveModulePhysicalCharacteristics physicalCharacteristics)
-  {
-    SwerveMotor           angleMotor = angle.createMotor(false);
+  public SwerveModuleConfiguration createModuleConfiguration(
+      PIDFConfig anglePIDF,
+      PIDFConfig velocityPIDF,
+      double maxSpeed,
+      SwerveModulePhysicalCharacteristics physicalCharacteristics) {
+    SwerveMotor angleMotor = angle.createMotor(false);
     SwerveAbsoluteEncoder absEncoder = encoder.createEncoder();
 
     // If the absolute encoder is attached.
-    if (absEncoder == null)
-    {
+    if (absEncoder == null) {
       absEncoder = angle.createIntegratedEncoder(angleMotor);
       angleMotor.setAbsoluteEncoder(absEncoder);
     }
 
-    return new SwerveModuleConfiguration(drive.createMotor(true), angleMotor, absEncoder,
-                                         absoluteEncoderOffset, Units.inchesToMeters(location.x),
-                                         Units.inchesToMeters(location.y), anglePIDF, velocityPIDF, maxSpeed,
-                                         physicalCharacteristics, absoluteEncoderInverted, inverted.drive,
-                                         inverted.angle);
+    return new SwerveModuleConfiguration(
+        drive.createMotor(true),
+        angleMotor,
+        absEncoder,
+        absoluteEncoderOffset,
+        Units.inchesToMeters(location.x),
+        Units.inchesToMeters(location.y),
+        anglePIDF,
+        velocityPIDF,
+        maxSpeed,
+        physicalCharacteristics,
+        absoluteEncoderInverted,
+        inverted.drive,
+        inverted.angle);
   }
 }

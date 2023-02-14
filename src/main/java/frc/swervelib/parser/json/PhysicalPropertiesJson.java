@@ -4,8 +4,8 @@ import edu.wpi.first.math.util.Units;
 import frc.swervelib.parser.SwerveModulePhysicalCharacteristics;
 
 /**
- * {@link frc.swervelib.parser.SwerveModulePhysicalCharacteristics}
- * parsed data. Used to configure the SwerveModule.
+ * {@link frc.swervelib.parser.SwerveModulePhysicalCharacteristics} parsed data. Used to configure
+ * the SwerveModule.
  */
 public class PhysicalPropertiesJson {
 

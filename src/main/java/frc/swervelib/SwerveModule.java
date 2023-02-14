@@ -12,11 +12,8 @@ import frc.swervelib.math.SwerveModuleState2;
 import frc.swervelib.motors.SwerveMotor;
 import frc.swervelib.parser.SwerveModuleConfiguration;
 
-/**
- * The Swerve Module class which represents and controls Swerve Modules for the swerve drive.
- */
-public class SwerveModule
-{
+/** The Swerve Module class which represents and controls Swerve Modules for the swerve drive. */
+public class SwerveModule {
 
   /** Swerve module configuration options. */
   public final SwerveModuleConfiguration configuration;
@@ -24,6 +21,7 @@ public class SwerveModule
   private final double angleOffset;
   /** Swerve Motors. */
   private final SwerveMotor angleMotor;
+
   private final SwerveMotor driveMotor;
   /** Absolute encoder for swerve drive. */
   private final SwerveAbsoluteEncoder absoluteEncoder;

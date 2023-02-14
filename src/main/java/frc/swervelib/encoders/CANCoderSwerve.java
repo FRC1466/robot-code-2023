@@ -6,11 +6,8 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
-/**
- * Swerve Absolute Encoder for CTRE CANCoders.
- */
-public class CANCoderSwerve extends SwerveAbsoluteEncoder
-{
+/** Swerve Absolute Encoder for CTRE CANCoders. */
+public class CANCoderSwerve extends SwerveAbsoluteEncoder {
 
   /** CANCoder with WPILib sendable and support. */
   public WPI_CANCoder encoder;
@@ -78,8 +75,7 @@ public class CANCoderSwerve extends SwerveAbsoluteEncoder
    * @return Absolute encoder object.
    */
   @Override
-  public Object getAbsoluteEncoder()
-  {
+  public Object getAbsoluteEncoder() {
     return encoder;
   }
 }

@@ -6,8 +6,7 @@ import frc.swervelib.parser.PIDFConfig;
 /**
  * Swerve motor abstraction which defines a standard interface for motors within a swerve module.
  */
-public abstract class SwerveMotor
-{
+public abstract class SwerveMotor {
 
   /** Whether the swerve motor is a drive motor. */
   protected boolean isDriveMotor;
@@ -26,7 +25,8 @@ public abstract class SwerveMotor
   public abstract SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder);
 
   /**
-   * Configure the integrated encoder for the swerve module. Sets the conversion factors for position and velocity.
+   * Configure the integrated encoder for the swerve module. Sets the conversion factors for
+   * position and velocity.
    *
    * @param positionConversionFactor The conversion factor to apply for position.
    */

@@ -9,18 +9,14 @@ import frc.swervelib.parser.SwerveControllerConfiguration;
 public class SwerveController {
 
   /**
-   * {@link SwerveControllerConfiguration} object storing data to generate the {@link PIDController} for controlling the
-   * robot heading, and deadband for heading joystick.
+   * {@link SwerveControllerConfiguration} object storing data to generate the {@link PIDController}
+   * for controlling the robot heading, and deadband for heading joystick.
    */
-  public final  SwerveControllerConfiguration config;
-  /**
-   * PID Controller for the robot heading.
-   */
-  private final PIDController                 thetaController; // TODO: Switch to ProfilePIDController
-  /**
-   * Last angle to robot was set to.
-   */
-  public        double                        lastAngle;
+  public final SwerveControllerConfiguration config;
+  /** PID Controller for the robot heading. */
+  private final PIDController thetaController; // TODO: Switch to ProfilePIDController
+  /** Last angle to robot was set to. */
+  public double lastAngle;
 
   /**
    * Construct the SwerveController object which is used for determining the speeds of the robot
