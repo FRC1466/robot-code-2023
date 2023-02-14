@@ -12,11 +12,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import frc.lib.util.Gains;
-import frc.lib.util.HolonomicPose2d;
-import frc.lib.util.RectanglePoseArea;
-import frc.lib.util.chargedup.LoadingArea;
-import frc.lib.util.chargedup.ScoringArea;
+import frc.webblib.util.Gains;
+import frc.webblib.util.HolonomicPose2d;
+import frc.webblib.util.RectanglePoseArea;
+import frc.webblib.util.chargedup.LoadingArea;
+import frc.webblib.util.chargedup.ScoringArea;
+
 import java.util.ArrayList;
 import java.util.List;
 

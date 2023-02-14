@@ -10,15 +10,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.swerve.SwerveBalance;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.subsystems.swervedrive2.swervelib.SwerveController;
-import frc.robot.subsystems.swervedrive2.swervelib.SwerveDrive;
-import frc.robot.subsystems.swervedrive2.swervelib.math.SwerveKinematics2;
-import frc.robot.subsystems.swervedrive2.swervelib.math.SwerveModuleState2;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveControllerConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveDriveConfiguration;
-import frc.robot.subsystems.swervedrive2.swervelib.parser.SwerveParser;
+import frc.swervelib.SwerveController;
+import frc.swervelib.SwerveDrive;
+import frc.swervelib.math.SwerveKinematics2;
+import frc.swervelib.math.SwerveModuleState2;
+import frc.swervelib.parser.SwerveControllerConfiguration;
+import frc.swervelib.parser.SwerveDriveConfiguration;
+import frc.swervelib.parser.SwerveParser;
+import frc.webblib.util.swerve.SwerveBalance;
+
 import java.io.File;
 
 public class SwerveSubsystem extends SubsystemBase {
