@@ -177,7 +177,7 @@ public class SwerveModule {
     if (Robot.isReal()) {
       velocity = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
-      omega = angleMotor.getVelocity();
+      omega = Math.toRadians(angleMotor.getVelocity());
     } else {
       velocity = speed;
       azimuth = Rotation2d.fromDegrees(this.angle);
