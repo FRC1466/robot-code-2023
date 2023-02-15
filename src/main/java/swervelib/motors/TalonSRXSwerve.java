@@ -175,7 +175,7 @@ public class TalonSRXSwerve extends SwerveMotor {
    */
   @Override
   public double getVelocity() {
-    return motor.getSelectedSensorVelocity() * (100 * positionConversionFactor);
+    return motor.getSelectedSensorVelocity() * (10 * positionConversionFactor);
   }
 
   /**
@@ -259,23 +259,33 @@ public class TalonSRXSwerve extends SwerveMotor {
 
   /** The Talon SRX Slot profile used to configure the motor to use for the PID. */
   enum CTRE_slotIdx {
+    /** Slot 0, meant for distances PID's. */
     Distance,
+    /** Slot 1, meant for turning PID's. */
     Turning,
+    /** Slot 2, meant for velocity PID's. */
     Velocity,
+    /** Slot 3, meant for motion profiles. */
     MotionProfile
   }
 
   /** The Talon PID to use onboard. */
   enum CTRE_pidIdx {
+    /** Primary PID for talons. */
     PRIMARY_PID,
+    /** Secondary PID for talons. */
     AUXILIARY_PID,
+    /** Third PID slot for talons. */
     THIRD_PID,
+    /** Fourth PID slot for talons. */
     FOURTH_PID
   }
 
   /** The remote sensor. */
   enum CTRE_remoteSensor {
+    /** Remote sensor 0. */
     REMOTE_SENSOR_0,
+    /** Remote sensor 1. */
     REMOTE_SENSOR_1
   }
 }

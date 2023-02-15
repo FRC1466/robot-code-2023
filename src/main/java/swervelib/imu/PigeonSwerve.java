@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** SwerveIMU interface for the Pigeon. */
 public class PigeonSwerve extends SwerveIMU {
 
+  /** Pigeon v1 IMU device. */
   WPI_PigeonIMU imu;
 
   /**

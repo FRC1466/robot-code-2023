@@ -121,7 +121,10 @@ public class SwerveMath {
 
   /**
    * Calculates the maximum acceleration allowed in a direction without tipping the robot. Reads arm
-   * position from NetworkTables and is passed the direction in question.
+   * position from NetworkTables and is passed the direction in question.<br>
+   * <b>Requires modules to be named: <br
+   * />
+   * "frontright.json", "frontleft.json", "backright.json", "backleft.json"</b>
    *
    * @param angle The direction in which to calculate max acceleration, as a Rotation2d. Note that
    *     this is robot-relative.
@@ -197,7 +200,9 @@ public class SwerveMath {
   /**
    * Limits a commanded velocity to prevent exceeding the maximum acceleration given by {@link
    * SwerveMath#calcMaxAccel(Rotation2d, double, double, Translation3d, SwerveDriveConfiguration)}.
-   * Note that this takes and returns field-relative velocities.
+   * Note that this takes and returns field-relative velocities. <br>
+   * <b>Requires modules to be named:<br>
+   * "frontright.json", "frontleft.json", "backright.json", "backleft.json"</b>
    *
    * @param commandedVelocity The desired velocity
    * @param fieldVelocity The velocity of the robot within a field relative state.

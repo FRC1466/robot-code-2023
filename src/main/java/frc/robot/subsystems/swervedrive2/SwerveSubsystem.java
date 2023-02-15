@@ -146,8 +146,8 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @param brake True to set motors to brake mode, false for coast.
    */
-  public void setMotorBrake(boolean brake) {
-    swerveDrive.setMotorBrake(brake);
+  public void setMotorIdleMode(boolean brake) {
+    swerveDrive.setMotorIdleMode(brake);
   }
 
   /**
