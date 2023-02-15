@@ -20,8 +20,6 @@ public class TalonFXSwerve extends SwerveMotor {
   /** Conversion factors for pos and velocity since Talon can't do it automatically. */
   private double positionConversionFactor;
 
-  private double velocityConversionFactor;
-
   /**
    * Initialize the swerve motor.
    *
@@ -154,7 +152,6 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor) {
     this.positionConversionFactor = positionConversionFactor;
-    this.velocityConversionFactor = positionConversionFactor / 10;
   }
 
   /**
@@ -229,7 +226,7 @@ public class TalonFXSwerve extends SwerveMotor {
                 motor.getSelectedSensorPosition() * positionConversionFactor, setpoint)
             : setpoint;
     setpoint =
-        isDriveMotor ? setpoint / velocityConversionFactor : setpoint / positionConversionFactor;
+        isDriveMotor ? setpoint * 0.1 / positionConversionFactor : setpoint / positionConversionFactor;
     motor.set(
         isDriveMotor ? TalonFXControlMode.Velocity : TalonFXControlMode.Position,
         setpoint,
@@ -244,7 +241,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getVelocity() {
-    return motor.getSelectedSensorVelocity() * velocityConversionFactor;
+    return motor.getSelectedSensorVelocity() * positionConversionFactor * 10;
   }
 
   /**
@@ -268,7 +265,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setPosition(double position) {
-    motor.setSelectedSensorPosition(position);
+    motor.setSelectedSensorPosition(position * positionConversionFactor);
   }
 
   /** CTRE Slots for PID configuration. */
