@@ -1,11 +1,11 @@
 {
   "drive": {
-    "type": "talon",
+    "type": "talonfx",
     "id": 7,
     "canbus": null
   },
   "angle": {
-    "type": "talon",
+    "type": "talonfx",
     "id": 8,
     "canbus": null
   },

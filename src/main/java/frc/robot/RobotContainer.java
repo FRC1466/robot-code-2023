@@ -57,15 +57,15 @@ public class RobotContainer {
             drivebase,
             () ->
                 (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                    ? driverController.getY() * 0.6
+                    ? driverController.getY()
                     : 0,
             () ->
                 (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                    ? driverController.getX() * 0.6
+                    ? driverController.getX()
                     : 0,
             () ->
                 (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? -driverController.getZ() * 0.6
+                    ? -driverController.getZ()
                     : 0,
             () -> true,
             false);
