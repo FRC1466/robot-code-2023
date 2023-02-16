@@ -52,7 +52,6 @@ public class GoToPose {
         new PPSwerveControllerCommand(
             traj,
             drive::getPose, // Pose supplier
-            drive.getKinematics(), // SwerveDriveKinematics
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
@@ -69,7 +68,7 @@ public class GoToPose {
                 AutoConstants.thetaController.I,
                 AutoConstants.thetaController.D),
             // Rotation controller.
-            drive::setDesiredModuleStates, // Module states consumer
+            drive::setChassisSpeeds, // Module states consumer
             true,
             drive // Requires this drive subsystem
             );
@@ -105,7 +104,6 @@ public class GoToPose {
         new PPSwerveControllerCommand(
             traj,
             drive::getPose, // Pose supplier
-            drive.getKinematics(), // SwerveDriveKinematics
             new PIDController(
                 AutoConstants.translationController.P,
                 AutoConstants.translationController.I,
@@ -118,7 +116,7 @@ public class GoToPose {
                 AutoConstants.thetaController.P,
                 AutoConstants.thetaController.I,
                 AutoConstants.thetaController.D),
-            drive::setDesiredModuleStates, // Module states consumer
+            drive::setChassisSpeeds, // Module states consumer
             true,
             drive // Requires this drive subsystem
             );

@@ -65,7 +65,7 @@ public class RobotContainer {
                     : 0,
             () ->
                 (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? -driverController.getZ()
+                    ? driverController.getZ()
                     : 0,
             () -> true,
             false);

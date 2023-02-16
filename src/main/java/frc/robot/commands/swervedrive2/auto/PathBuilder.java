@@ -23,7 +23,6 @@ public class PathBuilder {
         new SwerveAutoBuilder(
             drivebase::getPose, // Functional interface to feed supplier
             drivebase::resetOdometry,
-            drivebase.getKinematics(),
             // Position controllers
             new PIDConstants(
                 AutoConstants.translationController.P,
@@ -33,7 +32,7 @@ public class PathBuilder {
                 AutoConstants.thetaController.P,
                 AutoConstants.thetaController.I,
                 AutoConstants.thetaController.D),
-            drivebase::setDesiredModuleStates,
+            drivebase::setChassisSpeeds,
             eventMap,
             true,
             drivebase);

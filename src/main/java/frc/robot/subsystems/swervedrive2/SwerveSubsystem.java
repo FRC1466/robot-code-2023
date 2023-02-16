@@ -121,10 +121,6 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.setChassisSpeeds(chassisSpeeds);
   }
 
-  public void setDesiredModuleStates(SwerveModuleState[] desiredStates) {
-    swerveDrive.setModuleStates((SwerveModuleState2[]) desiredStates, false);
-  }
-
   /**
    * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
    */

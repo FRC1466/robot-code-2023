@@ -446,8 +446,8 @@ public class SwerveDrive
       moduleStates[module.moduleNumber + 1] = moduleState.speedMetersPerSecond;
       sumOmega += Math.abs(moduleState.omegaRadPerSecond);
 
-      SmartDashboard.putNumber("Module" + module.moduleNumber + "Relative Encoder", module.getRelativePosition());
-      SmartDashboard.putNumber("Module" + module.moduleNumber + "Absolute Encoder", module.getAbsolutePosition());
+      SmartDashboard.putNumber("Module" + module.moduleNumber + "Relative Encoder", 0);
+      SmartDashboard.putNumber("Module" + module.moduleNumber + "Absolute Encoder", 0);
     }
     SmartDashboard.putNumberArray("moduleStates", moduleStates);
 
@@ -455,22 +455,22 @@ public class SwerveDrive
     // To ensure that everytime we initialize it works.
     if (sumOmega <= .01 && ++moduleSynchronizationCounter > 5)
     {
-      synchronizeModuleEncoders();
+      // synchronizeModuleEncoders();
       moduleSynchronizationCounter = 0;
     }
 
   }
 
-  /**
-   * Synchronize angle motor integrated encoders with data from absolute encoders.
-   */
-  public void synchronizeModuleEncoders()
-  {
-    for (SwerveModule module : swerveModules)
-    {
-      module.synchronizeEncoders();
-    }
-  }
+  // /**
+  //  * Synchronize angle motor integrated encoders with data from absolute encoders.
+  //  */
+  // public void synchronizeModuleEncoders()
+  // {
+  //   for (SwerveModule module : swerveModules)
+  //   {
+  //     module.synchronizeEncoders();
+  //   }
+  // }
 
   /**
    * Add a vision measurement to the {@link SwerveDrivePoseEstimator} and update the {@link SwerveIMU} gyro reading with

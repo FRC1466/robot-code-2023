@@ -199,7 +199,7 @@ public class TalonFXSwerve extends SwerveMotor
 //    for (; newAngle < 0 && absoluteEncoder; newAngle += 360)
 //      ;
 
-    return newAngle % 360;
+    return newAngle;
   }
 
   /**
@@ -293,7 +293,8 @@ public class TalonFXSwerve extends SwerveMotor
    */
   public double convertToNativeSensorUnits(double setpoint)
   {
-    setpoint = isDriveMotor ? (setpoint * .1) : setpoint;
+    setpoint = isDriveMotor ? (setpoint * .1) : placeInAppropriate0To360Scope(motor.getSelectedSensorPosition() * positionConversionFactor,
+    setpoint);
     return setpoint / positionConversionFactor;
   }
 
@@ -311,21 +312,6 @@ public class TalonFXSwerve extends SwerveMotor
       PhysicsSim.getInstance().run();
     }
 
-    burnFlash();
-
-    if (!isDriveMotor)
-    {
-      System.out.println("THe angle motor is " + motor.getDeviceID());
-      System.out.println("Setpoint " + setpoint + " => " + convertToNativeSensorUnits(setpoint));
-      System.out.println("Current point " + motor.getSelectedSensorPosition());
-      System.out.println("Adjusted point " + getPosition());
-
-      System.out.println("Scoped point " + convertToNativeSensorUnits(placeInAppropriate0To360Scope(getPosition(),
-                                                                                                    setpoint)));
-//                         placeInAppropriate0To360Scope(motor.getSelectedSensorPosition() * positionConversionFactor,
-//                                                       setpoint));
-    }
-
     motor.set(isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
               convertToNativeSensorUnits(setpoint),
               DemandType.ArbitraryFeedForward,
@@ -340,7 +326,7 @@ public class TalonFXSwerve extends SwerveMotor
   @Override
   public double getVelocity()
   {
-    return (isDriveMotor ? motor.getSelectedSensorVelocity() * 10
+    return (isDriveMotor ? motor.getSelectedSensorVelocity() * positionConversionFactor * 10
                          : motor.getSelectedSensorVelocity()) * positionConversionFactor;
   }
 

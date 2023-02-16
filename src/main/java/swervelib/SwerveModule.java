@@ -89,7 +89,7 @@ public class SwerveModule
     absoluteEncoder.factoryDefault();
     absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
     angleMotor.configureIntegratedEncoder(moduleConfiguration.getPositionEncoderConversion(false));
-    angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
+    // angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
 
     // Config angle motor/controller
     angleMotor.configurePIDF(moduleConfiguration.anglePIDF);
@@ -114,13 +114,13 @@ public class SwerveModule
     lastAngle = getState().angle.getDegrees();
   }
 
-  /**
-   * Synchronize the integrated angle encoder with the absolute encoder.
-   */
-  public void synchronizeEncoders()
-  {
-    angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
-  }
+  // /**
+  //  * Synchronize the integrated angle encoder with the absolute encoder.
+  //  */
+  // public void synchronizeEncoders()
+  // {
+  //   angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
+  // }
 
   /**
    * Set the desired state of the swerve module.
@@ -153,7 +153,7 @@ public class SwerveModule
     double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01) ?
                     lastAngle :
                     desiredState.angle.getDegrees());
-    angleMotor.setReference(angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
+    angleMotor.setReference(angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV * -0.3);
     lastAngle = angle;
 
     if (!Robot.isReal())

@@ -34,13 +34,13 @@ public class SwerveBalance {
    * @return ChassisSpeeds object to set to module states.
    */
   public Translation2d update(Rotation2d pitch, Rotation2d roll) {
-    var xGrad = -pitch.getTan();
+    var xGrad = pitch.getTan();
     var yGrad = -pitch.getCos() * roll.getTan();
 
     var vyMetersPerSecond =
-        BetterMath.signedAbsFunc(xGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
-    var vxMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
+    var vxMetersPerSecond =
+        BetterMath.signedAbsFunc(xGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
 
     return new Translation2d(vxMetersPerSecond, vyMetersPerSecond);
   }
