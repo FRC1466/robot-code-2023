@@ -1,15 +1,19 @@
 package swervelib.encoders;
 
 /**
- * Swerve abstraction class to define a standard interface with absolute encoders for swerve
- * modules..
+ * Swerve abstraction class to define a standard interface with absolute encoders for swerve modules..
  */
-public abstract class SwerveAbsoluteEncoder {
+public abstract class SwerveAbsoluteEncoder
+{
 
-  /** Reset the encoder to factory defaults. */
+  /**
+   * Reset the encoder to factory defaults.
+   */
   public abstract void factoryDefault();
 
-  /** Clear sticky faults on the encoder. */
+  /**
+   * Clear sticky faults on the encoder.
+   */
   public abstract void clearStickyFaults();
 
   /**
