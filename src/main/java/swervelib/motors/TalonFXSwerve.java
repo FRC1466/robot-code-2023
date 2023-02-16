@@ -136,7 +136,7 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor) {
     this.positionConversionFactor = positionConversionFactor;
-    motor.configSelectedFeedbackCoefficient(positionConversionFactor);
+    // motor.configSelectedFeedbackCoefficient(positionConversionFactor);
   }
 
   /**
@@ -213,8 +213,8 @@ public class TalonFXSwerve extends SwerveMotor {
     motor.set(
         isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
         isDriveMotor
-            ? setpoint * .1
-            : placeInAppropriate0To360Scope(
+            ? setpoint * .1 * positionConversionFactor
+            : positionConversionFactor * placeInAppropriate0To360Scope(
                 setpoint, motor.getSelectedSensorPosition() * positionConversionFactor),
         DemandType.ArbitraryFeedForward,
         feedforward);
