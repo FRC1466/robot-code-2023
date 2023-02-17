@@ -1,16 +1,12 @@
 package swervelib.simulation.ctre;
 
-
 import static swervelib.simulation.ctre.PhysicsSim.random;
 
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import swervelib.simulation.ctre.PhysicsSim.SimProfile;
 
-/**
- * Holds information about a simulated VictorSPX.
- */
-class VictorSPXSimProfile extends SimProfile
-{
+/** Holds information about a simulated VictorSPX. */
+class VictorSPXSimProfile extends SimProfile {
 
   public final VictorSPX _victor;
 
@@ -19,19 +15,18 @@ class VictorSPXSimProfile extends SimProfile
    *
    * @param victor The VictorSPX device
    */
-  public VictorSPXSimProfile(final VictorSPX victor)
-  {
+  public VictorSPXSimProfile(final VictorSPX victor) {
     this._victor = victor;
   }
 
   /**
    * Runs the simulation profile.
-   * <p>
-   * This uses very rudimentary physics simulation and exists to allow users to test features of our products in
-   * simulation using our examples out of the box. Users may modify this to utilize more accurate physics simulation.
+   *
+   * <p>This uses very rudimentary physics simulation and exists to allow users to test features of
+   * our products in simulation using our examples out of the box. Users may modify this to utilize
+   * more accurate physics simulation.
    */
-  public void run()
-  {
+  public void run() {
     // final double period = getPeriod();
 
     // Device voltage simulation

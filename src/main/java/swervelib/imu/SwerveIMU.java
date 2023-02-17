@@ -1,19 +1,12 @@
 package swervelib.imu;
 
-/**
- * Swerve IMU abstraction to define a standard interface with a swerve drive.
- */
-public abstract class SwerveIMU
-{
+/** Swerve IMU abstraction to define a standard interface with a swerve drive. */
+public abstract class SwerveIMU {
 
-  /**
-   * Reset IMU to factory default.
-   */
+  /** Reset IMU to factory default. */
   public abstract void factoryDefault();
 
-  /**
-   * Clear sticky faults on IMU.
-   */
+  /** Clear sticky faults on IMU. */
   public abstract void clearStickyFaults();
 
   /**
