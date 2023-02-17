@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Auton;
 import java.io.IOException;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -35,7 +35,7 @@ public class PhotonCameraWrapper {
             ? OriginPosition.kBlueAllianceWallRightSide
             : OriginPosition.kRedAllianceWallRightSide);
 
-    robotToCam = new Transform3d(AutoConstants.cameraTranslation, AutoConstants.cameraRotation);
+    robotToCam = new Transform3d(Auton.cameraTranslation, Auton.cameraRotation);
     photonPoseEstimator =
         new PhotonPoseEstimator(
             aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);

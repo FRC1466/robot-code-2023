@@ -5,11 +5,10 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Auton;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,21 +51,9 @@ public class GoToPose {
         new PPSwerveControllerCommand(
             traj,
             drive::getPose, // Pose supplier
-            new PIDController(
-                AutoConstants.translationController.P,
-                AutoConstants.translationController.I,
-                AutoConstants.translationController.D),
-            // X controller. Tune these values for your robot. Leaving them 0 will only use
-            // feedforwards.
-            new PIDController(
-                AutoConstants.translationController.P,
-                AutoConstants.translationController.I,
-                AutoConstants.translationController.D),
-            // Y controller (usually the same values as X controller)
-            new PIDController(
-                AutoConstants.thetaController.P,
-                AutoConstants.thetaController.I,
-                AutoConstants.thetaController.D),
+            Auton.xAutoPID.createPIDController(),
+            Auton.yAutoPID.createPIDController(),
+            Auton.angleAutoPID.createPIDController(),
             // Rotation controller.
             drive::setChassisSpeeds, // Module states consumer
             true,
@@ -104,19 +91,10 @@ public class GoToPose {
         new PPSwerveControllerCommand(
             traj,
             drive::getPose, // Pose supplier
-            new PIDController(
-                AutoConstants.translationController.P,
-                AutoConstants.translationController.I,
-                AutoConstants.translationController.D),
-            new PIDController(
-                AutoConstants.translationController.P,
-                AutoConstants.translationController.I,
-                AutoConstants.translationController.D),
-            new PIDController(
-                AutoConstants.thetaController.P,
-                AutoConstants.thetaController.I,
-                AutoConstants.thetaController.D),
-            drive::setChassisSpeeds, // Module states consumer
+            Auton.xAutoPID.createPIDController(),
+            Auton.yAutoPID.createPIDController(),
+            Auton.angleAutoPID.createPIDController(),
+            drive::setChassisSpeeds,
             true,
             drive // Requires this drive subsystem
             );

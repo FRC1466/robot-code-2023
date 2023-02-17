@@ -5,13 +5,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Auton;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import webblib.util.chargedup.LoadingArea;
 
 public class GoToLoadingZone extends CommandBase {
   private final SwerveSubsystem drive;
-  private final LoadingArea loadingArea = AutoConstants.loadingArea;
+  private final LoadingArea loadingArea = Auton.loadingArea;
   private final LOADING_SIDE selectedLoadingSide;
   private Command currentCommand;
 
@@ -36,7 +36,7 @@ public class GoToLoadingZone extends CommandBase {
           goToPose =
               new GoToPose(
                   loadingArea.getDoubleSubstationLeft().getPoseMeters(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
+                  new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
           break;
@@ -44,7 +44,7 @@ public class GoToLoadingZone extends CommandBase {
           goToPose =
               new GoToPose(
                   loadingArea.getDoubleSubstationRight().getPoseMeters(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
+                  new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
           break;

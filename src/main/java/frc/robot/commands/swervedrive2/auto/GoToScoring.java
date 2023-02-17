@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Auton;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +13,7 @@ import webblib.util.chargedup.ScoringArea;
 
 public class GoToScoring extends CommandBase {
   private final SwerveSubsystem drive;
-  private final List<ScoringArea> scoreAreaList = AutoConstants.scoreAreaList;
+  private final List<ScoringArea> scoreAreaList = Auton.scoreAreaList;
   private final POSITION selectedPosition;
   private Command currentCommand;
 
@@ -58,7 +58,7 @@ public class GoToScoring extends CommandBase {
           goToPose =
               new GoToPose(
                   scoringArea.get().getLeftPosition().getPoseMeters(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
+                  new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
           break;
@@ -66,7 +66,7 @@ public class GoToScoring extends CommandBase {
           goToPose =
               new GoToPose(
                   scoringArea.get().getMiddlePosition().getPoseMeters(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
+                  new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
           break;
@@ -74,7 +74,7 @@ public class GoToScoring extends CommandBase {
           goToPose =
               new GoToPose(
                   scoringArea.get().getRightPosition().getPoseMeters(),
-                  new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS),
+                  new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
           break;

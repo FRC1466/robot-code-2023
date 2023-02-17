@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
+import swervelib.parser.PIDFConfig;
 import webblib.util.Gains;
 import webblib.util.HolonomicPose2d;
 import webblib.util.RectanglePoseArea;
@@ -43,11 +44,14 @@ public final class Constants {
     }
   }
 
-  public static final class AutoConstants {
-    public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 3.0;
+  public static final class Auton {
+    public static final PIDFConfig xAutoPID = new PIDFConfig(0.7, 0, 0);
+    public static final PIDFConfig yAutoPID = new PIDFConfig(0.7, 0, 0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
+
+    public static final double maxSpeedMPS = 3;
+    public static final double maxAccelerationMPS = 2;
     public static final double balanceScale = 1.0, balanceScalePow = 1.0;
-    public static final Gains thetaController = new Gains(3.0, 0.0, 0.0, 0, 0, 1),
-        translationController = new Gains(6, 0, 0, 0, 0, 1);
 
     public static final LoadingArea loadingArea =
         new LoadingArea(

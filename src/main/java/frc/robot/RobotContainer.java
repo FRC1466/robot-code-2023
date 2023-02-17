@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.swervedrive2.auto.GoToScoring;
 import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
@@ -96,15 +96,13 @@ public class RobotContainer {
         "Default Test",
         builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
-                "Test Path",
-                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
+                "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
     chooser.addOption(
         "3 Score T1",
         builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
-                "3 Score T1",
-                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
+                "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
     chooser.addOption(
         "1 Score + Dock T2",
@@ -112,8 +110,7 @@ public class RobotContainer {
             .getSwerveCommand(
                 PathPlanner.loadPathGroup(
                     "1 Score + Dock T2",
-                    new PathConstraints(
-                        AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)))
+                    new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
             .andThen(
                 Commands.run(
                         () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),

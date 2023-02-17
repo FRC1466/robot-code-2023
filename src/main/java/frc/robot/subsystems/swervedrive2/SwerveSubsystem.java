@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Auton;
 import java.io.File;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -25,7 +25,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
 
   private final SwerveBalance swerveBalance =
-      new SwerveBalance(AutoConstants.balanceScale, AutoConstants.balanceScalePow);
+      new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
