@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -23,9 +25,12 @@ import frc.robot.commands.swervedrive2.auto.GoToScoring;
 import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive2.auto.PathBuilder;
 import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
+import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.VirtualFourBar;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.io.File;
+
+import javax.swing.GrayFilter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,6 +45,7 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final VirtualFourBar arm = new VirtualFourBar();
+  private final Gripper gripper = new Gripper();
   // private final LED m_led = new LED();
 
   private final PathBuilder builder = new PathBuilder(drivebase);
@@ -57,17 +63,17 @@ public class RobotContainer {
             drivebase,
             () ->
                 (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                    ? driverController.getY()
+                    ? -driverController.getY()
                     : 0,
             () ->
                 (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                    ? driverController.getX()
+                    ? -driverController.getX()
                     : 0,
             () ->
                 (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? driverController.getZ()
+                    ? -driverController.getZ()
                     : 0,
-            () -> true,
+            driverController.button(3),
             false);
     // Configure the button bindings
     configureButtonBindings();
@@ -77,8 +83,8 @@ public class RobotContainer {
     arm.setDefaultCommand(
         new RunCommand(
             () ->
-                arm.setArm(-scoreController.getRawAxis(1) * Math.PI / 2 + Math.PI / 2), // 0.62 1.42
-            arm));
+                arm.setArm(MathUtil.clamp(driverController.getRawAxis(3) / 2 * Math.PI + (Math.PI/2), -0.68, 4.34)),
+            arm)); // 0.68
     // arm.setDefaultCommand(Commands.run(()-> arm.setArmPercent(scoreController.getRawAxis(1)/3),
     // arm));
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
@@ -132,10 +138,10 @@ public class RobotContainer {
     scoreController.button(2).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
     scoreController.button(3).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
     driverController
-        .button(11)
+        .button(5)
         .whileTrue(
             Commands.run(
-                    () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
+                    () -> drivebase.drive(drivebase.getBalanceTranslation().times(-1), 0, false, false),
                     drivebase)
                 .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
   }

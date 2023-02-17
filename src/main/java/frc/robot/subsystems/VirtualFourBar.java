@@ -7,6 +7,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -22,6 +23,7 @@ import frc.robot.Robot;
 public class VirtualFourBar extends SubsystemBase {
   private WPI_TalonFX armMotor;
   private DutyCycleEncoder armEncoder;
+  private Encoder armEncoderQuadrature;
   private PIDController armPID;
 
   private final DCMotor m_armGearbox;
@@ -32,6 +34,7 @@ public class VirtualFourBar extends SubsystemBase {
   private final MechanismRoot2d m_armPivot;
   private final MechanismLigament2d m_armTower;
   private final MechanismLigament2d m_arm;
+  private double positionOffset;
 
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
@@ -39,8 +42,12 @@ public class VirtualFourBar extends SubsystemBase {
     configArmMotor();
 
     armEncoder = new DutyCycleEncoder(0);
-    armEncoder.setDistancePerRotation(1);
-    armEncoder.setPositionOffset(0.92);
+    armEncoder.setDistancePerRotation(1.0);
+    armEncoder.setPositionOffset(0.0);
+    this.positionOffset = getShiftedAbsoluteDistance();
+
+    armEncoderQuadrature = new Encoder(1, 2);
+    armEncoderQuadrature.setDistancePerPulse(1.0);
 
     armPID =
         new PIDController(
@@ -97,21 +104,40 @@ public class VirtualFourBar extends SubsystemBase {
     armMotor.configAllSettings(Robot.armConfig.config);
   }
 
+  private double getShiftedAbsoluteDistance() {
+    var a = armEncoder.getAbsolutePosition();
+    a -= 0.312153;
+    return -a;
+  }
+
+  private double getPosition() {
+    return (armEncoderQuadrature.getDistance()/2048.0 - positionOffset) * 2 * Math.PI;
+  }
+
   /**
    * Set arm with PID.
    *
    * @param a setpoint in encoder units.
    */
   public void setArm(double a) {
-    SmartDashboard.putNumber("setpoint", a);
-    var motorOutput = MathUtil.clamp(armPID.calculate(armEncoder.getDistance(), a), -1, 1);
+    SmartDashboard.putNumber("arm setpoint", a);
+    var motorOutput = MathUtil.clamp(armPID.calculate(getPosition(), a), -1, 1);
     SmartDashboard.putNumber("arm pid error", armPID.getPositionError());
     SmartDashboard.putNumber("armPID output", motorOutput);
-    // armMotor.set(motorOutput + Rotation2d.fromRadians(armEncoder.getDistance()).getCos()*0.2);
+    // armMotor.set(sanitizeMotorOutput(motorOutput)); // + Rotation2d.fromRadians(armEncoder.getDistance()).getCos()*0.2);
+    // -0.62, 4.34
+  }
+
+  public double sanitizeMotorOutput(double motorOutput) {
+    return motorOutput > -0.50 || motorOutput < 4.20 ? motorOutput : 0;
   }
 
   public void setArmPercent(double a) {
     armMotor.set(a);
+  }
+
+  public void setPosTo0() {
+
   }
 
   /**
@@ -127,6 +153,7 @@ public class VirtualFourBar extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putData(armEncoder);
     SmartDashboard.putNumber("abs arm", armEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("norm arm", armEncoder.getDistance());
+    SmartDashboard.putNumber("q encoder arm", armEncoderQuadrature.getDistance());
+    SmartDashboard.putNumber("norm arm", getPosition());
   }
 }

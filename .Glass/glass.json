@@ -1,8 +1,5 @@
 {
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
     "Retained Values": {
       "open": false
     },
@@ -11,6 +8,15 @@
         "open": true
       },
       "SmartDashboard": {
+        "DutyCycle Encoder[0]": {
+          "open": true
+        },
+        "Field": {
+          "open": true
+        },
+        "PPSwerveControllerCommand": {
+          "open": true
+        },
         "open": true
       }
     },
@@ -22,9 +28,17 @@
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/PPSwerveControllerCommand_field": "Field2d",
       "/SmartDashboard/Pigeon 2 [20]": "Gyro"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables Settings": {
+    "dsClient": false,
     "mode": "Client (NT4)",
     "serverTeam": "1466"
   },
@@ -41,7 +55,7 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/motor 8 Anglefinal"
+              "id": "NT:/SmartDashboard/norm arm"
             },
             {
               "color": [
@@ -50,9 +64,70 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/motor 8 Angleinit"
+              "id": "NT:/SmartDashboard/gripper enc position"
             }
           ]
+        }
+      ]
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/PPSwerveControllerCommand/xErrorMeters"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/PPSwerveControllerCommand/rotationErrorDegrees"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <2>": {
+      "plots": [
+        {
+          "height": 407,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/PPSwerveControllerCommand/xErrorMeters"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/PPSwerveControllerCommand/rotationErrorDegrees"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "height": 332
         }
       ]
     }

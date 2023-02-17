@@ -46,8 +46,8 @@ public final class Constants {
   public static final class AutoConstants {
     public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 3.0;
     public static final double balanceScale = 1.0, balanceScalePow = 1.0;
-    public static final Gains thetaController = new Gains(5, 0.0, 0.0, 0, 0, 1),
-        translationController = new Gains(1, 0, 0, 0, 0, 1);
+    public static final Gains thetaController = new Gains(3.0, 0.0, 0.0, 0, 0, 1),
+        translationController = new Gains(6, 0, 0, 0, 0, 1);
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -92,7 +92,7 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30;
-    public static final Gains armPosition = new Gains(2.8, 0, 0.5, 0, 0, 0.6);
+    public static final Gains armPosition = new Gains(0.3, 0, 0, 0, 0, 0.6);
 
     public static final class ArmConfig {
       public TalonFXConfiguration config;
@@ -109,7 +109,7 @@ public final class Constants {
   }
 
   public static final class GripperConstants {
-    public static final Gains gripperPosition = new Gains(0, 0, 0, 0, 0, 0.5);
+    public static final Gains gripperPosition = new Gains(0.14, 0, 0, 0, 0, 0.5);
   }
 
   public static final class LEDConstants {

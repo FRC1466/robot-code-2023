@@ -299,9 +299,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getPosition() {
-    return isDriveMotor
-        ? motor.getSelectedSensorPosition() * positionConversionFactor
-        : (motor.getSelectedSensorPosition() * positionConversionFactor) % 360;
+    return motor.getSelectedSensorPosition() * positionConversionFactor;
   }
 
   /**

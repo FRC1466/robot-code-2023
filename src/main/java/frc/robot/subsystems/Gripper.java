@@ -15,10 +15,11 @@ public class Gripper extends SubsystemBase {
 
   /** Create a new Gripper subsystem. */
   public Gripper() {
-    gripperMotor = new CANSparkMax(24, MotorType.kBrushless);
+    gripperMotor = new CANSparkMax(34, MotorType.kBrushless);
     pidController = gripperMotor.getPIDController();
     initializePID();
     encoder = gripperMotor.getEncoder();
+    encoder.setPosition(0);
   }
 
   public void setGripperMotorPercent(double a) {
@@ -42,5 +43,6 @@ public class Gripper extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("gripper enc position", encoder.getPosition());
-  }
+    pidController.setReference(-20.7, CANSparkMax.ControlType.kPosition);
+  } // 0, -11.38, -20.7
 }
