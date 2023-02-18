@@ -204,7 +204,6 @@ public class SparkMaxSwerve extends SwerveMotor {
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, CANStatus2);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, CANStatus3);
     motor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, CANStatus4);
-    // TODO: Configure Status Frame 5 and 6 if necessary
     //  https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
   }
 

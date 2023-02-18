@@ -72,7 +72,7 @@ public class RobotContainer {
                   : 0,
           () ->
               (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                  ? driverController.getZ()
+                  ? driverController.getZ() // TODO: set this to 0 and start tuning PID heading
                   : 0,
           () -> true, // driverController.button(3).negate(),
           false);
@@ -121,7 +121,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureBindings() {
-
+    // TODO: Calibrate gyro to 0 to attempt to fix problems. Try both combinations.
     drivebase.setDefaultCommand(closedFieldRel);
     arm.setDefaultCommand(
         new RunCommand(

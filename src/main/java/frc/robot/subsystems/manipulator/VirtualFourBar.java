@@ -167,6 +167,7 @@ public class VirtualFourBar extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Raw Absolute Arm", absoluteArmEncoder.getAbsolutePosition());
+    // TODO: read this to set offset to 0
     SmartDashboard.putNumber("Proccessed Absolute Arm", getPosition().getRadians());
   }
 }
