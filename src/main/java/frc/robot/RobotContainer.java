@@ -27,9 +27,9 @@ import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive2.auto.PathBuilder;
 import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.Gripper;
+import frc.robot.subsystems.Gripper.INTAKE;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.VirtualFourBar;
-import frc.robot.subsystems.Gripper.INTAKE;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.io.File;
 
@@ -148,9 +148,11 @@ public class RobotContainer {
     scoreController.button(1).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
     scoreController.button(2).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
     scoreController.button(3).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
-    
-    new Trigger(drivebase::isMoving).onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh));
-    new Trigger(drivebase::isMoving).onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
+
+    new Trigger(drivebase::isMoving)
+        .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh));
+    new Trigger(drivebase::isMoving)
+        .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
   }
 
   /**

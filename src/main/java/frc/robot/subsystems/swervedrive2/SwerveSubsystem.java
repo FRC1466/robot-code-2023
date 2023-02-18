@@ -128,6 +128,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /**
    * Gets plane inclination with current robot plane and the plane z = 0.
+   *
    * @return plane inclination in radians.
    */
   public Rotation2d getPlaneInclination() {
@@ -137,6 +138,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   /**
    * Gets the translation of the robot according to the swerve balance updater.
+   *
    * @return translation of the robot.
    */
   public Translation2d getBalanceTranslation() {
@@ -191,7 +193,9 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public boolean isMoving() {
-    return Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1 || Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1 || Math.abs(getFieldVelocity().omegaRadiansPerSecond) > 0.1;
+    return Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1
+        || Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1
+        || Math.abs(getFieldVelocity().omegaRadiansPerSecond) > 0.1;
   }
 
   /**
