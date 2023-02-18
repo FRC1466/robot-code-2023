@@ -31,6 +31,7 @@ import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.VirtualFourBar;
+import frc.robot.subsystems.Gripper.INTAKE;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.io.File;
 
@@ -142,6 +143,9 @@ public class RobotContainer {
                             ArmConstants.minRadians,
                             ArmConstants.maxRadians))),
             arm));
+    // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
+    gripper.setDefaultCommand(Commands.run(() -> gripper.setGripper(INTAKE.OPEN), gripper));
+
     driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
         .button(3)
@@ -156,6 +160,8 @@ public class RobotContainer {
                     () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
                     drivebase)
                 .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
+    driverController.button(5).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper));
+    driverController.button(6).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper));
     new Trigger(drivebase::isMoving).onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh));
     new Trigger(drivebase::isMoving).onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
   }

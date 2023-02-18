@@ -123,6 +123,8 @@ public final class Constants {
 
   public static final class GripperConstants {
     public static final Gains gripperPosition = new Gains(0.14, 0, 0, 0, 0, 0.5);
+    public static final double positionOpen = 0.20, positionCube = -11.38, positionCone = -20.7;
+    public static final int gripperID = 34;
   }
 
   public static final class LEDConstants {

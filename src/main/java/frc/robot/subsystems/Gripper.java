@@ -13,17 +13,22 @@ public class Gripper extends SubsystemBase {
   private SparkMaxPIDController pidController;
   private RelativeEncoder encoder;
 
-  /** Create a new Gripper subsystem. */
-  public Gripper() {
-    gripperMotor = new CANSparkMax(34, MotorType.kBrushless);
-    pidController = gripperMotor.getPIDController();
-    initializePID();
-    encoder = gripperMotor.getEncoder();
-    encoder.setPosition(0);
+  public enum INTAKE {
+    OPEN,
+    CUBE,
+    CONE
   }
 
-  public void setGripperMotorPercent(double a) {
-    gripperMotor.set(a);
+  /** Create a new Gripper subsystem. */
+  public Gripper() {
+
+    gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
+
+    pidController = gripperMotor.getPIDController();
+    initializePID();
+
+    encoder = gripperMotor.getEncoder();
+    initializeEncoder();
   }
 
   private void initializePID() {
@@ -36,13 +41,31 @@ public class Gripper extends SubsystemBase {
         -GripperConstants.gripperPosition.peakOutput, GripperConstants.gripperPosition.peakOutput);
   }
 
-  public void setPID(double rotations) {
-    pidController.setReference(rotations, CANSparkMax.ControlType.kPosition);
+  private void initializeEncoder() {
+    encoder.setPosition(0);
+  }
+
+  public void setGripper(INTAKE intake) {
+    switch (intake) {
+      case OPEN:
+        pidController.setReference(
+            GripperConstants.positionOpen, CANSparkMax.ControlType.kPosition);
+        break;
+      case CUBE:
+        pidController.setReference(
+            GripperConstants.positionCube, CANSparkMax.ControlType.kPosition);
+        break;
+      case CONE:
+        pidController.setReference(
+            GripperConstants.positionCone, CANSparkMax.ControlType.kPosition);
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid intake enum position.");
+    }
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("gripper enc position", encoder.getPosition());
-    pidController.setReference(-20.7, CANSparkMax.ControlType.kPosition);
-  } // 0, -11.38, -20.7
+    SmartDashboard.putNumber("Gripper SPARKMAX encoder position", encoder.getPosition());
+  }
 }
