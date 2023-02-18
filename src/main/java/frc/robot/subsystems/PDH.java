@@ -3,11 +3,16 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.PDHConstants;
 
 public class PDH extends SubsystemBase {
-    private PowerDistribution power = new PowerDistribution(0, ModuleType.kRev);
-    
-    public PDH() {
+  private final PowerDistribution power = new PowerDistribution(PDHConstants.port, ModuleType.kRev);
 
-    }
+  public PDH() {
+    power.setSwitchableChannel(false);
+  }
+
+  public void setSwitchableChannel(boolean isSwitchedOn) {
+    power.setSwitchableChannel(isSwitchedOn);
+  }
 }

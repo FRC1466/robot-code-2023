@@ -26,6 +26,7 @@ import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive2.auto.PathBuilder;
 import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.Gripper;
+import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.VirtualFourBar;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.io.File;
@@ -47,6 +48,7 @@ public class RobotContainer {
   private final VirtualFourBar arm = new VirtualFourBar();
   private final Gripper gripper = new Gripper();
   // private final LED m_led = new LED();
+  private final PDH pdh = new PDH();
 
   private final PathBuilder builder = new PathBuilder(drivebase);
 
@@ -141,6 +143,8 @@ public class RobotContainer {
                     () -> drivebase.drive(drivebase.getBalanceTranslation().times(-1), 0, false, false),
                     drivebase)
                 .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
+    new Trigger(drivebase::isMoving).onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh));
+    new Trigger(drivebase::isMoving).onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
   }
 
   /**
