@@ -182,6 +182,10 @@ public class SwerveSubsystem extends SubsystemBase {
         xInput, yInput, angle.getRadians(), getHeading().getRadians());
   }
 
+  public boolean isMoving() {
+    return Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1 || Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1 || Math.abs(getFieldVelocity().omegaRadiansPerSecond) > 0.1;
+  }
+
   /**
    * Gets the current field-relative velocity (x, y and omega) of the robot
    *

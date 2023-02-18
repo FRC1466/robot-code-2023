@@ -128,4 +128,8 @@ public final class Constants {
   public static final class LEDConstants {
     public static final int PWMPort = 9, length = 10;
   }
+
+  public static final class PDHConstants {
+    public static final int port = 50;
+  }
 }
