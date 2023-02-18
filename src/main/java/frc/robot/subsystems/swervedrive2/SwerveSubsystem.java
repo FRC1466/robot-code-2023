@@ -126,11 +126,19 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.zeroGyro();
   }
 
+  /**
+   * Gets plane inclination with current robot plane and the plane z = 0.
+   * @return plane inclination in radians.
+   */
   public Rotation2d getPlaneInclination() {
     return Rotation2d.fromRadians(
         Math.atan(Math.hypot(swerveDrive.getPitch().getTan(), swerveDrive.getRoll().getTan())));
   }
 
+  /**
+   * Gets the translation of the robot according to the swerve balance updater.
+   * @return translation of the robot.
+   */
   public Translation2d getBalanceTranslation() {
     return swerveBalance.update(swerveDrive.getPitch(), swerveDrive.getRoll());
   }

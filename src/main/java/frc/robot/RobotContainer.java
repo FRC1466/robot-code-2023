@@ -6,9 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -34,8 +32,6 @@ import frc.robot.subsystems.VirtualFourBar;
 import frc.robot.subsystems.Gripper.INTAKE;
 import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
 import java.io.File;
-
-import javax.swing.GrayFilter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -81,18 +77,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
-    configureButtonBindings();
+    configureBindings();
     initializeChooser();
-
-    drivebase.setDefaultCommand(closedFieldRel);
-    arm.setDefaultCommand(
-        new RunCommand(
-            () ->
-                arm.setArm(MathUtil.clamp(driverController.getRawAxis(3) / 2 * Math.PI + (Math.PI/2), -0.68, 4.34)),
-            arm)); // 0.68
-    // arm.setDefaultCommand(Commands.run(()-> arm.setArmPercent(scoreController.getRawAxis(1)/3),
-    // arm));
-    // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
   }
 
   private void initializeChooser() {
@@ -131,7 +117,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
+  private void configureBindings() {
+
+    drivebase.setDefaultCommand(closedFieldRel);
     arm.setDefaultCommand(
         new RunCommand(
             () ->
@@ -149,12 +137,6 @@ public class RobotContainer {
     driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
         .button(3)
-        .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d()), drivebase));
-    scoreController.button(1).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
-    scoreController.button(2).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
-    scoreController.button(3).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
-    driverController
-        .button(5)
         .whileTrue(
             Commands.run(
                     () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
@@ -162,6 +144,11 @@ public class RobotContainer {
                 .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
     driverController.button(5).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper));
     driverController.button(6).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper));
+
+    scoreController.button(1).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
+    scoreController.button(2).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
+    scoreController.button(3).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
+    
     new Trigger(drivebase::isMoving).onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh));
     new Trigger(drivebase::isMoving).onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
   }
