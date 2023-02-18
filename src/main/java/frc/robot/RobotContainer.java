@@ -56,27 +56,26 @@ public class RobotContainer {
   private final CommandJoystick scoreController = new CommandJoystick(OIConstants.intakeID);
 
   // the default commands
-  private final TeleopDrive closedFieldRel;
+  private final TeleopDrive closedFieldRel =
+      new TeleopDrive(
+          drivebase,
+          () ->
+              (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
+                  ? driverController.getY()
+                  : 0,
+          () ->
+              (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
+                  ? driverController.getX()
+                  : 0,
+          () ->
+              (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
+                  ? driverController.getZ()
+                  : 0,
+          () -> true, // driverController.button(3).negate(),
+          false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    closedFieldRel =
-        new TeleopDrive(
-            drivebase,
-            () ->
-                (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                    ? -driverController.getY()
-                    : 0,
-            () ->
-                (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                    ? -driverController.getX()
-                    : 0,
-            () ->
-                (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? -driverController.getZ()
-                    : 0,
-            driverController.button(3),
-            false);
     // Configure the button bindings
     configureButtonBindings();
     initializeChooser();
@@ -140,7 +139,7 @@ public class RobotContainer {
         .button(5)
         .whileTrue(
             Commands.run(
-                    () -> drivebase.drive(drivebase.getBalanceTranslation().times(-1), 0, false, false),
+                    () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
                     drivebase)
                 .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
     new Trigger(drivebase::isMoving).onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh));
