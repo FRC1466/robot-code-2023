@@ -95,8 +95,17 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int armPort = 30;
+    public static final int armPort = 30, dutyCyclePort = 0;
     public static final Gains armPosition = new Gains(0.3, 0, 0, 0, 0, 0.6);
+    public static final double dutyCycleResolution = 1.0;
+    public static final double absolutePositionOffset = 0.312153;
+    public static final double maxRadians = 4.34;
+    public static final double minRadians = -0.62;
+    public static final double toleranceRadians = 0.10;
+    public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
+    public static final double armOffset = minRadians + (minRadians + maxRadians) / 2;
+    public static final double gravityFF = 0.0;
+    public static final boolean encoderInverted = true;
 
     public static final class ArmConfig {
       public TalonFXConfiguration config;

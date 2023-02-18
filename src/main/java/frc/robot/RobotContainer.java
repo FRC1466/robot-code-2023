@@ -9,6 +9,7 @@ import com.pathplanner.lib.PathPlanner;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.swervedrive2.auto.GoToScoring;
@@ -128,6 +130,17 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    arm.setDefaultCommand(
+        new RunCommand(
+            () ->
+                arm.setArm(
+                    Rotation2d.fromRadians(
+                        MathUtil.clamp(
+                            driverController.getRawAxis(3) / ArmConstants.armInputScale * Math.PI
+                                + ArmConstants.armOffset,
+                            ArmConstants.minRadians,
+                            ArmConstants.maxRadians))),
+            arm));
     driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
         .button(3)

@@ -4,10 +4,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.simulation.DutyCycleEncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -19,41 +19,55 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
+import webblib.math.ArmPIDController;
 
 public class VirtualFourBar extends SubsystemBase {
   private WPI_TalonFX armMotor;
-  private DutyCycleEncoder armEncoder;
-  private Encoder armEncoderQuadrature;
+  private DutyCycleEncoder absoluteArmEncoder;
   private PIDController armPID;
+  private ArmPIDController armPIDc;
 
-  private final DCMotor m_armGearbox;
-  private final SingleJointedArmSim armSim;
-  private final DutyCycleEncoderSim m_encoderSim;
+  private DCMotor m_armGearbox;
+  private SingleJointedArmSim armSim;
+  private DutyCycleEncoderSim m_encoderSim;
   // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
-  private final Mechanism2d m_mech2d;
-  private final MechanismRoot2d m_armPivot;
-  private final MechanismLigament2d m_armTower;
-  private final MechanismLigament2d m_arm;
-  private double positionOffset;
+  private Mechanism2d m_mech2d;
+  private MechanismRoot2d m_armPivot;
+  private MechanismLigament2d m_armTower;
+  private MechanismLigament2d m_arm;
+
+  public enum HEIGHT {
+    GROUND,
+    TOP,
+    STORAGE
+  }
 
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
     armMotor = new WPI_TalonFX(ArmConstants.armPort);
     configArmMotor();
 
-    armEncoder = new DutyCycleEncoder(0);
-    armEncoder.setDistancePerRotation(1.0);
-    armEncoder.setPositionOffset(0.0);
-    this.positionOffset = getShiftedAbsoluteDistance();
-
-    armEncoderQuadrature = new Encoder(1, 2);
-    armEncoderQuadrature.setDistancePerPulse(1.0);
+    absoluteArmEncoder = new DutyCycleEncoder(ArmConstants.dutyCyclePort);
+    absoluteArmEncoder.setDistancePerRotation(1.0);
 
     armPID =
         new PIDController(
             ArmConstants.armPosition.P, ArmConstants.armPosition.I, ArmConstants.armPosition.D);
     armPID.setTolerance(0.01);
+    armPIDc =
+        new ArmPIDController(
+            ArmConstants.armPosition.P, ArmConstants.armPosition.I, ArmConstants.armPosition.D);
+    armPIDc.setAvoidanceRange(
+        Rotation2d.fromRadians(ArmConstants.maxRadians),
+        Rotation2d.fromRadians(ArmConstants.minRadians));
 
+    if (!Robot.isReal()) {
+      createSimulation();
+      SmartDashboard.putData("Arm Sim", m_mech2d);
+    }
+  }
+
+  public void createSimulation() {
     m_armGearbox = DCMotor.getFalcon500(1);
     armSim =
         new SingleJointedArmSim(
@@ -65,7 +79,7 @@ public class VirtualFourBar extends SubsystemBase {
             3 * Math.PI / 2,
             true,
             VecBuilder.fill(1 / 256));
-    m_encoderSim = new DutyCycleEncoderSim(armEncoder);
+    m_encoderSim = new DutyCycleEncoderSim(absoluteArmEncoder);
     // Create a Mechanism2d display of an Arm with a fixed ArmTower and moving Arm.
     m_mech2d = new Mechanism2d(60, 60);
     m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
@@ -78,8 +92,6 @@ public class VirtualFourBar extends SubsystemBase {
                 Units.radiansToDegrees(armSim.getAngleRads()),
                 6,
                 new Color8Bit(Color.kYellow)));
-
-    SmartDashboard.putData("Arm Sim", m_mech2d);
   }
 
   @Override
@@ -104,40 +116,94 @@ public class VirtualFourBar extends SubsystemBase {
     armMotor.configAllSettings(Robot.armConfig.config);
   }
 
-  private double getShiftedAbsoluteDistance() {
-    var a = armEncoder.getAbsolutePosition();
-    a -= 0.312153;
-    return -a;
+  /**
+   * Gets absolute position of the arm as a Rotation2d. Assumes the arm being level within frame is
+   * the 0 point on the x axis. Assumes CCW+.
+   *
+   * @return current angle of arm
+   */
+  private Rotation2d getShiftedAbsoluteDistance() {
+    var initialPosition =
+        absoluteArmEncoder.getAbsolutePosition() / ArmConstants.dutyCycleResolution;
+    var adjustedPosition =
+        Rotation2d.fromRotations(initialPosition)
+            .minus(Rotation2d.fromRotations(ArmConstants.absolutePositionOffset));
+    return adjustedPosition;
   }
 
-  private double getPosition() {
-    return (armEncoderQuadrature.getDistance()/2048.0 - positionOffset) * 2 * Math.PI;
+  /**
+   * Gets position of arm in radians. Assumes the arm being level within frame is the 0 point on the
+   * x axis. Assumes CCW+.
+   *
+   * @return position in rad.
+   */
+  private Rotation2d getPosition() {
+    return ArmConstants.encoderInverted
+        ? getShiftedAbsoluteDistance().unaryMinus()
+        : getShiftedAbsoluteDistance();
   }
 
   /**
    * Set arm with PID.
    *
-   * @param a setpoint in encoder units.
+   * @param setpoint setpoint in radians.
    */
-  public void setArm(double a) {
-    SmartDashboard.putNumber("arm setpoint", a);
-    var motorOutput = MathUtil.clamp(armPID.calculate(getPosition(), a), -1, 1);
-    SmartDashboard.putNumber("arm pid error", armPID.getPositionError());
+  public void setArm(Rotation2d setpoint) {
+    var motorOutput =
+        MathUtil.clamp(
+            armPIDc.calculate(getPosition(), setpoint),
+            -ArmConstants.armPosition.peakOutput,
+            ArmConstants.armPosition.peakOutput);
+    var feedforward = getPosition().getCos() * ArmConstants.gravityFF;
+    SmartDashboard.putNumber("initial setpoint", setpoint.getRadians());
+    SmartDashboard.putNumber("armPID error", armPID.getPositionError());
     SmartDashboard.putNumber("armPID output", motorOutput);
-    // armMotor.set(sanitizeMotorOutput(motorOutput)); // + Rotation2d.fromRadians(armEncoder.getDistance()).getCos()*0.2);
-    // -0.62, 4.34
+    // armMotor.set(sanitizeMotorOutput(motorOutput + feedforward));
   }
 
-  public double sanitizeMotorOutput(double motorOutput) {
-    return motorOutput > -0.50 || motorOutput < 4.20 ? motorOutput : 0;
+  public void setArm(HEIGHT height) {
+    switch (height) {
+      case GROUND:
+        setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
+        break;
+      case TOP:
+        setArm(Rotation2d.fromDegrees(90));
+        break;
+      case STORAGE:
+        setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
+        break;
+      default:
+        throw new IllegalArgumentException("Height enum not supported.");
+    }
   }
 
-  public void setArmPercent(double a) {
-    armMotor.set(a);
+  /**
+   * Sanitize motor input as pseudo-limit switches. If within the range defined in {@link
+   * ArmConstants}, then ceases motor input unless its in the direction that's going away from the
+   * range. Assumes motor output and encoders are CCW+, where up is forward from rest position in
+   * robot.
+   *
+   * @param motorOutput current motor output to be sanitized.
+   * @param currentPosition current position in radians.
+   * @return sanitized output.
+   */
+  public double sanitizeMotorOutput(double motorOutput, double currentPosition) {
+    if (currentPosition < ArmConstants.minRadians + ArmConstants.toleranceRadians) {
+      return motorOutput > 0 ? motorOutput : 0;
+    }
+    if (currentPosition > ArmConstants.maxRadians - ArmConstants.toleranceRadians) {
+      return motorOutput < 0 ? motorOutput : 0;
+    }
+    return motorOutput;
   }
 
-  public void setPosTo0() {
-
+  /**
+   * Set arm motor percentage to a percent.
+   *
+   * @param percentOutput
+   */
+  public void setArmPercent(double percentOutput) {
+    armMotor.set(percentOutput);
   }
 
   /**
@@ -145,15 +211,14 @@ public class VirtualFourBar extends SubsystemBase {
    *
    * @return if arm is at setpoint.
    */
-  public Boolean isAtSetpoint() {
+  public boolean isAtSetpoint() {
     return armPID.atSetpoint();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putData(armEncoder);
-    SmartDashboard.putNumber("abs arm", armEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("q encoder arm", armEncoderQuadrature.getDistance());
-    SmartDashboard.putNumber("norm arm", getPosition());
+    SmartDashboard.putData(absoluteArmEncoder);
+    SmartDashboard.putNumber("Raw Absolute Arm", absoluteArmEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("Proccessed Absolute Arm", getPosition().getRadians());
   }
 }
