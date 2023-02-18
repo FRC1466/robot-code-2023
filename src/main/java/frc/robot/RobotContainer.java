@@ -6,7 +6,8 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -14,17 +15,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.AutoConstants;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.swervedrive2.auto.AutoMap;
 import frc.robot.commands.swervedrive2.auto.GoToScoring;
 import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive2.auto.PathBuilder;
 import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
-import frc.robot.subsystems.VirtualFourBar;
-import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
+import frc.robot.subsystems.PDH;
+import frc.robot.subsystems.manipulator.Gripper;
+import frc.robot.subsystems.manipulator.Gripper.INTAKE;
+import frc.robot.subsystems.manipulator.VirtualFourBar;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
 /**
@@ -40,48 +48,40 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final VirtualFourBar arm = new VirtualFourBar();
+  private final Gripper gripper = new Gripper();
   // private final LED m_led = new LED();
+  private final PDH pdh = new PDH();
 
-  private final PathBuilder builder = new PathBuilder(drivebase);
+  private final AutoMap autoMap = new AutoMap(gripper, arm);
+  private final PathBuilder builder = new PathBuilder(drivebase, autoMap.getMap());
 
   private final CommandJoystick driverController = new CommandJoystick(OIConstants.driverID);
   private final CommandJoystick scoreController = new CommandJoystick(OIConstants.intakeID);
 
   // the default commands
-  private final TeleopDrive closedFieldRel;
+  private final TeleopDrive closedFieldRel =
+      new TeleopDrive(
+          drivebase,
+          () ->
+              (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
+                  ? driverController.getY()
+                  : 0,
+          () ->
+              (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
+                  ? driverController.getX()
+                  : 0,
+          () ->
+              (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
+                  ? driverController.getZ()
+                  : 0,
+          () -> true, // driverController.button(3).negate(),
+          false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    closedFieldRel =
-        new TeleopDrive(
-            drivebase,
-            () ->
-                (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                    ? driverController.getY() * 0.6
-                    : 0,
-            () ->
-                (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                    ? driverController.getX() * 0.6
-                    : 0,
-            () ->
-                (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                    ? -driverController.getZ() * 0.6
-                    : 0,
-            () -> true,
-            false);
     // Configure the button bindings
-    configureButtonBindings();
+    configureBindings();
     initializeChooser();
-
-    drivebase.setDefaultCommand(closedFieldRel);
-    arm.setDefaultCommand(
-        new RunCommand(
-            () ->
-                arm.setArm(-scoreController.getRawAxis(1) * Math.PI / 2 + Math.PI / 2), // 0.62 1.42
-            arm));
-    // arm.setDefaultCommand(Commands.run(()-> arm.setArmPercent(scoreController.getRawAxis(1)/3),
-    // arm));
-    // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
   }
 
   private void initializeChooser() {
@@ -90,15 +90,13 @@ public class RobotContainer {
         "Default Test",
         builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
-                "Test Path",
-                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
+                "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
     chooser.addOption(
         "3 Score T1",
         builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
-                "3 Score T1",
-                new PathConstraints(AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS))));
+                "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
     chooser.addOption(
         "1 Score + Dock T2",
@@ -106,8 +104,7 @@ public class RobotContainer {
             .getSwerveCommand(
                 PathPlanner.loadPathGroup(
                     "1 Score + Dock T2",
-                    new PathConstraints(
-                        AutoConstants.maxSpeedMPS, AutoConstants.maxAccelerationMPS)))
+                    new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
             .andThen(
                 Commands.run(
                         () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
@@ -123,21 +120,90 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
+  private void configureBindings() {
+
+    drivebase.setDefaultCommand(closedFieldRel);
+    arm.setDefaultCommand(
+        new RunCommand(
+            () ->
+                arm.setArm(
+                    Rotation2d.fromRadians(
+                        MathUtil.clamp(
+                            driverController.getRawAxis(3) / ArmConstants.armInputScale * Math.PI
+                                + ArmConstants.armOffset,
+                            ArmConstants.minRadians,
+                            ArmConstants.maxRadians))),
+            arm));
+    // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
+    gripper.setDefaultCommand(Commands.run(() -> gripper.setGripper(INTAKE.OPEN), gripper));
+
     driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
         .button(3)
-        .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d()), drivebase));
-    scoreController.button(1).whileTrue(new GoToScoring(drivebase, POSITION.RIGHT));
-    scoreController.button(2).whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE));
-    scoreController.button(3).whileTrue(new GoToScoring(drivebase, POSITION.LEFT));
-    driverController
-        .button(11)
         .whileTrue(
             Commands.run(
                     () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
                     drivebase)
                 .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
+
+    driverController
+        .button(2)
+        .whileTrue(
+            new TeleopDrive(
+                drivebase,
+                () ->
+                    (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
+                        ? driverController.getY() * OIConstants.InputLimits.reduced
+                        : 0,
+                () ->
+                    (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
+                        ? driverController.getX() * OIConstants.InputLimits.reduced
+                        : 0,
+                () ->
+                    (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
+                        ? driverController.getZ() * OIConstants.InputLimits.reduced
+                        : 0,
+                () -> true, // driverController.button(3).negate(),
+                false));
+
+    driverController.button(5).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper));
+    driverController.button(6).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper));
+    driverController.trigger().onTrue(Commands.run(() -> gripper.setGripper(INTAKE.OPEN), gripper));
+
+    scoreController
+        .button(1)
+        .whileTrue(
+            new ProxyCommand(
+                    () ->
+                        new GoToScoring(drivebase, POSITION.RIGHT).getCommand(drivebase.getPose()))
+                .alongWith(
+                    autoMap
+                        .getCommandInMap("ArmGround")
+                        .andThen(autoMap.getCommandInMap("OpenGrab"))));
+    scoreController
+        .button(2)
+        .whileTrue(
+            new ProxyCommand(
+                    () ->
+                        new GoToScoring(drivebase, POSITION.MIDDLE).getCommand(drivebase.getPose()))
+                .alongWith(
+                    autoMap
+                        .getCommandInMap("ArmGround")
+                        .andThen(autoMap.getCommandInMap("OpenGrab"))));
+    scoreController
+        .button(3)
+        .whileTrue(
+            new ProxyCommand(
+                    () -> new GoToScoring(drivebase, POSITION.LEFT).getCommand(drivebase.getPose()))
+                .alongWith(
+                    autoMap
+                        .getCommandInMap("ArmGround")
+                        .andThen(autoMap.getCommandInMap("OpenGrab"))));
+
+    new Trigger(drivebase::isMoving)
+        .whileTrue(
+            Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh)
+                .finallyDo((interrupt) -> pdh.setSwitchableChannel(false)));
   }
 
   /**

@@ -1,0 +1,106 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.8869415516608812,
+        "y": 4.990176476079449
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.335530329180316,
+        "y": 4.761793113329817
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "ArmGround",
+          "OpenGrab"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "after",
+        "waitTime": 0.02
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.55108739557757,
+        "y": 4.595372119563684
+      },
+      "prevControl": {
+        "x": 6.562506563715052,
+        "y": 4.618210455838647
+      },
+      "nextControl": {
+        "x": 6.545980588337187,
+        "y": 4.585158505082919
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
+      "stopEvent": {
+        "names": [
+          "CubeGrab"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "before",
+        "waitTime": 0.5
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.8955237702142071,
+        "y": 4.421582193858832
+      },
+      "prevControl": {
+        "x": 3.8077928325995547,
+        "y": 4.968698626633365
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "OpenGrab"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": [
+    {
+      "position": 0.047017045454545645,
+      "names": [
+        "ArmStraightUp"
+      ]
+    },
+    {
+      "position": 1.8068892045454545,
+      "names": [
+        "ArmGround"
+      ]
+    },
+    {
+      "position": 1.2919744318181796,
+      "names": [
+        "ArmStraightUp"
+      ]
+    },
+    {
+      "position": 0.3578835227272727,
+      "names": [
+        "ArmGround"
+      ]
+    }
+  ]
+}

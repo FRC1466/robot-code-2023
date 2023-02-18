@@ -12,13 +12,14 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import frc.webblib.util.Gains;
-import frc.webblib.util.HolonomicPose2d;
-import frc.webblib.util.RectanglePoseArea;
-import frc.webblib.util.chargedup.LoadingArea;
-import frc.webblib.util.chargedup.ScoringArea;
 import java.util.ArrayList;
 import java.util.List;
+import swervelib.parser.PIDFConfig;
+import webblib.util.Gains;
+import webblib.util.HolonomicPose2d;
+import webblib.util.RectanglePoseArea;
+import webblib.util.chargedup.LoadingArea;
+import webblib.util.chargedup.ScoringArea;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -33,7 +34,8 @@ public final class Constants {
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final double CHASSIS_MASS = ROBOT_MASS;
   public static final Translation3d CHASSIS_CG = new Translation3d(0, 0, Units.inchesToMeters(8));
-  public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
+  public static final double LOOP_TIME = 0.02; // s, 20ms + 110ms sprk max velocity lag
+  public static final double STOP_SECONDS = 5.0;
 
   public static final class OIConstants {
     public static final int driverID = 4, intakeID = 5;
@@ -43,11 +45,14 @@ public final class Constants {
     }
   }
 
-  public static final class AutoConstants {
-    public static final double maxSpeedMPS = 2.0, maxAccelerationMPS = 3.0;
-    public static final double balanceScale = 4.0, balanceScalePow = 1.8;
-    public static final Gains thetaController = new Gains(20, 0.0, 0.0, 0, 0, 1),
-        translationController = new Gains(8, 1.0, 0, 0, 0, 1);
+  public static final class Auton {
+    public static final PIDFConfig xAutoPID = new PIDFConfig(0.7, 0, 0);
+    public static final PIDFConfig yAutoPID = new PIDFConfig(0.7, 0, 0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
+
+    public static final double maxSpeedMPS = 3;
+    public static final double maxAccelerationMPS = 2;
+    public static final double balanceScale = 1.0, balanceScalePow = 1.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -91,8 +96,17 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int armPort = 30;
-    public static final Gains armPosition = new Gains(2.8, 0, 0.5, 0, 0, 0.6);
+    public static final int armPort = 30, dutyCyclePort = 0;
+    public static final Gains armPosition = new Gains(0.3, 0, 0, 0, 0, 0.6);
+    public static final double dutyCycleResolution = 1.0;
+    public static final double absolutePositionOffset = 0.312153;
+    public static final double maxRadians = 4.34;
+    public static final double minRadians = -0.62;
+    public static final double toleranceRadians = 0.10;
+    public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
+    public static final double armOffset = minRadians + (minRadians + maxRadians) / 2;
+    public static final double gravityFF = 0.0;
+    public static final boolean encoderInverted = true;
 
     public static final class ArmConfig {
       public TalonFXConfiguration config;
@@ -109,10 +123,19 @@ public final class Constants {
   }
 
   public static final class GripperConstants {
-    public static final Gains gripperPosition = new Gains(0, 0, 0, 0, 0, 0.5);
+    public static final Gains gripperPosition = new Gains(0.14, 0, 0, 0, 0, 0.5);
+    public static final double positionOpen = 0.20,
+        positionCube = -11.38,
+        positionCone = -20.7,
+        positionStore = -16.0;
+    public static final int gripperID = 34;
   }
 
   public static final class LEDConstants {
     public static final int PWMPort = 9, length = 10;
+  }
+
+  public static final class PDHConstants {
+    public static final int port = 50;
   }
 }
