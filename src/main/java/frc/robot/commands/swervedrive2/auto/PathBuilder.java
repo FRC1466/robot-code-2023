@@ -4,28 +4,23 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.Constants.Auton;
-import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.util.HashMap;
 import java.util.List;
 
 public class PathBuilder {
   private SwerveAutoBuilder autoBuilder;
 
-  public PathBuilder(SwerveSubsystem drivebase) {
-
-    HashMap<String, Command> eventMap = new HashMap<>();
-    eventMap.put("marker1", new PrintCommand("Passed marker 1"));
-    eventMap.put("intakeDown", new PrintCommand("Passed intakedown 1"));
+  public PathBuilder(SwerveSubsystem drivebase, HashMap<String, Command> eventMap) {
 
     autoBuilder =
         new SwerveAutoBuilder(
             drivebase::getPose, // Functional interface to feed supplier
             drivebase::resetOdometry,
             // Position controllers
-            new PIDConstants(Auton.xAutoPID.p, Auton.xAutoPID.i, Auton.xAutoPID.f),
-            new PIDConstants(Auton.xAutoPID.p, Auton.xAutoPID.i, Auton.xAutoPID.f),
+            new PIDConstants(Auton.xAutoPID.p, Auton.xAutoPID.i, Auton.xAutoPID.d),
+            new PIDConstants(Auton.xAutoPID.p, Auton.xAutoPID.i, Auton.xAutoPID.d),
             drivebase::setChassisSpeeds,
             eventMap,
             true,

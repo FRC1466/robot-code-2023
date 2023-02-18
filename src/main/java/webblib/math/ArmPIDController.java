@@ -47,8 +47,8 @@ public class ArmPIDController extends PIDController {
   private boolean m_haveSetpoint;
 
   /**
-   * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
-   * 0.02 seconds.
+   * Allocates a new {@link ArmPIDController} with the given constants for kp, ki, and kd and a
+   * default period of 0.02 seconds. For use with an absolute encoder and avoidance zone.
    *
    * @param kp The proportional coefficient.
    * @param ki The integral coefficient.
@@ -214,11 +214,11 @@ public class ArmPIDController extends PIDController {
    */
   private boolean is_within_range(double test_angle, double a, double b) {
     test_angle = to_360(test_angle);
-    System.out.println(test_angle);
+    // System.out.println(test_angle);
     a = to_360(a);
-    System.out.println(a);
+    // System.out.println(a);
     b = to_360(b);
-    System.out.println(b);
+    // System.out.println(b);
     a -= test_angle;
     b -= test_angle;
     normalize(a);
@@ -240,8 +240,8 @@ public class ArmPIDController extends PIDController {
    * @param maximum maximum of the range. Assumes CCW+, so maximum is with that regard.
    */
   public void setAvoidanceRange(Rotation2d minimum, Rotation2d maximum) {
-    m_minimumAvoidanceBound = minimum;
-    m_maximumAvoidanceBound = maximum;
+    m_minimumAvoidanceBound = minimum.rotateBy(new Rotation2d());
+    m_maximumAvoidanceBound = maximum.rotateBy(new Rotation2d());
   }
 
   /**
@@ -299,7 +299,7 @@ public class ArmPIDController extends PIDController {
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(Rotation2d setpoint) {
-    m_setpoint = setpoint;
+    m_setpoint = setpoint.rotateBy(new Rotation2d());
     m_haveSetpoint = true;
     if (isSetpointWithinObstacle()) {
       /* Check which bound is closer, so we can use that plus/minus a tolerance for our setpoint. */
@@ -408,9 +408,9 @@ public class ArmPIDController extends PIDController {
    * @return The next controller output.
    */
   public double calculate(Rotation2d measurement, Rotation2d setpoint) {
-    m_setpoint = setpoint;
+    m_setpoint = setpoint.rotateBy(new Rotation2d());
     m_haveSetpoint = true;
-    return calculate(measurement);
+    return calculate(measurement.rotateBy(new Rotation2d()));
   }
 
   /**

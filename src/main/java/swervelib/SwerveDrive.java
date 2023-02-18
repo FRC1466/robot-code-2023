@@ -46,6 +46,8 @@ public class SwerveDrive {
   /** Counter to synchronize the modules relative encoder with absolute encoder when not moving. */
   private int moduleSynchronizationCounter = 0;
 
+  private double lastAngle;
+
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive}
    * method, or via the {@link SwerveDrive#setModuleStates} method. The {@link SwerveDrive#drive}
@@ -120,6 +122,12 @@ public class SwerveDrive {
             ? ChassisSpeeds.fromFieldRelativeSpeeds(
                 translation.getX(), translation.getY(), rotation, getYaw())
             : new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+    if (Math.abs(rotation) < 0.01) {
+      velocity.omegaRadiansPerSecond =
+          swerveController.headingCalculate(lastAngle, getYaw().getRadians());
+    } else {
+      lastAngle = getYaw().getRadians();
+    }
 
     // Display commanded speed for testing
     SmartDashboard.putString("RobotVelocity", velocity.toString());

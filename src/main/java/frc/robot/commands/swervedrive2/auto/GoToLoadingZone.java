@@ -4,9 +4,9 @@ import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.Auton;
-import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import webblib.util.chargedup.LoadingArea;
 
 public class GoToLoadingZone extends CommandBase {
@@ -24,7 +24,7 @@ public class GoToLoadingZone extends CommandBase {
     this.drive = drive;
     addRequirements(drive);
     this.selectedLoadingSide = selectedLoadingSide;
-    currentCommand = new InstantCommand();
+    currentCommand = Commands.none();
   }
 
   public Command getCommand(LOADING_SIDE loadingPosition, Pose2d pose) {
@@ -49,11 +49,10 @@ public class GoToLoadingZone extends CommandBase {
           command = goToPose.getCommand();
           break;
         default:
-          command = new InstantCommand();
-          break;
+          throw new IllegalArgumentException("Loading station enum not supported.");
       }
     } else {
-      command = new InstantCommand();
+      command = Commands.none();
     }
     return command;
   }
@@ -74,8 +73,6 @@ public class GoToLoadingZone extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted) {
-      currentCommand.cancel();
-    }
+    currentCommand.cancel();
   }
 }

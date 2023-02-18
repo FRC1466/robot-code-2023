@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.manipulator;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -16,7 +16,8 @@ public class Gripper extends SubsystemBase {
   public enum INTAKE {
     OPEN,
     CUBE,
-    CONE
+    CONE,
+    STORE
   }
 
   /** Create a new Gripper subsystem. */
@@ -58,6 +59,10 @@ public class Gripper extends SubsystemBase {
       case CONE:
         pidController.setReference(
             GripperConstants.positionCone, CANSparkMax.ControlType.kPosition);
+        break;
+      case STORE:
+        pidController.setReference(
+            GripperConstants.positionStore, CANSparkMax.ControlType.kPosition);
         break;
       default:
         throw new IllegalArgumentException("Invalid intake enum position.");

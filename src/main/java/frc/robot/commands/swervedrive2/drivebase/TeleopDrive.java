@@ -5,9 +5,11 @@
 package frc.robot.commands.swervedrive2.drivebase;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.swervedrive2.SwerveSubsystem;
+import frc.robot.Constants;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import swervelib.SwerveController;
@@ -22,6 +24,7 @@ public class TeleopDrive extends CommandBase {
   private final BooleanSupplier driveMode;
   private final boolean isOpenLoop;
   private final SwerveController controller;
+  private double lastTime;
 
   /**
    * Creates a new ExampleCommand.
@@ -42,6 +45,7 @@ public class TeleopDrive extends CommandBase {
     this.driveMode = driveMode;
     this.isOpenLoop = isOpenLoop;
     this.controller = swerve.getSwerveController();
+    this.lastTime = Timer.getFPGATimestamp();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerve);
   }
@@ -59,8 +63,15 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putNumber("vX", xVelocity);
     SmartDashboard.putNumber("vY", yVelocity);
     SmartDashboard.putNumber("omega", angVelocity);
-    swerve.drive(
-        new Translation2d(xVelocity, yVelocity), angVelocity, driveMode.getAsBoolean(), isOpenLoop);
+    if (Math.abs(xVelocity) > 0 || Math.abs(yVelocity) > 0 || Math.abs(angVelocity) > 0) {
+      swerve.drive(
+          new Translation2d(xVelocity, yVelocity),
+          angVelocity,
+          driveMode.getAsBoolean(),
+          isOpenLoop);
+    } else if (Timer.getFPGATimestamp() - lastTime > Constants.STOP_SECONDS) {
+      swerve.lockPose();
+    }
   }
 
   // Called once the command ends or is interrupted.
