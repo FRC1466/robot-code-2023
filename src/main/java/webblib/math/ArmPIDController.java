@@ -28,6 +28,7 @@ public class ArmPIDController extends PIDController {
 
   private Rotation2d m_maximumAvoidanceBound = new Rotation2d();
   private Rotation2d m_minimumAvoidanceBound = new Rotation2d();
+  private Rotation2d m_middleAvoidanceBound = new Rotation2d();
   private Rotation2d m_avoidanceTolerance = Rotation2d.fromDegrees(2.0);
 
   // The error at the time of the second-most-recent call to calculate() (used to compute velocity)
@@ -242,6 +243,8 @@ public class ArmPIDController extends PIDController {
   public void setAvoidanceRange(Rotation2d minimum, Rotation2d maximum) {
     m_minimumAvoidanceBound = minimum.rotateBy(new Rotation2d());
     m_maximumAvoidanceBound = maximum.rotateBy(new Rotation2d());
+    m_middleAvoidanceBound =
+        m_minimumAvoidanceBound.plus(m_maximumAvoidanceBound.minus(m_minimumAvoidanceBound).div(2));
   }
 
   /**
@@ -263,6 +266,8 @@ public class ArmPIDController extends PIDController {
     m_minimumAvoidanceBound = minimum.minus(Rotation2d.fromDegrees(0));
     m_maximumAvoidanceBound = maximum.minus(Rotation2d.fromDegrees(0));
     m_avoidanceTolerance = tolerance.minus(Rotation2d.fromDegrees(0));
+    m_middleAvoidanceBound =
+        m_minimumAvoidanceBound.plus(m_maximumAvoidanceBound.minus(m_minimumAvoidanceBound).div(2));
   }
 
   /**
@@ -283,14 +288,40 @@ public class ArmPIDController extends PIDController {
    * @return if avoidance range is between the setpoint and the measurement
    */
   private boolean isObstacleInSetpointsWay() {
-    return is_within_range(
-            m_maximumAvoidanceBound.getDegrees(),
-            m_setpoint.getDegrees(),
-            m_measurement.getDegrees())
-        && is_within_range(
-            m_minimumAvoidanceBound.getDegrees(),
-            m_setpoint.getDegrees(),
-            m_measurement.getDegrees());
+    return
+    /** Are both the maximum and minimum in between the setpoint and measurement? */
+    (is_within_range(
+                m_maximumAvoidanceBound.getDegrees(),
+                m_setpoint.getDegrees(),
+                m_measurement.getDegrees())
+            && is_within_range(
+                m_minimumAvoidanceBound.getDegrees(),
+                m_setpoint.getDegrees(),
+                m_measurement.getDegrees()))
+        /**
+         * Case for when measurement is within the obstacle but closer to the maximum and setpoint
+         * is on opposite side (could still be within obstacle)
+         */
+        || (is_within_range(
+                m_measurement.getDegrees(),
+                m_middleAvoidanceBound.getDegrees(),
+                m_maximumAvoidanceBound.getDegrees())
+            && is_within_range(
+                m_minimumAvoidanceBound.getDegrees(),
+                m_setpoint.getDegrees(),
+                m_measurement.getDegrees()))
+        /**
+         * Case for when measurement is within the obstacle but closer to the minimum and setpoint
+         * is on opposite side (could still be within obstacle)
+         */
+        || (is_within_range(
+                m_measurement.getDegrees(),
+                m_minimumAvoidanceBound.getDegrees(),
+                m_middleAvoidanceBound.getDegrees())
+            && is_within_range(
+                m_maximumAvoidanceBound.getDegrees(),
+                m_setpoint.getDegrees(),
+                m_measurement.getDegrees()));
   }
 
   /**
@@ -303,8 +334,8 @@ public class ArmPIDController extends PIDController {
     m_haveSetpoint = true;
     if (isSetpointWithinObstacle()) {
       /* Check which bound is closer, so we can use that plus/minus a tolerance for our setpoint. */
-      if (m_maximumAvoidanceBound.minus(m_measurement).getDegrees()
-          > m_minimumAvoidanceBound.minus(m_measurement).getDegrees()) {
+      if (m_setpoint.minus(m_minimumAvoidanceBound).getDegrees()
+          > m_maximumAvoidanceBound.minus(m_setpoint).getDegrees()) {
         m_setpoint = m_maximumAvoidanceBound.plus(m_avoidanceTolerance);
       } else {
         m_setpoint = m_minimumAvoidanceBound.minus(m_avoidanceTolerance);
@@ -424,19 +455,19 @@ public class ArmPIDController extends PIDController {
     m_prevError = m_positionError;
     m_haveMeasurement = true;
 
-    // System.out.println("initSetp" + m_setpoint.getRadians());
+    // System.out.println("initSetp: " + m_setpoint.getRadians());
 
     if (isSetpointWithinObstacle()) {
-      // System.out.println("isSetpointWithinObstacle" + true);
       /* Check which bound is closer, so we can use that plus/minus a tolerance for our setpoint. */
-      if (m_maximumAvoidanceBound.minus(m_measurement).getDegrees()
-          > m_minimumAvoidanceBound.minus(m_measurement).getDegrees()) {
+      // System.out.println("Setp in obstacle: " + m_setpoint.getRadians());
+      if (m_setpoint.minus(m_minimumAvoidanceBound).getDegrees()
+          > m_maximumAvoidanceBound.minus(m_setpoint).getDegrees()) {
         m_setpoint = m_maximumAvoidanceBound.plus(m_avoidanceTolerance);
       } else {
         m_setpoint = m_minimumAvoidanceBound.minus(m_avoidanceTolerance);
       }
     }
-    // System.out.println("finalSetp" + m_setpoint.getRadians());
+    // System.out.println("finalSetp: " + m_setpoint.getRadians());
 
     Rotation2d initialError = m_setpoint.minus(m_measurement);
 
@@ -445,10 +476,10 @@ public class ArmPIDController extends PIDController {
           initialError.getDegrees() >= 0
               ? Rotation2d.fromDegrees(-360 + initialError.getDegrees())
               : Rotation2d.fromDegrees(360 + initialError.getDegrees());
-      // System.out.println("set way" + m_positionError.getRadians());
+      // System.out.println("obstacle in way: " + m_positionError.getRadians());
     } else {
       m_positionError = initialError;
-      // System.out.println("set no way" + m_positionError.getRadians());
+      // System.out.println("obstacle not in way: " + m_positionError.getRadians());
     }
 
     m_velocityError = (m_positionError.getRadians() - m_prevError.getRadians()) / m_period;
