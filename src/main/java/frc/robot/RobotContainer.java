@@ -114,6 +114,28 @@ public class RobotContainer {
     SmartDashboard.putData("CHOOSE", chooser);
   }
 
+  //
+  // Brainstorming for controls:
+  // 1) Pickup floor cube on press. when released, grab the cube and
+  // store it
+  // 2) Pickup floor cone on press. when released, grab the cone and store it
+  // note: combine 1&2, 3&4, 5&6 w/ color sensor?
+  // 3) Pickup station cube on press (NONALIGN). when released, grab the cube and store it
+  // 4) Pickup station cone on press (NONALIGN). when released, grab the cube and store it (nonalign
+  // option depends on how good align is & vice versa)
+  // 5) Pickup station cube on press (ALIGN). when released, grab the cube and store it
+  // 6) Pickup station cone on press (ALIGN). when released, grab the cube and store it
+  // 7) manual low scoring button
+  // 8) manual mid scoring button
+  // Button box auto scoring
+  // worst case for manipulator: 8, best case for manipulator: 2 (possibly 4 with scoring
+  // redundancy)
+  //
+  // 1) Non-field relative toggle
+  // 2) GYRO RESET
+  // 3) Slower drive
+  // 4) auto balance (could be helpful idk, not the most necessary)
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
@@ -176,6 +198,8 @@ public class RobotContainer {
             new ProxyCommand(
                     () ->
                         new GoToScoring(drivebase, POSITION.RIGHT).getCommand(drivebase.getPose()))
+                .andThen(Commands.waitSeconds(1))
+                .repeatedly()
                 .alongWith(
                     autoMap
                         .getCommandInMap("ArmGround")
@@ -186,6 +210,8 @@ public class RobotContainer {
             new ProxyCommand(
                     () ->
                         new GoToScoring(drivebase, POSITION.MIDDLE).getCommand(drivebase.getPose()))
+                .andThen(Commands.waitSeconds(1))
+                .repeatedly()
                 .alongWith(
                     autoMap
                         .getCommandInMap("ArmGround")
@@ -195,6 +221,8 @@ public class RobotContainer {
         .whileTrue(
             new ProxyCommand(
                     () -> new GoToScoring(drivebase, POSITION.LEFT).getCommand(drivebase.getPose()))
+                .andThen(Commands.waitSeconds(1))
+                .repeatedly()
                 .alongWith(
                     autoMap
                         .getCommandInMap("ArmGround")
@@ -202,8 +230,8 @@ public class RobotContainer {
 
     new Trigger(drivebase::isMoving)
         .whileTrue(
-            Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh)
-                .finallyDo((interrupt) -> pdh.setSwitchableChannel(false)));
+            Commands.startEnd(
+                () -> pdh.setSwitchableChannel(true), () -> pdh.setSwitchableChannel(false)));
   }
 
   /**
