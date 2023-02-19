@@ -35,7 +35,7 @@ public final class Constants {
   public static final double CHASSIS_MASS = ROBOT_MASS;
   public static final Translation3d CHASSIS_CG = new Translation3d(0, 0, Units.inchesToMeters(8));
   public static final double LOOP_TIME = 0.02; // s, 20ms + 110ms sprk max velocity lag
-  public static final double STOP_SECONDS = 5.0;
+  public static final double STOP_SECONDS = 3.0;
 
   public static final class OIConstants {
     public static final int driverID = 4, intakeID = 5;

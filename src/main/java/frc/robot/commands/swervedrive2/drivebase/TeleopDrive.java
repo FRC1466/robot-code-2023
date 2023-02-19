@@ -64,6 +64,7 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putNumber("vY", yVelocity);
     SmartDashboard.putNumber("omega", angVelocity);
     if (Math.abs(xVelocity) > 0 || Math.abs(yVelocity) > 0 || Math.abs(angVelocity) > 0) {
+      lastTime = Timer.getFPGATimestamp();
       swerve.drive(
           new Translation2d(xVelocity, yVelocity),
           angVelocity,
