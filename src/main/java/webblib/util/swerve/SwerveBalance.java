@@ -35,7 +35,7 @@ public class SwerveBalance {
    */
   public Translation2d update(Rotation2d pitch, Rotation2d roll) {
     var xGrad = pitch.getTan();
-    var yGrad = -pitch.getCos() * roll.getTan();
+    var yGrad = -roll.getTan();
 
     var vyMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
