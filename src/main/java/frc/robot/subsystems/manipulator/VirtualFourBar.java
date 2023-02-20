@@ -30,6 +30,7 @@ public class VirtualFourBar extends SubsystemBase {
     configArmMotor();
 
     absoluteArmEncoder = new DutyCycleEncoder(ArmConstants.dutyCyclePort);
+    absoluteArmEncoder.setDutyCycleRange(0, 1);
     absoluteArmEncoder.setDistancePerRotation(1.0);
 
     armPID =
