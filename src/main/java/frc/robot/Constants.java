@@ -46,13 +46,13 @@ public final class Constants {
   }
 
   public static final class Auton {
-    public static final PIDFConfig xAutoPID = new PIDFConfig(0.7, 0, 0);
-    public static final PIDFConfig yAutoPID = new PIDFConfig(0.7, 0, 0);
-    public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
+    public static final PIDFConfig xAutoPID = new PIDFConfig(4.0, 0, 0);
+    public static final PIDFConfig yAutoPID = new PIDFConfig(4.0, 0, 0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(2.2, 0, 0.0);
 
     public static final double maxSpeedMPS = 3;
     public static final double maxAccelerationMPS = 2;
-    public static final double balanceScale = 1.0, balanceScalePow = 1.0;
+    public static final double balanceScale = 0.8, balanceScalePow = 1.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -97,14 +97,14 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.3, 0, 0, 0, 0, 0.6);
+    public static final Gains armPosition = new Gains(0.6, 0, 0, 0, 0, 0.6);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.312153;
-    public static final double maxRadians = 4.34;
-    public static final double minRadians = -0.62;
+    public static final double maxRadians = 4.24;
+    public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
-    public static final double armOffset = minRadians + (minRadians + maxRadians) / 2;
+    public static final double armOffset = minRadians + (maxRadians-minRadians) / 2;
     public static final double gravityFF = 0.0;
     public static final boolean encoderInverted = true;
 

@@ -62,7 +62,8 @@ public class GoToPose {
             );
   }
 
-  private PathConstraints calculateRotationalConstraints(Transform2d transform, PathConstraints constraints) {
+  private PathConstraints calculateRotationalConstraints(
+      Transform2d transform, PathConstraints constraints) {
     var maxRadPerSecond = 2.0;
 
     var desiredTime = 1 / maxRadPerSecond * transform.getRotation().getRadians();
@@ -95,8 +96,9 @@ public class GoToPose {
             add(new PathPoint(translation, heading, holonomic));
           }
         };
-    
-    if (Math.abs(diffPose.getTranslation().getNorm()) < 0.05 && Math.abs(diffPose.getRotation().getRadians()) > 0.5) {
+
+    if (Math.abs(diffPose.getTranslation().getNorm()) < 0.05
+        && Math.abs(diffPose.getRotation().getRadians()) > 0.5) {
       constraints = calculateRotationalConstraints(diffPose, constraints);
     }
     traj = PathPlanner.generatePath(constraints, path);

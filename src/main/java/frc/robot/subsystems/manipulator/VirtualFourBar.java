@@ -101,13 +101,13 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("armPID error", armPID.getPositionError());
     SmartDashboard.putNumber("armPID output", motorOutput);
     SmartDashboard.putNumber("arm feedforward", feedforward);
-    // armMotor.set(sanitizeMotorOutput(motorOutput + feedforward));
+    // armMotor.set(motorOutput + feedforward);
   }
 
   public void setArm(HEIGHT height) {
     switch (height) {
       case GROUND:
-        setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
+        setArm(Rotation2d.fromRadians(ArmConstants.maxRadians));
         break;
       case STATION:
         setArm(Rotation2d.fromDegrees(135));

@@ -17,7 +17,7 @@ public class AutoMap {
 
     eventMapGetter.put(
         "ArmGround",
-        () -> Commands.run(() -> arm.setArm(HEIGHT.GROUND), arm).until(() -> arm.isAtSetpoint()));
+        () -> Commands.run(() -> arm.setArm(HEIGHT.GROUND), arm));
     eventMapGetter.put(
         "ArmLoadingStation",
         () -> Commands.run(() -> arm.setArm(HEIGHT.STATION), arm).until(() -> arm.isAtSetpoint()));
@@ -39,28 +39,28 @@ public class AutoMap {
             Commands.runOnce(
                 () ->
                     gripper.setDefaultCommand(
-                        Commands.run(() -> gripper.setGripper(INTAKE.CONE)))));
+                        Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper))));
     eventMapGetter.put(
         "NeutralGrab",
         () ->
             Commands.runOnce(
                 () ->
                     gripper.setDefaultCommand(
-                        Commands.run(() -> gripper.setGripper(INTAKE.STORE)))));
+                        Commands.run(() -> gripper.setGripper(INTAKE.STORE), gripper))));
     eventMapGetter.put(
         "CubeGrab",
         () ->
             Commands.runOnce(
                 () ->
                     gripper.setDefaultCommand(
-                        Commands.run(() -> gripper.setGripper(INTAKE.CUBE)))));
+                        Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper))));
     eventMapGetter.put(
         "OpenGrab",
         () ->
             Commands.runOnce(
                 () ->
                     gripper.setDefaultCommand(
-                        Commands.run(() -> gripper.setGripper(INTAKE.OPEN)))));
+                        Commands.run(() -> gripper.setGripper(INTAKE.OPEN), gripper))));
 
     eventMapGetter.forEach(
         (key, val) -> {
