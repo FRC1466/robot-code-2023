@@ -3,7 +3,6 @@ package swervelib;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.parser.SwerveControllerConfiguration;
 
 /** Controller class used to convert raw inputs into robot speeds. */
@@ -110,10 +109,5 @@ public class SwerveController {
     lastAngle = angle;
 
     return speeds;
-  }
-
-  public double headingCalculate(double currentHeadingAngleRadians, double angle) {
-    SmartDashboard.putNumber("thetaController error", thetaController.getPositionError());
-    return thetaController.calculate(currentHeadingAngleRadians, angle) * config.maxAngularVelocity;
   }
 }

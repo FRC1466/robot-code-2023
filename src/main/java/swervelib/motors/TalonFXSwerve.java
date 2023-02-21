@@ -3,24 +3,27 @@ package swervelib.motors;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import frc.robot.Robot;
+import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 import swervelib.simulation.ctre.PhysicsSim;
 
-/** {@link com.ctre.phoenix.motorcontrol.can.TalonFX} Swerve Motor. */
+/**
+ * {@link com.ctre.phoenix.motorcontrol.can.TalonFX} Swerve Motor. Made by Team 1466 WebbRobotics.
+ */
 public class TalonFXSwerve extends SwerveMotor {
 
   /** Factory default already occurred. */
   private final boolean factoryDefaultOccurred = false;
-  /** TalonFX motor controller. */
-  WPI_TalonFX motor;
   /** Current TalonFX configuration. */
   private final TalonFXConfiguration configuration = new TalonFXConfiguration();
   /** Whether the absolute encoder is integrated. */
   private final boolean absoluteEncoder = false;
+  /** TalonFX motor controller. */
+  WPI_TalonFX motor;
   /**
    * The position conversion factor to convert raw sensor units to Meters Per 100ms, or Ticks to
    * Degrees.
@@ -28,6 +31,8 @@ public class TalonFXSwerve extends SwerveMotor {
   private double positionConversionFactor = 1;
   /** If the TalonFX configuration has changed. */
   private boolean configChanged = true;
+  /** Feedforward scalar value for the angle motor. */
+  private double fscalar = 1;
 
   /**
    * Constructor for TalonFX swerve motor.
@@ -42,8 +47,8 @@ public class TalonFXSwerve extends SwerveMotor {
     factoryDefaults();
     clearStickyFaults();
 
-    if (!Robot.isReal()) {
-      PhysicsSim.getInstance().addTalonFX(motor, .5, 6800);
+    if (RobotBase.isSimulation()) {
+      PhysicsSim.getInstance().addTalonFX(motor, .25, 6800);
     }
   }
 
@@ -90,17 +95,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder) {
-    /*if (encoder.getAbsoluteEncoder() instanceof CANCoder)
-        {
-          configuration.primaryPID.selectedFeedbackSensor = FeedbackDevice.RemoteSensor0;
-          configuration.remoteFilter0.remoteSensorDeviceID = ((CANCoder) encoder.getAbsoluteEncoder()).getDeviceID();
-          configuration.remoteFilter0.remoteSensorSource = RemoteSensorSource.CANCoder;
-    //      motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
-    //      motor.configRemoteFeedbackFilter((CANCoder) encoder.getAbsoluteEncoder(),
-    //                                       CTRE_remoteSensor.REMOTE_SENSOR_0.ordinal());
-          configChanged = true;
-          absoluteEncoder = true;
-        }*/
+    // Do not support.
     return this;
   }
 
@@ -123,54 +118,21 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor) {
     this.positionConversionFactor = positionConversionFactor;
-    //    configuration.primaryPID.selectedFeedbackCoefficient = positionConversionFactor;
-    //    configChanged = true;
-    //    motor.configSelectedFeedbackCoefficient(positionConversionFactor);
+    // Taken from democat's library.
+    // https://github.com/democat3457/swerve-lib/blob/7c03126b8c22f23a501b2c2742f9d173a5bcbc40/src/main/java/com/swervedrivespecialties/swervelib/ctre/Falcon500DriveControllerFactoryBuilder.java#L16
+    configureCANStatusFrames(250);
   }
 
   /**
-   * Put an angle within the the 360 deg scope of a reference. For example, given a scope reference
-   * of 756 degrees, assumes the full scope is (720-1080), and places an angle of 22 degrees into
-   * it, returning 742 deg.
+   * Set the CAN status frames.
    *
-   * @param scopeReference Current Angle (deg)
-   * @param newAngle Target Angle (deg)
-   * @return Closest angle within scope (deg)
+   * @param CANStatus1 Applied Motor Output, Fault Information, Limit Switch Information
    */
-  private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
-    //    for (; scopeReference < 0 && absoluteEncoder; scopeReference += 360)
-    //      ;
-
-    double lowerBound;
-    double upperBound;
-    double lowerOffset = scopeReference % 360;
-
-    // Create the interval from the reference angle.
-    if (lowerOffset >= 0) {
-      lowerBound = scopeReference - lowerOffset;
-      upperBound = scopeReference + (360 - lowerOffset);
-    } else {
-      upperBound = scopeReference - lowerOffset;
-      lowerBound = scopeReference - (360 + lowerOffset);
-    }
-    // Put the angle in the interval.
-    while (newAngle < lowerBound) {
-      newAngle += 360;
-    }
-    while (newAngle > upperBound) {
-      newAngle -= 360;
-    }
-    // Smooth the transition between interval boundaries.
-    if (newAngle - scopeReference > 180) {
-      newAngle -= 360;
-    } else if (newAngle - scopeReference < -180) {
-      newAngle += 360;
-    }
-
-    //    for (; newAngle < 0 && absoluteEncoder; newAngle += 360)
-    //      ;
-
-    return newAngle;
+  public void configureCANStatusFrames(int CANStatus1) {
+    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, CANStatus1);
+    // TODO: Configure Status Frame 2 thru 21 if necessary
+    //
+    // https://v5.docs.ctr-electronics.com/en/stable/ch18_CommonAPI.html#setting-status-frame-periods
   }
 
   /**
@@ -180,21 +142,13 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void configurePIDF(PIDFConfig config) {
-    //    int slotIdx = isDriveMotor ? CTRE_slotIdx.Velocity.ordinal() :
-    // CTRE_slotIdx.Turning.ordinal();
-    //    slotIdx = 0;
-    //    motor.config_kP(slotIdx, config.p);
-    //    motor.config_kI(slotIdx, config.i);
-    //    motor.config_kD(slotIdx, config.d);
-    //    motor.config_kF(slotIdx, config.f);
-    //    motor.config_IntegralZone(slotIdx, config.iz);
-    //    motor.configClosedLoopPeakOutput(slotIdx, config.output.max);
     configuration.slot0.kP = config.p;
     configuration.slot0.kI = config.i;
     configuration.slot0.kD = config.d;
     configuration.slot0.kF = config.f;
     configuration.slot0.integralZone = config.iz;
     configuration.slot0.closedLoopPeakOutput = config.output.max;
+    fscalar = config.fscalar;
     configChanged = true;
   }
 
@@ -233,7 +187,7 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void burnFlash() {
     if (configChanged) {
-      motor.configAllSettings(configuration);
+      motor.configAllSettings(configuration, 250);
       configChanged = false;
     }
   }
@@ -249,6 +203,44 @@ public class TalonFXSwerve extends SwerveMotor {
   }
 
   /**
+   * Put an angle within the the 360 deg scope of a reference. For example, given a scope reference
+   * of 756 degrees, assumes the full scope is (720-1080), and places an angle of 22 degrees into
+   * it, returning 742 deg.
+   *
+   * @param scopeReference Current Angle (deg)
+   * @param newAngle Target Angle (deg)
+   * @return Closest angle within scope (deg)
+   */
+  private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+    double lowerBound;
+    double upperBound;
+    double lowerOffset = scopeReference % 360;
+
+    // Create the interval from the reference angle.
+    if (lowerOffset >= 0) {
+      lowerBound = scopeReference - lowerOffset;
+      upperBound = scopeReference + (360 - lowerOffset);
+    } else {
+      upperBound = scopeReference - lowerOffset;
+      lowerBound = scopeReference - (360 + lowerOffset);
+    }
+    // Put the angle in the interval.
+    while (newAngle < lowerBound) {
+      newAngle += 360;
+    }
+    while (newAngle > upperBound) {
+      newAngle -= 360;
+    }
+    // Smooth the transition between interval boundaries.
+    if (newAngle - scopeReference > 180) {
+      newAngle -= 360;
+    } else if (newAngle - scopeReference < -180) {
+      newAngle += 360;
+    }
+    return newAngle;
+  }
+
+  /**
    * Convert the setpoint into native sensor units.
    *
    * @param setpoint Setpoint to mutate. In meters per second or degrees.
@@ -256,10 +248,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   public double convertToNativeSensorUnits(double setpoint) {
     setpoint =
-        isDriveMotor
-            ? (setpoint * .1)
-            : placeInAppropriate0To360Scope(
-                motor.getSelectedSensorPosition() * positionConversionFactor, setpoint);
+        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getRawPosition(), setpoint);
     return setpoint / positionConversionFactor;
   }
 
@@ -271,15 +260,18 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setReference(double setpoint, double feedforward) {
-    if (!Robot.isReal()) {
+    if (RobotBase.isSimulation()) {
       PhysicsSim.getInstance().run();
     }
+
+    burnFlash();
 
     motor.set(
         isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
         convertToNativeSensorUnits(setpoint),
         DemandType.ArbitraryFeedForward,
-        isDriveMotor ? feedforward : feedforward * 0.33);
+        isDriveMotor ? feedforward : feedforward * fscalar);
+    // Credit to Team 3181 for the -0.3, I'm not sure why it works, but it does.
   }
 
   /**
@@ -289,7 +281,16 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getVelocity() {
-    return motor.getSelectedSensorVelocity() * positionConversionFactor * 10;
+    return (motor.getSelectedSensorVelocity() * 10) * positionConversionFactor;
+  }
+
+  /**
+   * Get the raw position.
+   *
+   * @return Position in meters or degrees.
+   */
+  public double getRawPosition() {
+    return motor.getSelectedSensorPosition() * positionConversionFactor;
   }
 
   /**
@@ -299,7 +300,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getPosition() {
-    return motor.getSelectedSensorPosition() * positionConversionFactor;
+    return isDriveMotor ? getRawPosition() : getRawPosition() % 360;
   }
 
   /**
@@ -309,8 +310,8 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setPosition(double position) {
-    if (!absoluteEncoder) {
-      motor.setSelectedSensorPosition(convertToNativeSensorUnits(position));
+    if (!absoluteEncoder && !RobotBase.isSimulation()) {
+      motor.setSelectedSensorPosition(convertToNativeSensorUnits(position), 0, 250);
     }
   }
 
@@ -321,8 +322,6 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setVoltageCompensation(double nominalVoltage) {
-    //    motor.enableVoltageCompensation(true);
-    //    motor.configVoltageCompSaturation(nominalVoltage);
     configuration.voltageCompSaturation = nominalVoltage;
     configChanged = true;
   }
@@ -335,11 +334,6 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setCurrentLimit(int currentLimit) {
-    //    SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
-    //    motor.configGetSupplyCurrentLimit(config);
-    //    config.currentLimit = currentLimit;
-    //    config.enable = true;
-    //    motor.configSupplyCurrentLimit(config);
     configuration.supplyCurrLimit.currentLimit = currentLimit;
     configuration.supplyCurrLimit.enable = true;
     configChanged = true;
@@ -352,8 +346,6 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setLoopRampRate(double rampRate) {
-    //    motor.configClosedloopRamp(rampRate);
-    //    motor.configOpenloopRamp(rampRate);
     configuration.closedloopRamp = rampRate;
     configuration.openloopRamp = rampRate;
     configChanged = true;

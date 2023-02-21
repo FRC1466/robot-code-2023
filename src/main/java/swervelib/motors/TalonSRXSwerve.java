@@ -4,10 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.sensors.CANCoder;
+import edu.wpi.first.wpilibj.RobotBase;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 
@@ -16,10 +15,10 @@ public class TalonSRXSwerve extends SwerveMotor {
 
   /** Factory default already occurred. */
   private final boolean factoryDefaultOccurred = false;
+  /** Whether the absolute encoder is integrated. */
+  private final boolean absoluteEncoder = false;
   /** TalonSRX motor controller. */
   WPI_TalonSRX motor;
-  /** Whether the absolute encoder is integrated. */
-  private boolean absoluteEncoder = false;
   /** The position conversion factor. */
   private double positionConversionFactor = 1;
 
@@ -53,6 +52,7 @@ public class TalonSRXSwerve extends SwerveMotor {
   public void factoryDefaults() {
     if (!factoryDefaultOccurred) {
       motor.configFactoryDefault();
+      motor.setSensorPhase(true);
     }
   }
 
@@ -69,12 +69,6 @@ public class TalonSRXSwerve extends SwerveMotor {
    */
   @Override
   public SwerveMotor setAbsoluteEncoder(SwerveAbsoluteEncoder encoder) {
-    if (encoder.getAbsoluteEncoder() instanceof CANCoder) {
-      motor.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0);
-      motor.configRemoteFeedbackFilter(
-          (CANCoder) encoder.getAbsoluteEncoder(), CTRE_remoteSensor.REMOTE_SENSOR_0.ordinal());
-      absoluteEncoder = true;
-    }
     return this;
   }
 
@@ -87,7 +81,6 @@ public class TalonSRXSwerve extends SwerveMotor {
   @Override
   public void configureIntegratedEncoder(double positionConversionFactor) {
     this.positionConversionFactor = positionConversionFactor;
-    motor.configSelectedFeedbackCoefficient(positionConversionFactor);
   }
 
   /**
@@ -97,7 +90,7 @@ public class TalonSRXSwerve extends SwerveMotor {
    */
   @Override
   public void configurePIDF(PIDFConfig config) {
-    int slotIdx = isDriveMotor ? CTRE_slotIdx.Velocity.ordinal() : CTRE_slotIdx.Turning.ordinal();
+    int slotIdx = 0;
     motor.config_kP(slotIdx, config.p);
     motor.config_kI(slotIdx, config.i);
     motor.config_kD(slotIdx, config.d);
@@ -161,11 +154,14 @@ public class TalonSRXSwerve extends SwerveMotor {
    */
   @Override
   public void setReference(double setpoint, double feedforward) {
+    burnFlash();
+
     motor.set(
         isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
-        isDriveMotor ? setpoint * .1 : setpoint,
+        convertToNativeSensorUnits(setpoint),
         DemandType.ArbitraryFeedForward,
-        feedforward);
+        feedforward * -0.3);
+    // Credit to Team 3181 for the -0.3, I'm not sure why it works, but it does.
   }
 
   /**
@@ -175,28 +171,37 @@ public class TalonSRXSwerve extends SwerveMotor {
    */
   @Override
   public double getVelocity() {
-    return motor.getSelectedSensorVelocity() * (10 * positionConversionFactor);
+    return (motor.getSelectedSensorVelocity() * 10) * positionConversionFactor;
+  }
+
+  /**
+   * Get the raw position.
+   *
+   * @return Position in meters or degrees.
+   */
+  public double getRawPosition() {
+    return motor.getSelectedSensorPosition() * positionConversionFactor;
   }
 
   /**
    * Get the position of the integrated encoder.
    *
-   * @return Position
+   * @return Position in Meters or Degrees.
    */
   @Override
   public double getPosition() {
-    return motor.getSelectedSensorPosition() * positionConversionFactor;
+    return isDriveMotor ? getRawPosition() : getRawPosition() % 360;
   }
 
   /**
    * Set the integrated encoder position.
    *
-   * @param position Integrated encoder position. Should be angle in degrees or meters per second.
+   * @param position Integrated encoder position. Should be angle in degrees or meters.
    */
   @Override
   public void setPosition(double position) {
-    if (!absoluteEncoder) {
-      motor.setSelectedSensorPosition(position * positionConversionFactor);
+    if (!absoluteEncoder && !RobotBase.isSimulation()) {
+      motor.setSelectedSensorPosition(convertToNativeSensorUnits(position));
     }
   }
 
@@ -257,35 +262,53 @@ public class TalonSRXSwerve extends SwerveMotor {
     return absoluteEncoder;
   }
 
-  /** The Talon SRX Slot profile used to configure the motor to use for the PID. */
-  enum CTRE_slotIdx {
-    /** Slot 0, meant for distances PID's. */
-    Distance,
-    /** Slot 1, meant for turning PID's. */
-    Turning,
-    /** Slot 2, meant for velocity PID's. */
-    Velocity,
-    /** Slot 3, meant for motion profiles. */
-    MotionProfile
+  /**
+   * Put an angle within the the 360 deg scope of a reference. For example, given a scope reference
+   * of 756 degrees, assumes the full scope is (720-1080), and places an angle of 22 degrees into
+   * it, returning 742 deg.
+   *
+   * @param scopeReference Current Angle (deg)
+   * @param newAngle Target Angle (deg)
+   * @return Closest angle within scope (deg)
+   */
+  private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+    double lowerBound;
+    double upperBound;
+    double lowerOffset = scopeReference % 360;
+
+    // Create the interval from the reference angle.
+    if (lowerOffset >= 0) {
+      lowerBound = scopeReference - lowerOffset;
+      upperBound = scopeReference + (360 - lowerOffset);
+    } else {
+      upperBound = scopeReference - lowerOffset;
+      lowerBound = scopeReference - (360 + lowerOffset);
+    }
+    // Put the angle in the interval.
+    while (newAngle < lowerBound) {
+      newAngle += 360;
+    }
+    while (newAngle > upperBound) {
+      newAngle -= 360;
+    }
+    // Smooth the transition between interval boundaries.
+    if (newAngle - scopeReference > 180) {
+      newAngle -= 360;
+    } else if (newAngle - scopeReference < -180) {
+      newAngle += 360;
+    }
+    return newAngle;
   }
 
-  /** The Talon PID to use onboard. */
-  enum CTRE_pidIdx {
-    /** Primary PID for talons. */
-    PRIMARY_PID,
-    /** Secondary PID for talons. */
-    AUXILIARY_PID,
-    /** Third PID slot for talons. */
-    THIRD_PID,
-    /** Fourth PID slot for talons. */
-    FOURTH_PID
-  }
-
-  /** The remote sensor. */
-  enum CTRE_remoteSensor {
-    /** Remote sensor 0. */
-    REMOTE_SENSOR_0,
-    /** Remote sensor 1. */
-    REMOTE_SENSOR_1
+  /**
+   * Convert the setpoint into native sensor units.
+   *
+   * @param setpoint Setpoint to mutate. In meters per second or degrees.
+   * @return Setpoint as native sensor units. Encoder ticks per 100ms, or Encoder tick.
+   */
+  public double convertToNativeSensorUnits(double setpoint) {
+    setpoint =
+        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getRawPosition(), setpoint);
+    return setpoint / positionConversionFactor;
   }
 }
