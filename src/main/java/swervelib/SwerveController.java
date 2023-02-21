@@ -110,4 +110,8 @@ public class SwerveController {
 
     return speeds;
   }
+
+  public double headingCalculate(double currentHeadingAngleRadians, double angle) {
+    return thetaController.calculate(currentHeadingAngleRadians, angle) * config.maxAngularVelocity;
+  }
 }

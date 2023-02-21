@@ -4,8 +4,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveModuleState2;
 import swervelib.motors.SwerveMotor;
@@ -69,13 +69,10 @@ public class SwerveModule {
 
     // Config angle encoders
     absoluteEncoder = moduleConfiguration.absoluteEncoder;
-    if (absoluteEncoder != null) {
-      absoluteEncoder.factoryDefault();
-      absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
-      angleMotor.configureIntegratedEncoder(
-          moduleConfiguration.getPositionEncoderConversion(false));
-      angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
-    }
+    absoluteEncoder.factoryDefault();
+    absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
+    angleMotor.configureIntegratedEncoder(moduleConfiguration.getPositionEncoderConversion(false));
+    // angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
 
     // Config angle motor/controller
     angleMotor.configurePIDF(moduleConfiguration.anglePIDF);
@@ -92,19 +89,20 @@ public class SwerveModule {
     driveMotor.burnFlash();
     angleMotor.burnFlash();
 
-    if (RobotBase.isSimulation()) {
+    if (!Robot.isReal()) {
       simModule = new SwerveModuleSimulation();
     }
 
     lastAngle = getState().angle.getDegrees();
   }
 
-  /** Synchronize the integrated angle encoder with the absolute encoder. */
-  public void synchronizeEncoders() {
-    if (absoluteEncoder != null) {
-      angleMotor.setPosition(getAbsolutePosition() - angleOffset);
-    }
-  }
+  // /**
+  //  * Synchronize the integrated angle encoder with the absolute encoder.
+  //  */
+  // public void synchronizeEncoders()
+  // {
+  //   angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
+  // }
 
   /**
    * Set the desired state of the swerve module.
@@ -144,7 +142,7 @@ public class SwerveModule {
         angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
     lastAngle = angle;
 
-    if (RobotBase.isSimulation()) {
+    if (!Robot.isReal()) {
       simModule.updateStateAndPosition(desiredState);
     }
   }
@@ -168,7 +166,7 @@ public class SwerveModule {
     double velocity;
     Rotation2d azimuth;
     double omega;
-    if (!RobotBase.isSimulation()) {
+    if (Robot.isReal()) {
       velocity = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
       omega = Math.toRadians(angleMotor.getVelocity());
@@ -186,7 +184,7 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     double position;
     Rotation2d azimuth;
-    if (!RobotBase.isSimulation()) {
+    if (Robot.isReal()) {
       position = driveMotor.getPosition();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
     } else {
@@ -202,14 +200,7 @@ public class SwerveModule {
    * @return Absolute encoder angle in degrees.
    */
   public double getAbsolutePosition() {
-    if (absoluteEncoder != null) {
-      double angle = absoluteEncoder.getAbsolutePosition();
-      if (absoluteEncoder.readingError) {
-        angle = getRelativePosition();
-      }
-      return angle;
-    }
-    return 0;
+    return absoluteEncoder.getAbsolutePosition();
   }
 
   /**

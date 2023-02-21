@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
@@ -31,6 +30,7 @@ import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.Gripper;
 import frc.robot.subsystems.manipulator.Gripper.INTAKE;
+import frc.robot.subsystems.manipulator.VirtualFourBar.ARM;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -144,19 +144,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     drivebase.setDefaultCommand(closedFieldRel);
-    arm.setDefaultCommand(
-        new RunCommand(
-            () ->
-                arm.setArm(
-                    Rotation2d.fromRadians(
-                        MathUtil.clamp(
-                            driverController.getRawAxis(3) / ArmConstants.armInputScale * Math.PI
-                                + ArmConstants.armOffset,
-                            ArmConstants.minRadians,
-                            ArmConstants.maxRadians))),
-            arm));
+    arm.setDefaultCommand(Commands.run(() -> arm.ambientArm(), arm));
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
-    gripper.setDefaultCommand(Commands.run(() -> gripper.setGripper(INTAKE.STORE), gripper));
+    gripper.setDefaultCommand(Commands.run(() -> gripper.ambientGripper(), gripper));
 
     driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
@@ -208,7 +198,9 @@ public class RobotContainer {
             autoMap
                 .getCommandInMap("EnsureNeutralGrab")
                 .andThen(autoMap.getCommandInMap("ArmGround"))
-                .andThen(autoMap.getCommandInMap("OpenGrab")))
+                .andThen(autoMap.getCommandInMap("OpenGrab")));
+    driverController
+        .trigger()
         .onFalse(
             autoMap.getCommandInMap("CubeGrab").andThen(autoMap.getCommandInMap("ArmStoreObject")));
 
@@ -257,10 +249,11 @@ public class RobotContainer {
                                 .getCommandInMap("ArmGround")
                                 .andThen(autoMap.getCommandInMap("OpenGrab")))));
 
-    new Trigger(drivebase::isMoving)
-        .whileTrue(
-            Commands.startEnd(
-                () -> pdh.setSwitchableChannel(true), () -> pdh.setSwitchableChannel(false), pdh));
+    // new Trigger(drivebase::isMoving)
+    //     .whileTrue(
+    //         Commands.startEnd(
+    //             () -> pdh.setSwitchableChannel(true), () -> pdh.setSwitchableChannel(false),
+    // pdh));
   }
 
   /**

@@ -72,6 +72,7 @@ public class TeleopDrive extends CommandBase {
           isOpenLoop);
     } else if (Timer.getFPGATimestamp() - lastTime > Constants.STOP_SECONDS) {
       swerve.lockPose();
+      System.out.println("Pose locked.");
     }
   }
 

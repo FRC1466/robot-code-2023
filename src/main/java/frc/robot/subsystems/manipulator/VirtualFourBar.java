@@ -24,6 +24,8 @@ public class VirtualFourBar extends SubsystemBase {
     MID
   }
 
+  private Rotation2d currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
+
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
     armMotor = new WPI_TalonFX(ArmConstants.armPort);
@@ -101,29 +103,33 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("armPID error", armPID.getPositionError());
     SmartDashboard.putNumber("armPID output", motorOutput);
     SmartDashboard.putNumber("arm feedforward", feedforward);
-    // armMotor.set(motorOutput + feedforward);
+    armMotor.set(motorOutput + feedforward);
   }
 
   public void setArm(ARM height) {
     switch (height) {
       case GROUND:
-        setArm(Rotation2d.fromRadians(ArmConstants.maxRadians));
+        currentArm = Rotation2d.fromRadians(ArmConstants.maxRadians);
         break;
       case STATION:
-        setArm(Rotation2d.fromDegrees(135));
+        currentArm = Rotation2d.fromDegrees(135);
         break;
       case MID:
-        setArm(Rotation2d.fromDegrees(135));
+      currentArm = Rotation2d.fromDegrees(135);
         break;
       case STORAGE:
-        setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
+      currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
         break;
       case VERTICAL:
-        setArm(Rotation2d.fromDegrees(90));
+      currentArm = Rotation2d.fromDegrees(90);
         break;
       default:
         throw new IllegalArgumentException("Height enum not supported.");
     }
+  }
+
+  public void ambientArm() {
+    setArm(currentArm);
   }
 
   /**

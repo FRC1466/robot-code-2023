@@ -7,16 +7,16 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.SwerveController;
-import swervelib.SwerveModule;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveModuleConfiguration;
+import swervelib.parser.SwerveParser;
 
 /** Mathematical functions which pertain to swerve drive. */
 public class SwerveMath {
 
   /**
    * Calculate the angle kV which will be multiplied by the radians per second for the feedforward.
-   * Volt * seconds / degree == (maxVolts) / (maxSpeed)
+   * Volt * seconds / degree <=> (maxVolts) / (maxSpeed)
    *
    * @param optimalVoltage Optimal voltage to use when calculating the angle kV.
    * @param motorFreeSpeedRPM Motor free speed in Rotations per Minute.
@@ -43,17 +43,6 @@ public class SwerveMath {
   public static double calculateMetersPerRotation(
       double wheelDiameter, double driveGearRatio, double pulsePerRotation) {
     return (Math.PI * wheelDiameter) / (driveGearRatio * pulsePerRotation);
-  }
-
-  /**
-   * Normalize an angle to be within 0 to 360.
-   *
-   * @param angle Angle in degrees.
-   * @return Normalized angle in degrees.
-   */
-  public static double normalizeAngle(double angle) {
-    Rotation2d angleRotation = Rotation2d.fromDegrees(angle);
-    return new Rotation2d(angleRotation.getCos(), angleRotation.getSin()).getDegrees();
   }
 
   /**
@@ -132,7 +121,10 @@ public class SwerveMath {
 
   /**
    * Calculates the maximum acceleration allowed in a direction without tipping the robot. Reads arm
-   * position from NetworkTables and is passed the direction in question.
+   * position from NetworkTables and is passed the direction in question.<br>
+   * <b>Requires modules to be named: <br
+   * />
+   * "frontright.json", "frontleft.json", "backright.json", "backleft.json"</b>
    *
    * @param angle The direction in which to calculate max acceleration, as a Rotation2d. Note that
    *     this is robot-relative.
@@ -172,22 +164,27 @@ public class SwerveMath {
     Translation2d projectedWheelbaseEdge;
     double angDeg = angle.getDegrees();
     if (angDeg <= 45 && angDeg >= -45) {
-      SwerveModuleConfiguration conf = getSwerveModule(config.modules, true, true);
+      SwerveModuleConfiguration conf =
+          SwerveParser.getModuleConfigurationByName("frontleft", config).configuration;
       projectedWheelbaseEdge =
           new Translation2d(
               conf.moduleLocation.getX(), conf.moduleLocation.getX() * angle.getTan());
     } else if (135 >= angDeg && angDeg > 45) {
-      SwerveModuleConfiguration conf = getSwerveModule(config.modules, true, true);
+      SwerveModuleConfiguration conf =
+          SwerveParser.getModuleConfigurationByName("frontleft", config).configuration;
+
       projectedWheelbaseEdge =
           new Translation2d(
               conf.moduleLocation.getY() / angle.getTan(), conf.moduleLocation.getY());
     } else if (-135 <= angDeg && angDeg < -45) {
-      SwerveModuleConfiguration conf = getSwerveModule(config.modules, true, false);
+      SwerveModuleConfiguration conf =
+          SwerveParser.getModuleConfigurationByName("frontright", config).configuration;
       projectedWheelbaseEdge =
           new Translation2d(
               conf.moduleLocation.getY() / angle.getTan(), conf.moduleLocation.getY());
     } else {
-      SwerveModuleConfiguration conf = getSwerveModule(config.modules, false, true);
+      SwerveModuleConfiguration conf =
+          SwerveParser.getModuleConfigurationByName("backleft", config).configuration;
       projectedWheelbaseEdge =
           new Translation2d(
               conf.moduleLocation.getX(), conf.moduleLocation.getX() * angle.getTan());
@@ -203,7 +200,9 @@ public class SwerveMath {
   /**
    * Limits a commanded velocity to prevent exceeding the maximum acceleration given by {@link
    * SwerveMath#calcMaxAccel(Rotation2d, double, double, Translation3d, SwerveDriveConfiguration)}.
-   * Note that this takes and returns field-relative velocities.
+   * Note that this takes and returns field-relative velocities. <br>
+   * <b>Requires modules to be named:<br>
+   * "frontright.json", "frontleft.json", "backright.json", "backleft.json"</b>
    *
    * @param commandedVelocity The desired velocity
    * @param fieldVelocity The velocity of the robot within a field relative state.
@@ -260,32 +259,5 @@ public class SwerveMath {
       // If the commanded velocity is attainable, use that.
       return commandedVelocity;
     }
-  }
-
-  /**
-   * Get the fruthest module from center based on the module locations.
-   *
-   * @param modules Swerve module list.
-   * @param front True = furthest front, False = furthest back.
-   * @param left True = furthest left, False = furthest right.
-   * @return Module location which is the furthest from center and abides by parameters.
-   */
-  public static SwerveModuleConfiguration getSwerveModule(
-      SwerveModule[] modules, boolean front, boolean left) {
-    Translation2d target = modules[0].configuration.moduleLocation, current, temp;
-    SwerveModuleConfiguration configuration = modules[0].configuration;
-    for (SwerveModule module : modules) {
-      current = module.configuration.moduleLocation;
-      temp =
-          front
-              ? (target.getY() >= current.getY() ? current : target)
-              : (target.getY() <= current.getY() ? current : target);
-      target =
-          left
-              ? (target.getX() >= temp.getX() ? temp : target)
-              : (target.getX() <= temp.getX() ? temp : target);
-      configuration = current.equals(target) ? module.configuration : configuration;
-    }
-    return configuration;
   }
 }

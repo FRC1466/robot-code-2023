@@ -11,11 +11,7 @@ public class PhysicsSim {
   private static final PhysicsSim sim = new PhysicsSim();
   private final ArrayList<SimProfile> _simProfiles = new ArrayList<SimProfile>();
 
-  /**
-   * Gets the robot simulator instance.
-   *
-   * @return {@link PhysicsSim} instance.
-   */
+  /** Gets the robot simulator instance. */
   public static PhysicsSim getInstance() {
     return sim;
   }

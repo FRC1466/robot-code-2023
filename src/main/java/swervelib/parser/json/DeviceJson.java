@@ -33,7 +33,6 @@ public class DeviceJson {
    */
   public SwerveAbsoluteEncoder createEncoder() {
     switch (type) {
-      case "none":
       case "integrated":
       case "attached":
         return null;
@@ -97,13 +96,8 @@ public class DeviceJson {
    * @return {@link SwerveAbsoluteEncoder} from the motor controller.
    */
   public SwerveAbsoluteEncoder createIntegratedEncoder(SwerveMotor motor) {
-    System.out.println(type);
-    switch (type) {
-      case "sparkmax":
-        return new SparkMaxEncoderSwerve(motor);
-      case "falcon":
-      case "talonfx":
-        return null;
+    if (type.equals("sparkmax")) {
+      return new SparkMaxEncoderSwerve(motor);
     }
     throw new RuntimeException(
         "Could not create absolute encoder from data port of " + type + " id " + id);
