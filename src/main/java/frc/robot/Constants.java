@@ -41,7 +41,7 @@ public final class Constants {
     public static final int driverID = 4, intakeID = 5;
 
     public static final class InputLimits {
-      public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.3;
+      public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.5;
     }
   }
 
@@ -104,7 +104,7 @@ public final class Constants {
     public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
-    public static final double armOffset = minRadians + (maxRadians-minRadians) / 2;
+    public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
     public static final double gravityFF = 0.0;
     public static final boolean encoderInverted = true;
 

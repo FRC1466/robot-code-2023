@@ -16,9 +16,9 @@ public class VirtualFourBar extends SubsystemBase {
   private ArmPIDController armPID;
   private VirtualFourBarSimulation sim;
 
-  public enum HEIGHT {
+  public enum ARM {
     GROUND,
-    STRAIGHT_UP,
+    VERTICAL,
     STORAGE,
     STATION,
     MID
@@ -104,7 +104,7 @@ public class VirtualFourBar extends SubsystemBase {
     // armMotor.set(motorOutput + feedforward);
   }
 
-  public void setArm(HEIGHT height) {
+  public void setArm(ARM height) {
     switch (height) {
       case GROUND:
         setArm(Rotation2d.fromRadians(ArmConstants.maxRadians));
@@ -118,7 +118,7 @@ public class VirtualFourBar extends SubsystemBase {
       case STORAGE:
         setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
         break;
-      case STRAIGHT_UP:
+      case VERTICAL:
         setArm(Rotation2d.fromDegrees(90));
         break;
       default:
@@ -168,7 +168,8 @@ public class VirtualFourBar extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Raw Absolute Arm", absoluteArmEncoder.getAbsolutePosition());
-    // TODO: read this to set offset to 0
+    // System.out.println("Output: " + armPID.calculate(Rotation2d.fromDegrees(180),
+    // Rotation2d.fromDegrees(0)));
     SmartDashboard.putNumber("Proccessed Absolute Arm", getPosition().getRadians());
   }
 }

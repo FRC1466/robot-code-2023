@@ -20,6 +20,8 @@ public class Gripper extends SubsystemBase {
     STORE
   }
 
+  private INTAKE currentIntake;
+
   /** Create a new Gripper subsystem. */
   public Gripper() {
 
@@ -47,6 +49,7 @@ public class Gripper extends SubsystemBase {
   }
 
   public void setGripper(INTAKE intake) {
+    currentIntake = intake;
     switch (intake) {
       case OPEN:
         pidController.setReference(
@@ -67,6 +70,10 @@ public class Gripper extends SubsystemBase {
       default:
         throw new IllegalArgumentException("Invalid intake enum position.");
     }
+  }
+
+  public INTAKE getCurrentIntake() {
+    return currentIntake;
   }
 
   @Override

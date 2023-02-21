@@ -72,7 +72,7 @@ public class RobotContainer {
                   : 0,
           () ->
               (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                  ? -driverController.getZ() // TODO: set this to 0 and start tuning PID heading
+                  ? -driverController.getZ()
                   : 0,
           () -> true, // driverController.button(3).negate(),
           false);
@@ -156,7 +156,7 @@ public class RobotContainer {
                             ArmConstants.maxRadians))),
             arm));
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
-    gripper.setDefaultCommand(Commands.run(() -> gripper.setGripper(INTAKE.OPEN), gripper));
+    gripper.setDefaultCommand(Commands.run(() -> gripper.setGripper(INTAKE.STORE), gripper));
 
     driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
@@ -174,22 +174,30 @@ public class RobotContainer {
                 drivebase,
                 () ->
                     (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                        ? driverController.getY() * OIConstants.InputLimits.reduced
+                        ? -driverController.getY() * OIConstants.InputLimits.reduced
                         : 0,
                 () ->
                     (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                        ? driverController.getX() * OIConstants.InputLimits.reduced
+                        ? -driverController.getX() * OIConstants.InputLimits.reduced
                         : 0,
                 () ->
                     (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                        ? driverController.getZ() * OIConstants.InputLimits.reduced
+                        ? -driverController.getZ() * OIConstants.InputLimits.reduced
                         : 0,
                 () -> true, // driverController.button(3).negate(),
                 false));
 
     driverController.button(5).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper));
     driverController.button(6).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper));
-    driverController.trigger().onTrue(Commands.run(() -> gripper.setGripper(INTAKE.OPEN), gripper));
+    driverController
+        .trigger()
+        .onTrue(
+            autoMap
+                .getCommandInMap("EnsureNeutralGrab")
+                .andThen(autoMap.getCommandInMap("ArmGround"))
+                .andThen(autoMap.getCommandInMap("OpenGrab")))
+        .onFalse(
+            autoMap.getCommandInMap("CubeGrab").andThen(autoMap.getCommandInMap("ArmStoreObject")));
 
     scoreController
         .button(1)
@@ -201,8 +209,11 @@ public class RobotContainer {
                 .repeatedly()
                 .alongWith(
                     autoMap
-                        .getCommandInMap("ArmGround")
-                        .andThen(autoMap.getCommandInMap("OpenGrab"))));
+                        .getCommandInMap("EnsureNeutralGrab")
+                        .andThen(
+                            autoMap
+                                .getCommandInMap("ArmGround")
+                                .andThen(autoMap.getCommandInMap("OpenGrab")))));
     scoreController
         .button(2)
         .whileTrue(
@@ -213,8 +224,11 @@ public class RobotContainer {
                 .repeatedly()
                 .alongWith(
                     autoMap
-                        .getCommandInMap("ArmGround")
-                        .andThen(autoMap.getCommandInMap("OpenGrab"))));
+                        .getCommandInMap("EnsureNeutralGrab")
+                        .andThen(
+                            autoMap
+                                .getCommandInMap("ArmGround")
+                                .andThen(autoMap.getCommandInMap("OpenGrab")))));
     scoreController
         .button(3)
         .whileTrue(
@@ -224,13 +238,16 @@ public class RobotContainer {
                 .repeatedly()
                 .alongWith(
                     autoMap
-                        .getCommandInMap("ArmGround")
-                        .andThen(autoMap.getCommandInMap("OpenGrab"))));
+                        .getCommandInMap("EnsureNeutralGrab")
+                        .andThen(
+                            autoMap
+                                .getCommandInMap("ArmGround")
+                                .andThen(autoMap.getCommandInMap("OpenGrab")))));
 
     new Trigger(drivebase::isMoving)
         .whileTrue(
             Commands.startEnd(
-                () -> pdh.setSwitchableChannel(true), () -> pdh.setSwitchableChannel(false)));
+                () -> pdh.setSwitchableChannel(true), () -> pdh.setSwitchableChannel(false), pdh));
   }
 
   /**

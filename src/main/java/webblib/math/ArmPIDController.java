@@ -224,7 +224,7 @@ public class ArmPIDController extends PIDController {
     b -= test_angle;
     normalize(a);
     normalize(b);
-    if (a * b >= 0) {
+    if (a * b > 0) {
       return false;
     }
     return Math.abs(a - b) < 180;
