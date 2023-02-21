@@ -18,10 +18,11 @@
       "stopEvent": {
         "names": [
           "CubeGrab",
-          "ArmGround"
+          "ArmGround",
+          "CubeOpen"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "none",
+        "waitBehavior": "after",
         "waitTime": 0
       }
     },

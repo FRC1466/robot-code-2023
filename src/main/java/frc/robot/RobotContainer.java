@@ -190,6 +190,19 @@ public class RobotContainer {
     driverController.button(5).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper));
     driverController.button(6).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper));
     driverController
+        .povDown()
+        .onTrue(
+            autoMap
+                .getCommandInMap("EnsureNeutralGrab")
+                .andThen(autoMap.getCommandInMap("ArmMidScore")))
+        .onFalse(
+            autoMap
+                .getCommandInMap("OpenGrab")
+                .andThen(Commands.waitSeconds(0.5))
+                .andThen(autoMap.getCommandInMap("EnsureNeutralGrab"))
+                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+
+    driverController
         .trigger()
         .onTrue(
             autoMap
