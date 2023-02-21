@@ -2,8 +2,8 @@ package swervelib;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -23,6 +23,7 @@ import swervelib.math.SwerveModuleState2;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.simulation.SwerveIMUSimulation;
+import webblib.math.SwerveDrivePoseEstimator;
 
 /** Swerve Drive class representing and controlling the swerve drive. */
 public class SwerveDrive {
@@ -81,13 +82,13 @@ public class SwerveDrive {
     swerveDrivePoseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics,
-            getYaw(),
+            getGyroRotation3d(),
             getModulePositions(),
-            new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)),
+            new Pose3d(),
             VecBuilder.fill(
-                0.1, 0.1, 0.1), // x,y,heading in radians; state std dev, higher=less weight
+                0.1, 0.1, 0.1, 0.1), // x,y,heading in radians; state std dev, higher=less weight
             VecBuilder.fill(
-                0.9, 0.9,
+                0.9, 0.9, 0.9,
                 0.9)); // x,y,heading in radians; Vision measurement std dev, higher=less weight
 
     zeroGyro();
@@ -380,7 +381,7 @@ public class SwerveDrive {
    */
   public void updateOdometry() {
     // Update odometry
-    swerveDrivePoseEstimator.update(getYaw(), getModulePositions());
+    swerveDrivePoseEstimator.update(getGyroRotation3d(), getModulePositions());
 
     // Update angle accumulator if the robot is simulated
     if (RobotBase.isSimulation()) {

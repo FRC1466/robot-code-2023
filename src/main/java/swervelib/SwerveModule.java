@@ -202,12 +202,14 @@ public class SwerveModule {
    * @return Absolute encoder angle in degrees.
    */
   public double getAbsolutePosition() {
-    double angle = absoluteEncoder.getAbsolutePosition();
-    if (absoluteEncoder.readingError) {
-      angle = getRelativePosition();
+    if (absoluteEncoder != null) {
+      double angle = absoluteEncoder.getAbsolutePosition();
+      if (absoluteEncoder.readingError) {
+        angle = getRelativePosition();
+      }
+      return angle;
     }
-
-    return angle;
+    return 0;
   }
 
   /**

@@ -97,10 +97,12 @@ public class DeviceJson {
    * @return {@link SwerveAbsoluteEncoder} from the motor controller.
    */
   public SwerveAbsoluteEncoder createIntegratedEncoder(SwerveMotor motor) {
+    System.out.println(type);
     switch (type) {
       case "sparkmax":
         return new SparkMaxEncoderSwerve(motor);
-      case "none":
+      case "falcon":
+      case "talonfx":
         return null;
     }
     throw new RuntimeException(
