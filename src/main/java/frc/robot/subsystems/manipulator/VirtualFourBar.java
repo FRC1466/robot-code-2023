@@ -115,13 +115,13 @@ public class VirtualFourBar extends SubsystemBase {
         currentArm = Rotation2d.fromDegrees(135);
         break;
       case MID:
-      currentArm = Rotation2d.fromDegrees(135);
+        currentArm = Rotation2d.fromDegrees(135);
         break;
       case STORAGE:
-      currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
+        currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
         break;
       case VERTICAL:
-      currentArm = Rotation2d.fromDegrees(90);
+        currentArm = Rotation2d.fromDegrees(90);
         break;
       default:
         throw new IllegalArgumentException("Height enum not supported.");

@@ -18,18 +18,16 @@ public class AutoMap {
     eventMapGetter.put(
         "ArmGround",
         () ->
-            Commands.runOnce(
-                () ->
-                    arm.setArm(ARM.GROUND)).andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
+            Commands.runOnce(() -> arm.setArm(ARM.GROUND))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmLoadingStation",
         () -> Commands.run(() -> arm.setArm(ARM.STATION), arm).until(() -> arm.isAtSetpoint()));
     eventMapGetter.put(
         "ArmStoreObject",
         () ->
-            Commands.runOnce(
-                () ->
-                    arm.setArm(ARM.STORAGE)).andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
+            Commands.runOnce(() -> arm.setArm(ARM.STORAGE))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmMidScore",
         () -> Commands.run(() -> arm.setArm(ARM.MID), arm).until(() -> arm.isAtSetpoint()));
@@ -37,12 +35,7 @@ public class AutoMap {
         "ArmVertical",
         () -> Commands.run(() -> arm.setArm(ARM.VERTICAL), arm).until(() -> arm.isAtSetpoint()));
 
-    eventMapGetter.put(
-        "ConeGrab",
-        () ->
-            Commands.runOnce(
-                () ->
-                    gripper.setGripper(INTAKE.CONE)));
+    eventMapGetter.put("ConeGrab", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONE)));
     eventMapGetter.put(
         "EnsureNeutralGrab",
         () ->
@@ -52,17 +45,8 @@ public class AutoMap {
                     gripper.setGripper(INTAKE.STORE);
                   }
                 }));
-    eventMapGetter.put(
-        "CubeGrab",
-        () ->
-            Commands.runOnce(
-                () ->
-                gripper.setGripper(INTAKE.CUBE)));
-    eventMapGetter.put(
-        "OpenGrab",
-        () ->
-            Commands.runOnce(
-                () -> gripper.setGripper(INTAKE.OPEN)));
+    eventMapGetter.put("CubeGrab", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBE)));
+    eventMapGetter.put("OpenGrab", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.OPEN)));
 
     eventMapGetter.forEach(
         (key, val) -> {

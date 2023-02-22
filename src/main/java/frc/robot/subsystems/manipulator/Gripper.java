@@ -51,28 +51,23 @@ public class Gripper extends SubsystemBase {
   }
 
   public void ambientGripper() {
-    pidController.setReference(
-      currentGripper, CANSparkMax.ControlType.kPosition);
+    pidController.setReference(currentGripper, CANSparkMax.ControlType.kPosition);
   }
 
   public void setGripper(INTAKE intake) {
     currentIntake = intake;
     switch (intake) {
       case OPEN:
-         currentGripper = 
-            GripperConstants.positionOpen;
+        currentGripper = GripperConstants.positionOpen;
         break;
       case CUBE:
-      currentGripper = 
-      GripperConstants.positionCube;
+        currentGripper = GripperConstants.positionCube;
         break;
       case CONE:
-      currentGripper = 
-      GripperConstants.positionCone;
+        currentGripper = GripperConstants.positionCone;
         break;
       case STORE:
-      currentGripper = 
-      GripperConstants.positionStore;
+        currentGripper = GripperConstants.positionStore;
         break;
       default:
         throw new IllegalArgumentException("Invalid intake enum position.");

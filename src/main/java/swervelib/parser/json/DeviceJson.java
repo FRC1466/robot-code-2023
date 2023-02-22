@@ -1,5 +1,6 @@
 package swervelib.parser.json;
 
+import swervelib.encoders.AnalogAbsoluteEncoderSwerve;
 import swervelib.encoders.CANCoderSwerve;
 import swervelib.encoders.SparkMaxEncoderSwerve;
 import swervelib.encoders.SwerveAbsoluteEncoder;
@@ -33,9 +34,15 @@ public class DeviceJson {
    */
   public SwerveAbsoluteEncoder createEncoder() {
     switch (type) {
+      case "none":
       case "integrated":
       case "attached":
         return null;
+      case "thrifty":
+      case "throughbore":
+      case "dutycycle":
+      case "analog":
+        return new AnalogAbsoluteEncoderSwerve(id);
       case "cancoder":
         return new CANCoderSwerve(id, canbus != null ? canbus : "");
       default:
@@ -96,8 +103,12 @@ public class DeviceJson {
    * @return {@link SwerveAbsoluteEncoder} from the motor controller.
    */
   public SwerveAbsoluteEncoder createIntegratedEncoder(SwerveMotor motor) {
-    if (type.equals("sparkmax")) {
-      return new SparkMaxEncoderSwerve(motor);
+    switch (type) {
+      case "sparkmax":
+        return new SparkMaxEncoderSwerve(motor);
+      case "falcon":
+      case "talonfx":
+        return null;
     }
     throw new RuntimeException(
         "Could not create absolute encoder from data port of " + type + " id " + id);

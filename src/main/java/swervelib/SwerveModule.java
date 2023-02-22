@@ -4,8 +4,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveModuleState2;
 import swervelib.motors.SwerveMotor;
@@ -69,12 +69,14 @@ public class SwerveModule {
 
     // Config angle encoders
     absoluteEncoder = moduleConfiguration.absoluteEncoder;
-    absoluteEncoder.factoryDefault();
-    absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
-    angleMotor.configureIntegratedEncoder(moduleConfiguration.getPositionEncoderConversion(false));
-    // angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
+    if (absoluteEncoder != null) {
+      absoluteEncoder.factoryDefault();
+      absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
+      angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
+    }
 
     // Config angle motor/controller
+    angleMotor.configureIntegratedEncoder(moduleConfiguration.getPositionEncoderConversion(false));
     angleMotor.configurePIDF(moduleConfiguration.anglePIDF);
     angleMotor.configurePIDWrapping(-180, 180);
     angleMotor.setInverted(moduleConfiguration.angleMotorInverted);
@@ -89,20 +91,19 @@ public class SwerveModule {
     driveMotor.burnFlash();
     angleMotor.burnFlash();
 
-    if (!Robot.isReal()) {
+    if (RobotBase.isSimulation()) {
       simModule = new SwerveModuleSimulation();
     }
 
     lastAngle = getState().angle.getDegrees();
   }
 
-  // /**
-  //  * Synchronize the integrated angle encoder with the absolute encoder.
-  //  */
-  // public void synchronizeEncoders()
-  // {
-  //   angleMotor.setPosition(absoluteEncoder.getAbsolutePosition() - angleOffset);
-  // }
+  /** Synchronize the integrated angle encoder with the absolute encoder. */
+  public void synchronizeEncoders() {
+    if (absoluteEncoder != null) {
+      angleMotor.setPosition(getAbsolutePosition() - angleOffset);
+    }
+  }
 
   /**
    * Set the desired state of the swerve module.
@@ -142,7 +143,7 @@ public class SwerveModule {
         angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
     lastAngle = angle;
 
-    if (!Robot.isReal()) {
+    if (RobotBase.isSimulation()) {
       simModule.updateStateAndPosition(desiredState);
     }
   }
@@ -153,7 +154,7 @@ public class SwerveModule {
    * @param angle Angle in degrees.
    */
   public void setAngle(double angle) {
-    angleMotor.setReference(angle, 1 * configuration.angleKV);
+    angleMotor.setReference(angle, configuration.angleKV);
     lastAngle = angle;
   }
 
@@ -166,7 +167,7 @@ public class SwerveModule {
     double velocity;
     Rotation2d azimuth;
     double omega;
-    if (Robot.isReal()) {
+    if (!RobotBase.isSimulation()) {
       velocity = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
       omega = Math.toRadians(angleMotor.getVelocity());
@@ -184,7 +185,7 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     double position;
     Rotation2d azimuth;
-    if (Robot.isReal()) {
+    if (!RobotBase.isSimulation()) {
       position = driveMotor.getPosition();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
     } else {
@@ -195,12 +196,19 @@ public class SwerveModule {
   }
 
   /**
-   * Get the absolute position.
+   * Get the absolute position. Falls back to relative position on reading failure.
    *
    * @return Absolute encoder angle in degrees.
    */
   public double getAbsolutePosition() {
-    return absoluteEncoder.getAbsolutePosition();
+    if (absoluteEncoder != null) {
+      double angle = absoluteEncoder.getAbsolutePosition();
+      if (absoluteEncoder.readingError) {
+        angle = getRelativePosition();
+      }
+    return angle;
+    }
+    return getRelativePosition();
   }
 
   /**
