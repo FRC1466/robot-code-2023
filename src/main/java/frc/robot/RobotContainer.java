@@ -25,7 +25,6 @@ import frc.robot.commands.swervedrive2.auto.PathBuilder;
 import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.Gripper;
-import frc.robot.subsystems.manipulator.Gripper.INTAKE;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -143,9 +142,9 @@ public class RobotContainer {
     // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
     gripper.setDefaultCommand(Commands.run(() -> gripper.ambientGripper(), gripper));
 
-    driverController.button(4).onTrue(new InstantCommand(drivebase::zeroGyro));
+    driverController.povDown().onTrue(new InstantCommand(drivebase::zeroGyro));
     driverController
-        .button(3)
+        .povUp()
         .whileTrue(
             Commands.run(
                     () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
@@ -172,10 +171,8 @@ public class RobotContainer {
                 () -> true, // driverController.button(3).negate(),
                 false));
 
-    driverController.button(5).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CONE), gripper));
-    driverController.button(6).onTrue(Commands.run(() -> gripper.setGripper(INTAKE.CUBE), gripper));
     driverController
-        .povDown()
+        .trigger()
         .onTrue(
             autoMap
                 .getCommandInMap("EnsureNeutralGrab")
@@ -188,14 +185,51 @@ public class RobotContainer {
                 .andThen(autoMap.getCommandInMap("ArmStoreObject")));
 
     driverController
-        .trigger()
+        .button(3)
         .onTrue(
             autoMap
                 .getCommandInMap("EnsureNeutralGrab")
                 .andThen(autoMap.getCommandInMap("ArmGround"))
-                .andThen(autoMap.getCommandInMap("OpenGrab")));
+                .andThen(autoMap.getCommandInMap("OpenGrab")))
+        .onFalse(
+            autoMap
+                .getCommandInMap("ConeGrab")
+                .andThen(Commands.waitSeconds(0.5))
+                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+
     driverController
-        .trigger()
+        .button(4)
+        .onTrue(
+            autoMap
+                .getCommandInMap("EnsureNeutralGrab")
+                .andThen(autoMap.getCommandInMap("ArmGround"))
+                .andThen(autoMap.getCommandInMap("OpenGrab")))
+        .onFalse(
+            autoMap
+                .getCommandInMap("CubeGrab")
+                .andThen(Commands.waitSeconds(0.5))
+                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+
+    driverController
+        .button(5)
+        .onTrue(
+            autoMap
+                .getCommandInMap("EnsureNeutralGrab")
+                .andThen(autoMap.getCommandInMap("ArmStation"))
+                .andThen(autoMap.getCommandInMap("OpenGrab")))
+        .onFalse(
+            autoMap
+                .getCommandInMap("ConeGrab")
+                .andThen(Commands.waitSeconds(0.5))
+                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+
+    driverController
+        .button(6)
+        .onTrue(
+            autoMap
+                .getCommandInMap("EnsureNeutralGrab")
+                .andThen(autoMap.getCommandInMap("ArmStation"))
+                .andThen(autoMap.getCommandInMap("OpenGrab")))
         .onFalse(
             autoMap
                 .getCommandInMap("CubeGrab")
