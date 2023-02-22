@@ -215,7 +215,7 @@ public class RobotContainer {
         .onTrue(
             autoMap
                 .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmStation"))
+                .andThen(autoMap.getCommandInMap("ArmLoadingStation"))
                 .andThen(autoMap.getCommandInMap("OpenGrab")))
         .onFalse(
             autoMap
@@ -228,7 +228,7 @@ public class RobotContainer {
         .onTrue(
             autoMap
                 .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmStation"))
+                .andThen(autoMap.getCommandInMap("ArmLoadingStation"))
                 .andThen(autoMap.getCommandInMap("OpenGrab")))
         .onFalse(
             autoMap
