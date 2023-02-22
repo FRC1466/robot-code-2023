@@ -206,7 +206,7 @@ public class SwerveModule {
       if (absoluteEncoder.readingError) {
         angle = getRelativePosition();
       }
-    return angle;
+      return angle;
     }
     return getRelativePosition();
   }

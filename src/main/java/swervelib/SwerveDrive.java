@@ -89,7 +89,8 @@ public class SwerveDrive {
                 0.1, 0.1, 0.1, 0.1), // x,y,heading in radians; state std dev, higher=less weight
             VecBuilder.fill(
                 0.9, 0.9,
-                0.9, 0.9)); // x,y,heading in radians; Vision measurement std dev, higher=less weight
+                0.9,
+                    0.9)); // x,y,heading in radians; Vision measurement std dev, higher=less weight
 
     zeroGyro();
     SmartDashboard.putData("Field", field);

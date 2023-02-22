@@ -197,7 +197,10 @@ public class RobotContainer {
     driverController
         .trigger()
         .onFalse(
-            autoMap.getCommandInMap("CubeGrab").andThen(autoMap.getCommandInMap("ArmStoreObject")));
+            autoMap
+                .getCommandInMap("CubeGrab")
+                .andThen(Commands.waitSeconds(0.5))
+                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
 
     scoreController
         .button(1)
