@@ -57,7 +57,7 @@ public class VirtualFourBar extends SubsystemBase {
   /** Configure arm motor. */
   private void configArmMotor() {
     armMotor.configFactoryDefault();
-    armMotor.configAllSettings(Robot.armConfig.config);
+    armMotor.configAllSettings(ArmConstants.ArmConfig.motorConfig);
   }
 
   /**

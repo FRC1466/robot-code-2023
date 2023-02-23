@@ -26,7 +26,6 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     instance = this;
-    armConfig = new ArmConfig();
   }
 
   public static Robot getInstance() {

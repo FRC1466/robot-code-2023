@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -109,15 +111,25 @@ public final class Constants {
     public static final boolean encoderInverted = true;
 
     public static final class ArmConfig {
-      public TalonFXConfiguration config;
-
-      public ArmConfig() {
-        config = new TalonFXConfiguration();
-        config.nominalOutputForward = 0;
-        config.nominalOutputReverse = 0;
-        config.peakOutputForward = ArmConstants.armPosition.peakOutput;
-        config.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
-        config.initializationStrategy = SensorInitializationStrategy.BootToZero;
+      public static final SupplyCurrentLimitConfiguration supplyCurrent;
+      public static final StatorCurrentLimitConfiguration statorCurrent;
+      public static final TalonFXConfiguration motorConfig;
+      static {
+        supplyCurrent = new SupplyCurrentLimitConfiguration();
+        supplyCurrent.enable = true;
+        supplyCurrent.currentLimit = 40;
+        statorCurrent = new StatorCurrentLimitConfiguration();
+        statorCurrent.enable = true;
+        statorCurrent.currentLimit = 40;
+  
+        motorConfig = new TalonFXConfiguration();
+        motorConfig.nominalOutputForward = 0;
+        motorConfig.nominalOutputReverse = 0;
+        motorConfig.peakOutputForward = ArmConstants.armPosition.peakOutput;
+        motorConfig.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
+        motorConfig.supplyCurrLimit = supplyCurrent;
+        motorConfig.statorCurrLimit = statorCurrent;
+        motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
       }
     }
   }
