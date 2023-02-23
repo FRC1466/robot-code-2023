@@ -114,6 +114,7 @@ public final class Constants {
       public static final SupplyCurrentLimitConfiguration supplyCurrent;
       public static final StatorCurrentLimitConfiguration statorCurrent;
       public static final TalonFXConfiguration motorConfig;
+
       static {
         supplyCurrent = new SupplyCurrentLimitConfiguration();
         supplyCurrent.enable = true;
@@ -121,7 +122,7 @@ public final class Constants {
         statorCurrent = new StatorCurrentLimitConfiguration();
         statorCurrent.enable = true;
         statorCurrent.currentLimit = 40;
-  
+
         motorConfig = new TalonFXConfiguration();
         motorConfig.nominalOutputForward = 0;
         motorConfig.nominalOutputReverse = 0;

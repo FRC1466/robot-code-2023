@@ -248,7 +248,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   public double convertToNativeSensorUnits(double setpoint) {
     setpoint =
-        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getPosition(), setpoint);
+        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getRawPosition(), setpoint);
     return setpoint / positionConversionFactor;
   }
 
@@ -285,13 +285,22 @@ public class TalonFXSwerve extends SwerveMotor {
   }
 
   /**
+   * Get the raw position.
+   *
+   * @return Position in meters or degrees.
+   */
+  public double getRawPosition() {
+    return motor.getSelectedSensorPosition() * positionConversionFactor;
+  }
+
+  /**
    * Get the position of the integrated encoder.
    *
    * @return Position in Meters or Degrees.
    */
   @Override
   public double getPosition() {
-    return motor.getSelectedSensorPosition() * positionConversionFactor;
+    return isDriveMotor ? getRawPosition() : getRawPosition() % 360;
   }
 
   /**
