@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Auton;
@@ -99,11 +97,7 @@ public class RobotContainer {
                 PathPlanner.loadPathGroup(
                     "1 Score + Dock T2",
                     new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
-            .andThen(
-                Commands.run(
-                        () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
-                        drivebase)
-                    .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0)));
+            .andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
   }
@@ -130,6 +124,13 @@ public class RobotContainer {
   // 3) Slower drive
   // 4) auto balance (could be helpful idk, not the most necessary)
 
+  private Command autoBalance() {
+    return Commands.run(
+            () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false), drivebase)
+        .until(
+            () -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < Auton.balanceLimitDeg);
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
@@ -138,18 +139,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     drivebase.setDefaultCommand(closedFieldRel);
-    arm.setDefaultCommand(Commands.run(() -> arm.ambientArm(), arm));
-    // m_led.setDefaultCommand(Commands.run(() -> m_led.setColor(), m_led));
-    gripper.setDefaultCommand(Commands.run(() -> gripper.ambientGripper(), gripper));
+    arm.setDefaultCommand(Commands.run(arm::ambientArm, arm));
+    // m_led.setDefaultCommand(Commands.run(m_led::setColor, m_led));
+    gripper.setDefaultCommand(Commands.run(gripper::ambientGripper, gripper));
 
-    driverController.povDown().onTrue(new InstantCommand(drivebase::zeroGyro));
-    driverController
-        .povUp()
-        .whileTrue(
-            Commands.run(
-                    () -> drivebase.drive(drivebase.getBalanceTranslation(), 0, false, false),
-                    drivebase)
-                .until(() -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < 2.0));
+    driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverController.povUp().whileTrue(autoBalance());
 
     driverController
         .button(2)
@@ -173,113 +168,76 @@ public class RobotContainer {
 
     driverController
         .trigger()
-        .onTrue(
-            autoMap
-                .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmMidScore")))
-        .onFalse(
-            autoMap
-                .getCommandInMap("OpenGrab")
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(autoMap.getCommandInMap("EnsureNeutralGrab"))
-                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+        .onTrue(autoMap.getCommandInMap(AutoMap.ScoreArmMid))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     driverController
         .button(3)
-        .onTrue(
-            autoMap
-                .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmGround"))
-                .andThen(autoMap.getCommandInMap("OpenGrab")))
-        .onFalse(
-            autoMap
-                .getCommandInMap("ConeGrab")
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+        .onTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
+        .onFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
 
     driverController
         .button(4)
-        .onTrue(
-            autoMap
-                .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmGround"))
-                .andThen(autoMap.getCommandInMap("OpenGrab")))
-        .onFalse(
-            autoMap
-                .getCommandInMap("CubeGrab")
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+        .onTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
+        .onFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     driverController
         .button(5)
-        .onTrue(
-            autoMap
-                .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmLoadingStation"))
-                .andThen(autoMap.getCommandInMap("OpenGrab")))
-        .onFalse(
-            autoMap
-                .getCommandInMap("ConeGrab")
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+        .onTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
+        .onFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
 
     driverController
         .button(6)
-        .onTrue(
-            autoMap
-                .getCommandInMap("EnsureNeutralGrab")
-                .andThen(autoMap.getCommandInMap("ArmLoadingStation"))
-                .andThen(autoMap.getCommandInMap("OpenGrab")))
-        .onFalse(
-            autoMap
-                .getCommandInMap("CubeGrab")
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(autoMap.getCommandInMap("ArmStoreObject")));
+        .onTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
+        .onFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     scoreController
         .button(1)
         .whileTrue(
-            new ProxyCommand(
-                    () ->
-                        new GoToScoring(drivebase, POSITION.RIGHT).getCommand(drivebase.getPose()))
-                .andThen(Commands.waitSeconds(1))
-                .repeatedly()
-                .alongWith(
-                    autoMap
-                        .getCommandInMap("EnsureNeutralGrab")
-                        .andThen(
-                            autoMap
-                                .getCommandInMap("ArmGround")
-                                .andThen(autoMap.getCommandInMap("OpenGrab")))));
+            new GoToScoring(drivebase, POSITION.RIGHT)
+                .getCommand()
+                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+
     scoreController
         .button(2)
         .whileTrue(
-            new ProxyCommand(
-                    () ->
-                        new GoToScoring(drivebase, POSITION.MIDDLE).getCommand(drivebase.getPose()))
-                .andThen(Commands.waitSeconds(1))
-                .repeatedly()
-                .alongWith(
-                    autoMap
-                        .getCommandInMap("EnsureNeutralGrab")
-                        .andThen(
-                            autoMap
-                                .getCommandInMap("ArmGround")
-                                .andThen(autoMap.getCommandInMap("OpenGrab")))));
+            new GoToScoring(drivebase, POSITION.MIDDLE)
+                .getCommand()
+                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+
     scoreController
         .button(3)
         .whileTrue(
-            new ProxyCommand(
-                    () -> new GoToScoring(drivebase, POSITION.LEFT).getCommand(drivebase.getPose()))
-                .andThen(Commands.waitSeconds(1))
-                .repeatedly()
-                .alongWith(
-                    autoMap
-                        .getCommandInMap("EnsureNeutralGrab")
-                        .andThen(
-                            autoMap
-                                .getCommandInMap("ArmGround")
-                                .andThen(autoMap.getCommandInMap("OpenGrab")))));
+            new GoToScoring(drivebase, POSITION.LEFT)
+                .getCommand()
+                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+
+    scoreController
+        .button(4)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT)
+                .getCommand()
+                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+
+    scoreController
+        .button(5)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE)
+                .getCommand()
+                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+
+    scoreController
+        .button(6)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT)
+                .getCommand()
+                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     // new Trigger(drivebase::isMoving)
     //     .whileTrue(

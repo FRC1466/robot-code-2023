@@ -52,7 +52,7 @@ public final class Constants {
 
     public static final double maxSpeedMPS = 3;
     public static final double maxAccelerationMPS = 2;
-    public static final double balanceScale = 0.8, balanceScalePow = 1.0;
+    public static final double balanceScale = 0.8, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(

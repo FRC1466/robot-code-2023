@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.Constants.Auton;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.util.List;
@@ -81,5 +82,11 @@ public class GoToScoring {
       command = Commands.none();
     }
     return command;
+  }
+
+  public Command getCommand() {
+    return new ProxyCommand(() -> getCommand(drive.getPose()))
+        .andThen(Commands.waitSeconds(1))
+        .repeatedly();
   }
 }

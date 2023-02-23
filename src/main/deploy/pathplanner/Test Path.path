@@ -17,9 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "CubeGrab",
-          "ArmGround",
-          "CubeOpen"
+          "ScoreArmLow",
+          "DropObjectAndStore"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
