@@ -381,23 +381,9 @@ public class SwerveDrive {
    * Forcing the robot to keep the current pose.
    */
   public void lockPose() {
-    // Sets states
     for (SwerveModule swerveModule : swerveModules) {
-      SwerveModuleState2 moduleState = swerveModule.getState();
-      var desiredState =
-          new SwerveModuleState2(0, swerveModule.configuration.moduleLocation.getAngle(), 0);
-      SwerveDriveTelemetry.desiredStates[swerveModule.moduleNumber * 2] =
-          moduleState.angle.getDegrees();
-      SwerveDriveTelemetry.desiredStates[(swerveModule.moduleNumber * 2) + 1] =
-          moduleState.speedMetersPerSecond;
-
-      swerveModule.setDesiredState(desiredState, false);
-      SmartDashboard.putNumber(
-          "Module " + swerveModule.moduleNumber + " Speed Setpoint: ",
-          desiredState.speedMetersPerSecond);
-      SmartDashboard.putNumber(
-          "Module " + swerveModule.moduleNumber + " Angle Setpoint: ",
-          desiredState.angle.getDegrees());
+      swerveModule.setDesiredState(
+          new SwerveModuleState2(0, swerveModule.configuration.moduleLocation.getAngle(), 0), true);
     }
   }
 

@@ -102,7 +102,7 @@ public final class Constants {
     public static final Gains armPosition = new Gains(0.72, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.312153;
-    public static final double maxRadians = 4.30;
+    public static final double maxRadians = 4.24;
     public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
@@ -145,7 +145,7 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final int PWMPort = 9;
+    public static final int PWMPort = 9, length = 10;
   }
 
   public static final class PDHConstants {

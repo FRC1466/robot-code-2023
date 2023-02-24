@@ -18,11 +18,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.AutoMap;
-import frc.robot.commands.swervedrive.auto.GoToScoring;
-import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
-import frc.robot.commands.swervedrive.auto.PathBuilder;
-import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
+import frc.robot.commands.swervedrive2.auto.AutoMap;
+import frc.robot.commands.swervedrive2.auto.GoToScoring;
+import frc.robot.commands.swervedrive2.auto.GoToScoring.POSITION;
+import frc.robot.commands.swervedrive2.auto.PathBuilder;
+import frc.robot.commands.swervedrive2.drivebase.TeleopDrive;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.Gripper;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
@@ -69,7 +69,6 @@ public class RobotContainer {
                   ? -driverController.getZ()
                   : 0,
           () -> true, // driverController.button(3).negate(),
-          false,
           false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -167,14 +166,10 @@ public class RobotContainer {
                         ? -driverController.getZ() * OIConstants.InputLimits.reduced
                         : 0,
                 () -> true, // driverController.button(3).negate(),
-                false,
                 false));
 
     new Trigger(DriverStation::isTeleopEnabled)
-        .onTrue(
-            autoMap
-                .getCommandInMap(AutoMap.GrabEnsureNeutral)
-                .andThen(autoMap.getCommandInMap(AutoMap.ArmToStore)));
+        .onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     driverController
         .button(2)
