@@ -150,7 +150,7 @@ public class RobotContainer {
     driverController.povUp().whileTrue(autoBalance());
 
     driverController
-        .trigger()
+        .button(7)
         .whileTrue(
             new TeleopDrive(
                 drivebase,
@@ -169,32 +169,32 @@ public class RobotContainer {
                 () -> true, // driverController.button(3).negate(),
                 false));
 
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    // new Trigger(DriverStation::isTeleopEnabled).onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     driverController
         .button(2)
-        .onTrue(autoMap.getCommandInMap(AutoMap.ScoreArmMid))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.ScoreArmMid))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     driverController
         .button(3)
-        .onTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
-        .onFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
 
     driverController
         .button(4)
-        .onTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
-        .onFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     driverController
         .button(5)
-        .onTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
-        .onFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
 
     driverController
         .button(6)
-        .onTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
-        .onFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     scoreController
         .button(1)

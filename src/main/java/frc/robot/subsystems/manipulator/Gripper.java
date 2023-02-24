@@ -56,6 +56,7 @@ public class Gripper extends SubsystemBase {
 
   public void setGripper(INTAKE intake) {
     currentIntake = intake;
+    SmartDashboard.putString("gripper", intake.toString());
     switch (intake) {
       case OPEN:
         currentGripper = GripperConstants.positionOpen;

@@ -99,10 +99,10 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.72, 0, 0, 0, 0, 0.9);
+    public static final Gains armPosition = new Gains(0.77, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.312153;
-    public static final double maxRadians = 4.24;
+    public static final double maxRadians = 4.44;
     public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
@@ -136,10 +136,10 @@ public final class Constants {
   }
 
   public static final class GripperConstants {
-    public static final Gains gripperPosition = new Gains(0.22, 0, 0, 0, 0, 0.5);
+    public static final Gains gripperPosition = new Gains(0.28, 0, 0, 0, 0, 0.5);
     public static final double positionOpen = 0.20,
-        positionCube = -11.38,
-        positionCone = -21.2,
+        positionCube = -12.38,
+        positionCone = -32.0,
         positionStore = -16.0;
     public static final int gripperID = 34;
   }

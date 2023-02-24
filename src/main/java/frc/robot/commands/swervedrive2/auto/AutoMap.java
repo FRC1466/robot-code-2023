@@ -39,7 +39,9 @@ public class AutoMap {
                 .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToLoadingStation",
-        () -> Commands.run(() -> arm.setArm(ARM.STATION), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+        Commands.runOnce(() -> arm.setArm(ARM.STATION))
+            .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToStore",
         () ->
