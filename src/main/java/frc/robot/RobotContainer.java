@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -169,7 +168,8 @@ public class RobotContainer {
                 () -> true, // driverController.button(3).negate(),
                 false));
 
-    new Trigger(DriverStation::isTeleopEnabled).onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    new Trigger(DriverStation::isTeleopEnabled)
+        .onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     driverController
         .button(2)
