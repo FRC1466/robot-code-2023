@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -104,19 +103,19 @@ public class SwerveDrive {
     SwerveDriveTelemetry.maxAngularVelocity = swerveController.config.maxAngularVelocity;
     SwerveDriveTelemetry.moduleCount = swerveModules.length;
     SwerveDriveTelemetry.sizeFrontBack =
-        Units.metersToInches(
-            SwerveMath.getSwerveModule(swerveModules, true, false).moduleLocation.getX()
-                + SwerveMath.getSwerveModule(swerveModules, false, false).moduleLocation.getX());
+        (SwerveMath.getSwerveModule(swerveModules, true, false).moduleLocation.getX()
+                + SwerveMath.getSwerveModule(swerveModules, false, false).moduleLocation.getX())
+            / 2;
     SwerveDriveTelemetry.sizeLeftRight =
-        Units.metersToInches(
-            SwerveMath.getSwerveModule(swerveModules, false, true).moduleLocation.getY()
-                + SwerveMath.getSwerveModule(swerveModules, false, false).moduleLocation.getY());
+        (SwerveMath.getSwerveModule(swerveModules, false, true).moduleLocation.getY()
+                + SwerveMath.getSwerveModule(swerveModules, false, false).moduleLocation.getY())
+            / 2;
     SwerveDriveTelemetry.wheelLocations = new double[SwerveDriveTelemetry.moduleCount * 2];
     for (SwerveModule module : swerveModules) {
       SwerveDriveTelemetry.wheelLocations[module.moduleNumber * 2] =
-          Units.metersToInches(module.configuration.moduleLocation.getX());
+          module.configuration.moduleLocation.getX() / 2;
       SwerveDriveTelemetry.wheelLocations[(module.moduleNumber * 2) + 1] =
-          Units.metersToInches(module.configuration.moduleLocation.getY());
+          module.configuration.moduleLocation.getY() / 2;
     }
     SwerveDriveTelemetry.measuredStates = new double[SwerveDriveTelemetry.moduleCount * 2];
     SwerveDriveTelemetry.desiredStates = new double[SwerveDriveTelemetry.moduleCount * 2];
@@ -196,11 +195,6 @@ public class SwerveDrive {
    * @param chassisSpeeds Chassis speeds to set.
    */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
-    SwerveDriveTelemetry.desiredChassisSpeeds[1] = chassisSpeeds.vyMetersPerSecond;
-    SwerveDriveTelemetry.desiredChassisSpeeds[0] = chassisSpeeds.vxMetersPerSecond;
-    SwerveDriveTelemetry.desiredChassisSpeeds[2] =
-        Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond);
-
     setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
   }
 
