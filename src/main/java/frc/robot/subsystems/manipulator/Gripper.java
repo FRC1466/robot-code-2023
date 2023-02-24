@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GripperConstants;
 
 public class Gripper extends SubsystemBase {
-  private CANSparkMax gripperMotor;
-  private SparkMaxPIDController pidController;
-  private RelativeEncoder encoder;
+  private final CANSparkMax gripperMotor;
+  private final SparkMaxPIDController pidController;
+  private final RelativeEncoder encoder;
 
   public enum INTAKE {
     OPEN,
@@ -21,7 +21,6 @@ public class Gripper extends SubsystemBase {
   }
 
   private double currentGripper = GripperConstants.positionStore;
-
   private INTAKE currentIntake;
 
   /** Create a new Gripper subsystem. */

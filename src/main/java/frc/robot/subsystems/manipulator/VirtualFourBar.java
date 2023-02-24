@@ -41,7 +41,7 @@ public class VirtualFourBar extends SubsystemBase {
     armPID.setAvoidanceRange(
         Rotation2d.fromRadians(ArmConstants.maxRadians),
         Rotation2d.fromRadians(ArmConstants.minRadians));
-    armPID.setTolerance(0.1);
+    armPID.setTolerance(0.2);
 
     if (Robot.isSimulation()) {
       sim = new VirtualFourBarSimulation(absoluteArmEncoder);

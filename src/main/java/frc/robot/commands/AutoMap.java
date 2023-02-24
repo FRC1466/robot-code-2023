@@ -1,4 +1,4 @@
-package frc.robot.commands.swervedrive2.auto;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,24 +35,31 @@ public class AutoMap {
     eventMapGetter.put(
         "ArmToGround",
         () ->
-            Commands.runOnce(() -> arm.setArm(ARM.GROUND))
-                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
+            Commands.runOnce(() -> arm.setArm(ARM.GROUND), arm)
+                .andThen(Commands.waitUntil(arm::isAtSetpoint)));
     eventMapGetter.put(
         "ArmToLoadingStation",
-        () -> Commands.run(() -> arm.setArm(ARM.STATION), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.runOnce(() -> arm.setArm(ARM.STATION), arm)
+                .andThen(Commands.waitUntil(arm::isAtSetpoint)));
     eventMapGetter.put(
         "ArmToStore",
         () ->
-            Commands.runOnce(() -> arm.setArm(ARM.STORAGE))
-                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
+            Commands.runOnce(() -> arm.setArm(ARM.STORAGE), arm)
+                .andThen(Commands.waitUntil(arm::isAtSetpoint)));
     eventMapGetter.put(
         "ArmToMid",
-        () -> Commands.run(() -> arm.setArm(ARM.MID), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.run(() -> arm.setArm(ARM.MID), arm)
+                .andThen(Commands.waitUntil(arm::isAtSetpoint)));
     eventMapGetter.put(
         "ArmToVertical",
-        () -> Commands.run(() -> arm.setArm(ARM.VERTICAL), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.run(() -> arm.setArm(ARM.VERTICAL), arm)
+                .andThen(Commands.waitUntil(arm::isAtSetpoint)));
 
-    eventMapGetter.put("GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONE)));
+    eventMapGetter.put(
+        "GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONE), gripper));
     eventMapGetter.put(
         "GrabEnsureNeutral",
         () ->
@@ -61,9 +68,12 @@ public class AutoMap {
                   if (gripper.getCurrentIntake() == INTAKE.OPEN) {
                     gripper.setGripper(INTAKE.STORE);
                   }
-                }));
-    eventMapGetter.put("GrabCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBE)));
-    eventMapGetter.put("GrabOpen", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.OPEN)));
+                },
+                gripper));
+    eventMapGetter.put(
+        "GrabCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBE), gripper));
+    eventMapGetter.put(
+        "GrabOpen", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.OPEN), gripper));
 
     /* Compositions */
     eventMapGetter.put(
