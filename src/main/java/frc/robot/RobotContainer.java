@@ -200,7 +200,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.RIGHT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(2)
@@ -208,7 +208,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.MIDDLE)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(3)
@@ -216,7 +216,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(4)
@@ -232,7 +232,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.MIDDLE)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(6)
@@ -240,7 +240,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     // new Trigger(drivebase::isMoving)
     //     .whileTrue(
