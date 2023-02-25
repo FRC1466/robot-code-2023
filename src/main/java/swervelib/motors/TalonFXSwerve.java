@@ -34,6 +34,8 @@ public class TalonFXSwerve extends SwerveMotor {
   /** Feedforward scalar value for the angle motor. */
   private double fscalar = 1;
 
+  private double nominalVoltage = 12;
+
   /**
    * Constructor for TalonFX swerve motor.
    *
@@ -270,7 +272,7 @@ public class TalonFXSwerve extends SwerveMotor {
         isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
         convertToNativeSensorUnits(setpoint),
         DemandType.ArbitraryFeedForward,
-        isDriveMotor ? feedforward : feedforward * fscalar);
+        feedforward / nominalVoltage);
     // Credit to Team 3181 for the -0.3, I'm not sure why it works, but it does.
   }
 
@@ -314,6 +316,7 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void setVoltageCompensation(double nominalVoltage) {
     configuration.voltageCompSaturation = nominalVoltage;
+    this.nominalVoltage = nominalVoltage;
     configChanged = true;
   }
 
