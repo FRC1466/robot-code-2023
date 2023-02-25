@@ -40,8 +40,8 @@ public class AutoMap {
     eventMapGetter.put(
         "ArmToLoadingStation",
         () ->
-        Commands.runOnce(() -> arm.setArm(ARM.STATION))
-            .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
+            Commands.runOnce(() -> arm.setArm(ARM.STATION))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToStore",
         () ->

@@ -6,8 +6,6 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
-
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,13 +14,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.swervedrive.AutoMap;
 import frc.robot.commands.swervedrive.auto.GoToScoring;
-import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
+import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.Gripper;
@@ -169,7 +166,8 @@ public class RobotContainer {
                 () -> true, // driverController.button(3).negate(),
                 false));
 
-    // new Trigger(DriverStation::isTeleopEnabled).onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    // new
+    // Trigger(DriverStation::isTeleopEnabled).onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
 
     driverController
         .button(2)

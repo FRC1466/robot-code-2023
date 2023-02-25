@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
+import swervelib.math.Matter;
 import swervelib.parser.PIDFConfig;
 import webblib.util.Gains;
 import webblib.util.HolonomicPose2d;
@@ -35,7 +36,9 @@ public final class Constants {
 
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final double CHASSIS_MASS = ROBOT_MASS;
-  public static final Translation3d CHASSIS_CG = new Translation3d(0, 0, Units.inchesToMeters(8));
+  public static final Matter CHASSIS =
+      new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  ;
   public static final double LOOP_TIME = 0.02; // s, 20ms + 110ms sprk max velocity lag
   public static final double STOP_SECONDS = 3.0;
 

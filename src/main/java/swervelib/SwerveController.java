@@ -77,8 +77,7 @@ public class SwerveController {
   }
 
   /**
-   * Get the chassis speeds based on controller input of 1 joystick and an angle. Cubes the x and y
-   * input for smoother motion.
+   * Get the chassis speeds based on controller input of 1 joystick [-1,1] and an angle.
    *
    * @param xInput X joystick input for the robot to move in the X direction.
    * @param yInput Y joystick input for the robot to move in the Y direction.
@@ -90,8 +89,8 @@ public class SwerveController {
       double xInput, double yInput, double angle, double currentHeadingAngleRadians) {
     // Convert joystick inputs to m/s by scaling by max linear speed.  Also uses a cubic function
     // to allow for precise control and fast movement.
-    double x = Math.pow(xInput, 3) * config.maxSpeed;
-    double y = Math.pow(yInput, 3) * config.maxSpeed;
+    double x = xInput * config.maxSpeed;
+    double y = yInput * config.maxSpeed;
 
     return getRawTargetSpeeds(x, y, angle, currentHeadingAngleRadians);
   }
@@ -174,5 +173,18 @@ public class SwerveController {
         ySpeed,
         thetaController.calculate(currentHeadingAngleRadians, targetHeadingAngleRadians)
             * config.maxAngularVelocity);
+  }
+
+  /**
+   * Calculate the angular velocity given the current and target heading angle in radians.
+   *
+   * @param currentHeadingAngleRadians The current heading of the robot in radians.
+   * @param targetHeadingAngleRadians The target heading of the robot in radians.
+   * @return Angular velocity in radians per second.
+   */
+  public double headingCalculate(
+      double currentHeadingAngleRadians, double targetHeadingAngleRadians) {
+    return thetaController.calculate(currentHeadingAngleRadians, targetHeadingAngleRadians)
+        * config.maxAngularVelocity;
   }
 }

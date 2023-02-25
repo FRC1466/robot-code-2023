@@ -13,13 +13,17 @@ public class NavXSwerve extends SwerveIMU {
   /** Offset for the NavX yaw reading. */
   private double yawOffset = 0;
 
-  /** Constructor for the NavX swerve. */
-  public NavXSwerve() {
+  /**
+   * Constructor for the NavX swerve.
+   *
+   * @param port Serial Port to connect to.
+   */
+  public NavXSwerve(SerialPort.Port port) {
     try {
       /* Communicate w/navX-MXP via the MXP SPI Bus.                                     */
       /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
       /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
-      gyro = new AHRS(SerialPort.Port.kMXP);
+      gyro = new AHRS(port);
       SmartDashboard.putData(gyro);
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
@@ -30,7 +34,7 @@ public class NavXSwerve extends SwerveIMU {
   @Override
   public void factoryDefault() {
     // gyro.reset(); // Reported to be slow
-    yawOffset = gyro.getYaw() % 360;
+    yawOffset = Math.IEEEremainder(gyro.getYaw(), 360);
   }
 
   /** Clear sticky faults on IMU. */
@@ -45,7 +49,7 @@ public class NavXSwerve extends SwerveIMU {
   @Override
   public void setYaw(double yaw) {
     // gyro.reset(); // Reported to be slow using the offset.
-    yawOffset = (yaw % 360) + (gyro.getYaw() % 360);
+    yawOffset = Math.IEEEremainder(yaw, 360) + Math.IEEEremainder(gyro.getYaw(), 360);
   }
 
   /**
@@ -55,9 +59,10 @@ public class NavXSwerve extends SwerveIMU {
    */
   @Override
   public void getYawPitchRoll(double[] yprArray) {
-    yprArray[0] = (gyro.getYaw() % 360) - yawOffset;
-    yprArray[1] = gyro.getPitch() % 360;
-    yprArray[2] = gyro.getRoll() % 360;
+
+    yprArray[0] = (Math.IEEEremainder(gyro.getYaw(), 360)) - yawOffset;
+    yprArray[1] = Math.IEEEremainder(gyro.getPitch(), 360);
+    yprArray[2] = Math.IEEEremainder(gyro.getRoll(), 360);
   }
 
   /**
