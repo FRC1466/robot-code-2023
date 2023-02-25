@@ -10,12 +10,12 @@
     "canbus": null
   },
   "encoder": {
-    "type": "cancoder",
+    "type": "none",
     "id": 9,
     "canbus": null
   },
   "inverted": {
-    "drive": false,
+    "drive": true,
     "angle": false
   },
   "absoluteEncoderOffset": -0.088,

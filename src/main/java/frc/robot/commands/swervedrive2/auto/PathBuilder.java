@@ -20,7 +20,7 @@ public class PathBuilder {
             drivebase::resetOdometry,
             // Position controllers
             new PIDConstants(Auton.xAutoPID.p, Auton.xAutoPID.i, Auton.xAutoPID.d),
-            new PIDConstants(Auton.xAutoPID.p, Auton.xAutoPID.i, Auton.xAutoPID.d),
+            new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d),
             drivebase::setChassisSpeeds,
             eventMap,
             true,

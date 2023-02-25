@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,7 +26,6 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     instance = this;
-    armConfig = new ArmConfig();
   }
 
   public static Robot getInstance() {
@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }
     robotContainer = new RobotContainer();
+    PathPlannerServer.startServer(5811);
   }
 
   /**

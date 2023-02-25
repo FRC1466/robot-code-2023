@@ -17,10 +17,10 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ArmGround",
-          "OpenGrab"
+          "ScoreArmLow",
+          "DropObjectAndStore"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "after",
         "waitTime": 0.02
       }
@@ -45,7 +45,8 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "CubeGrab"
+          "PickupGroundReady",
+          "PickupCubeAndStore"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "before",
@@ -69,9 +70,10 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "OpenGrab"
+          "ScoreArmLow",
+          "DropObjectAndStore"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -81,25 +83,25 @@
     {
       "position": 0.047017045454545645,
       "names": [
-        "ArmStraightUp"
+        "ArmToVertical"
       ]
     },
     {
       "position": 1.8068892045454545,
       "names": [
-        "ArmGround"
+        "ScoreArmLow"
       ]
     },
     {
       "position": 1.2919744318181796,
       "names": [
-        "ArmStraightUp"
+        "ArmToVertical"
       ]
     },
     {
       "position": 0.3578835227272727,
       "names": [
-        "ArmGround"
+        "PickupGroundReady"
       ]
     }
   ]

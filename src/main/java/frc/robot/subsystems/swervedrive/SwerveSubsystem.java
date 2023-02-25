@@ -142,7 +142,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return translation of the robot.
    */
   public Translation2d getBalanceTranslation() {
-    return swerveBalance.update(swerveDrive.getPitch(), swerveDrive.getRoll());
+    return swerveBalance.update(swerveDrive.getPitch(), swerveDrive.getRoll()).unaryMinus();
   }
 
   /**

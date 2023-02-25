@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -35,24 +37,24 @@ public final class Constants {
   public static final double CHASSIS_MASS = ROBOT_MASS;
   public static final Translation3d CHASSIS_CG = new Translation3d(0, 0, Units.inchesToMeters(8));
   public static final double LOOP_TIME = 0.02; // s, 20ms + 110ms sprk max velocity lag
-  public static final double STOP_SECONDS = 5.0;
+  public static final double STOP_SECONDS = 3.0;
 
   public static final class OIConstants {
     public static final int driverID = 4, intakeID = 5;
 
     public static final class InputLimits {
-      public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.3;
+      public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.5;
     }
   }
 
   public static final class Auton {
-    public static final PIDFConfig xAutoPID = new PIDFConfig(0.7, 0, 0);
-    public static final PIDFConfig yAutoPID = new PIDFConfig(0.7, 0, 0);
-    public static final PIDFConfig angleAutoPID = new PIDFConfig(0.4, 0, 0.01);
+    public static final PIDFConfig xAutoPID = new PIDFConfig(4.0, 0, 0);
+    public static final PIDFConfig yAutoPID = new PIDFConfig(4.0, 0, 0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(2.2, 0, 0.0);
 
     public static final double maxSpeedMPS = 3;
     public static final double maxAccelerationMPS = 2;
-    public static final double balanceScale = 1.0, balanceScalePow = 1.0;
+    public static final double balanceScale = 0.8, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -97,36 +99,47 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.3, 0, 0, 0, 0, 0.6);
+    public static final Gains armPosition = new Gains(0.77, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.312153;
-    public static final double maxRadians = 4.34;
-    public static final double minRadians = -0.62;
+    public static final double maxRadians = 4.44;
+    public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
-    public static final double armOffset = minRadians + (minRadians + maxRadians) / 2;
-    public static final double gravityFF = 0.0;
+    public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
+    public static final double gravityFF = 0.05;
     public static final boolean encoderInverted = true;
 
     public static final class ArmConfig {
-      public TalonFXConfiguration config;
+      public static final SupplyCurrentLimitConfiguration supplyCurrent;
+      public static final StatorCurrentLimitConfiguration statorCurrent;
+      public static final TalonFXConfiguration motorConfig;
 
-      public ArmConfig() {
-        config = new TalonFXConfiguration();
-        config.nominalOutputForward = 0;
-        config.nominalOutputReverse = 0;
-        config.peakOutputForward = ArmConstants.armPosition.peakOutput;
-        config.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
-        config.initializationStrategy = SensorInitializationStrategy.BootToZero;
+      static {
+        supplyCurrent = new SupplyCurrentLimitConfiguration();
+        supplyCurrent.enable = true;
+        supplyCurrent.currentLimit = 40;
+        statorCurrent = new StatorCurrentLimitConfiguration();
+        statorCurrent.enable = true;
+        statorCurrent.currentLimit = 40;
+
+        motorConfig = new TalonFXConfiguration();
+        motorConfig.nominalOutputForward = 0;
+        motorConfig.nominalOutputReverse = 0;
+        motorConfig.peakOutputForward = ArmConstants.armPosition.peakOutput;
+        motorConfig.peakOutputReverse = -ArmConstants.armPosition.peakOutput;
+        motorConfig.supplyCurrLimit = supplyCurrent;
+        motorConfig.statorCurrLimit = statorCurrent;
+        motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
       }
     }
   }
 
   public static final class GripperConstants {
-    public static final Gains gripperPosition = new Gains(0.14, 0, 0, 0, 0, 0.5);
+    public static final Gains gripperPosition = new Gains(0.28, 0, 0, 0, 0, 0.5);
     public static final double positionOpen = 0.20,
-        positionCube = -11.38,
-        positionCone = -20.7,
+        positionCube = -12.38,
+        positionCone = -32.0,
         positionStore = -16.0;
     public static final int gripperID = 34;
   }

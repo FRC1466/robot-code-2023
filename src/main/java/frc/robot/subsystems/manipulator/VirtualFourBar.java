@@ -16,13 +16,15 @@ public class VirtualFourBar extends SubsystemBase {
   private ArmPIDController armPID;
   private VirtualFourBarSimulation sim;
 
-  public enum HEIGHT {
+  public enum ARM {
     GROUND,
-    STRAIGHT_UP,
+    VERTICAL,
     STORAGE,
     STATION,
     MID
   }
+
+  private Rotation2d currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
 
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
@@ -30,6 +32,7 @@ public class VirtualFourBar extends SubsystemBase {
     configArmMotor();
 
     absoluteArmEncoder = new DutyCycleEncoder(ArmConstants.dutyCyclePort);
+    absoluteArmEncoder.setDutyCycleRange(0, 1);
     absoluteArmEncoder.setDistancePerRotation(1.0);
 
     armPID =
@@ -38,7 +41,7 @@ public class VirtualFourBar extends SubsystemBase {
     armPID.setAvoidanceRange(
         Rotation2d.fromRadians(ArmConstants.maxRadians),
         Rotation2d.fromRadians(ArmConstants.minRadians));
-    armPID.setTolerance(0.1);
+    armPID.setTolerance(0.15);
 
     if (Robot.isSimulation()) {
       sim = new VirtualFourBarSimulation(absoluteArmEncoder);
@@ -54,7 +57,7 @@ public class VirtualFourBar extends SubsystemBase {
   /** Configure arm motor. */
   private void configArmMotor() {
     armMotor.configFactoryDefault();
-    armMotor.configAllSettings(Robot.armConfig.config);
+    armMotor.configAllSettings(ArmConstants.ArmConfig.motorConfig);
   }
 
   /**
@@ -100,29 +103,33 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("armPID error", armPID.getPositionError());
     SmartDashboard.putNumber("armPID output", motorOutput);
     SmartDashboard.putNumber("arm feedforward", feedforward);
-    // armMotor.set(sanitizeMotorOutput(motorOutput + feedforward));
+    armMotor.set(motorOutput + feedforward);
   }
 
-  public void setArm(HEIGHT height) {
+  public void setArm(ARM height) {
     switch (height) {
       case GROUND:
-        setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
+        currentArm = Rotation2d.fromRadians(ArmConstants.maxRadians);
         break;
       case STATION:
-        setArm(Rotation2d.fromDegrees(135));
+        currentArm = Rotation2d.fromDegrees(165);
         break;
       case MID:
-        setArm(Rotation2d.fromDegrees(135));
+        currentArm = Rotation2d.fromDegrees(165);
         break;
       case STORAGE:
-        setArm(Rotation2d.fromRadians(ArmConstants.minRadians));
+        currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
         break;
-      case STRAIGHT_UP:
-        setArm(Rotation2d.fromDegrees(90));
+      case VERTICAL:
+        currentArm = Rotation2d.fromDegrees(90);
         break;
       default:
         throw new IllegalArgumentException("Height enum not supported.");
     }
+  }
+
+  public void ambientArm() {
+    setArm(currentArm);
   }
 
   /**
@@ -167,6 +174,8 @@ public class VirtualFourBar extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Raw Absolute Arm", absoluteArmEncoder.getAbsolutePosition());
+    // System.out.println("Output: " + armPID.calculate(Rotation2d.fromDegrees(180),
+    // Rotation2d.fromDegrees(0)));
     SmartDashboard.putNumber("Proccessed Absolute Arm", getPosition().getRadians());
   }
 }

@@ -7,6 +7,7 @@ import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants.Auton;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -61,10 +62,21 @@ public class GoToPose {
             );
   }
 
+  private PathConstraints calculateRotationalConstraints(
+      Transform2d transform, PathConstraints constraints) {
+    var maxRadPerSecond = 2.0;
+
+    var desiredTime = 1 / maxRadPerSecond * transform.getRotation().getRadians();
+    var updatedConstraints = 1 / (desiredTime / transform.getTranslation().getNorm());
+
+    return new PathConstraints(Math.abs(updatedConstraints), constraints.maxAcceleration);
+  }
+
   public GoToPose(Pose2d pose, PathConstraints constraints, SwerveSubsystem drive) {
     Translation2d translation = pose.getTranslation();
     Rotation2d holonomic = pose.getRotation();
     var heading = translation.minus(drive.getPose().getTranslation()).getAngle();
+    var diffPose = pose.minus(drive.getPose());
 
     PathPoint currentPathPoint;
     if (Math.hypot(
@@ -85,6 +97,10 @@ public class GoToPose {
           }
         };
 
+    if (Math.abs(diffPose.getTranslation().getNorm()) < 0.05
+        && Math.abs(diffPose.getRotation().getRadians()) > 0.5) {
+      constraints = calculateRotationalConstraints(diffPose, constraints);
+    }
     traj = PathPlanner.generatePath(constraints, path);
 
     ppSwerveCommand =

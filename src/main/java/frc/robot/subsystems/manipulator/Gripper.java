@@ -20,6 +20,10 @@ public class Gripper extends SubsystemBase {
     STORE
   }
 
+  private double currentGripper = GripperConstants.positionStore;
+
+  private INTAKE currentIntake;
+
   /** Create a new Gripper subsystem. */
   public Gripper() {
 
@@ -46,27 +50,33 @@ public class Gripper extends SubsystemBase {
     encoder.setPosition(0);
   }
 
+  public void ambientGripper() {
+    pidController.setReference(currentGripper, CANSparkMax.ControlType.kPosition);
+  }
+
   public void setGripper(INTAKE intake) {
+    currentIntake = intake;
+    SmartDashboard.putString("gripper", intake.toString());
     switch (intake) {
       case OPEN:
-        pidController.setReference(
-            GripperConstants.positionOpen, CANSparkMax.ControlType.kPosition);
+        currentGripper = GripperConstants.positionOpen;
         break;
       case CUBE:
-        pidController.setReference(
-            GripperConstants.positionCube, CANSparkMax.ControlType.kPosition);
+        currentGripper = GripperConstants.positionCube;
         break;
       case CONE:
-        pidController.setReference(
-            GripperConstants.positionCone, CANSparkMax.ControlType.kPosition);
+        currentGripper = GripperConstants.positionCone;
         break;
       case STORE:
-        pidController.setReference(
-            GripperConstants.positionStore, CANSparkMax.ControlType.kPosition);
+        currentGripper = GripperConstants.positionStore;
         break;
       default:
         throw new IllegalArgumentException("Invalid intake enum position.");
     }
+  }
+
+  public INTAKE getCurrentIntake() {
+    return currentIntake;
   }
 
   @Override
