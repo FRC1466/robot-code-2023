@@ -53,11 +53,11 @@ public final class Constants {
   public static final class Auton {
     public static final PIDFConfig xAutoPID = new PIDFConfig(4.0, 0, 0);
     public static final PIDFConfig yAutoPID = new PIDFConfig(4.0, 0, 0);
-    public static final PIDFConfig angleAutoPID = new PIDFConfig(2.2, 0, 0.0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(8.2, 0, 0.0);
 
     public static final double maxSpeedMPS = 3;
     public static final double maxAccelerationMPS = 2;
-    public static final double balanceScale = 0.8, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
+    public static final double balanceScale = 2.0, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -102,10 +102,10 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.77, 0, 0, 0, 0, 0.9);
+    public static final Gains armPosition = new Gains(0.9, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.312153;
-    public static final double maxRadians = 4.44;
+    public static final double maxRadians = 4.24;
     public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);

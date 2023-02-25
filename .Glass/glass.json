@@ -8,16 +8,16 @@
         "open": true
       },
       "SmartDashboard": {
-        "DutyCycle Encoder[0]": {
-          "open": true
-        },
         "Field": {
           "open": true
         },
         "PPSwerveControllerCommand": {
           "open": true
         },
-        "open": true
+        "open": true,
+        "swerve": {
+          "open": true
+        }
       }
     },
     "types": {

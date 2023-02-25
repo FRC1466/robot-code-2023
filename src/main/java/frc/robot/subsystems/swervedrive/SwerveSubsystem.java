@@ -70,7 +70,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
+    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, true);
   }
 
   @Override

@@ -177,5 +177,6 @@ public class VirtualFourBar extends SubsystemBase {
     // System.out.println("Output: " + armPID.calculate(Rotation2d.fromDegrees(180),
     // Rotation2d.fromDegrees(0)));
     SmartDashboard.putNumber("Proccessed Absolute Arm", getPosition().getRadians());
+    SmartDashboard.putNumber("armPID error", armPID.getPositionError());
   }
 }
