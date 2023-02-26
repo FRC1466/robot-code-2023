@@ -3,8 +3,8 @@ package swervelib;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -29,6 +30,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.simulation.SwerveIMUSimulation;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import webblib.math.SwerveDrivePoseEstimator;
 
 /** Swerve Drive class representing and controlling the swerve drive. */
 public class SwerveDrive {
@@ -49,12 +51,13 @@ public class SwerveDrive {
    * Trustworthiness of the internal model of how motors should be moving Measured in expected
    * standard deviation (meters of position and degrees of rotation)
    */
-  public Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+  public Matrix<N4, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1, 0.1);
   /**
    * Trustworthiness of the vision system Measured in expected standard deviation (meters of
    * position and degrees of rotation)
    */
-  public Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+  public Matrix<N4, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 0.9);
+  public Matrix<N3, N1> visionMeasurementStdDevs2D = VecBuilder.fill(0.9, 0.9, 0.9);
   /** Swerve IMU device for sensing the heading of the robot. */
   private SwerveIMU imu;
   /** Simulation of the swerve drive. */
@@ -99,9 +102,9 @@ public class SwerveDrive {
     swerveDrivePoseEstimator =
         new SwerveDrivePoseEstimator(
             kinematics,
-            getYaw(),
+            getGyroRotation3d(),
             getModulePositions(),
-            new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)),
+            new Pose3d(),
             stateStdDevs,
             visionMeasurementStdDevs); // x,y,heading in radians; Vision measurement std dev,
     // higher=less weight
@@ -492,7 +495,7 @@ public class SwerveDrive {
    */
   public void updateOdometry() {
     // Update odometry
-    swerveDrivePoseEstimator.update(getYaw(), getModulePositions());
+    swerveDrivePoseEstimator.update(getGyroRotation3d(), getModulePositions());
 
     // Update angle accumulator if the robot is simulated
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {
@@ -571,7 +574,7 @@ public class SwerveDrive {
       Pose2d robotPose, double timestamp, boolean soft, double trustWorthiness) {
     if (soft) {
       swerveDrivePoseEstimator.addVisionMeasurement(
-          robotPose, timestamp, visionMeasurementStdDevs.times(1.0 / trustWorthiness));
+          robotPose, timestamp, visionMeasurementStdDevs2D.times(1.0 / trustWorthiness));
     } else {
       swerveDrivePoseEstimator.resetPosition(
           robotPose.getRotation(), getModulePositions(), robotPose);
