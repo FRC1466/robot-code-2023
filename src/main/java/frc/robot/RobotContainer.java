@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -244,11 +245,10 @@ public class RobotContainer {
                 .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
         .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
-    // new Trigger(drivebase::isMoving)
-    //     .whileTrue(
-    //         Commands.startEnd(
-    //             () -> pdh.setSwitchableChannel(true), () -> pdh.setSwitchableChannel(false),
-    // pdh));
+    new Trigger(() -> drivebase.isMoving())
+        .debounce(10, DebounceType.kBoth)
+        .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh))
+        .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
   }
 
   /**

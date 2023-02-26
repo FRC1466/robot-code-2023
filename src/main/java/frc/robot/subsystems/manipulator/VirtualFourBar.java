@@ -99,10 +99,9 @@ public class VirtualFourBar extends SubsystemBase {
             -ArmConstants.armPosition.peakOutput,
             ArmConstants.armPosition.peakOutput);
     var feedforward = getPosition().getCos() * ArmConstants.gravityFF;
-    SmartDashboard.putNumber("initial setpoint", setpoint.getRadians());
-    SmartDashboard.putNumber("armPID error", armPID.getPositionError());
-    SmartDashboard.putNumber("armPID output", motorOutput);
-    SmartDashboard.putNumber("arm feedforward", feedforward);
+    SmartDashboard.putNumber("Arm PID Setpoint", setpoint.getRadians());
+    SmartDashboard.putNumber("Arm PID Output", motorOutput);
+    SmartDashboard.putNumber("Arm Feedforward", feedforward);
     armMotor.set(motorOutput + feedforward);
   }
 
@@ -173,10 +172,10 @@ public class VirtualFourBar extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putData(absoluteArmEncoder);
-    SmartDashboard.putNumber("Raw Absolute Arm", absoluteArmEncoder.getAbsolutePosition());
-    // System.out.println("Output: " + armPID.calculate(Rotation2d.fromDegrees(180),
-    // Rotation2d.fromDegrees(0)));
-    SmartDashboard.putNumber("Proccessed Absolute Arm", getPosition().getRadians());
-    SmartDashboard.putNumber("armPID error", armPID.getPositionError());
+    SmartDashboard.putNumber("Arm Raw Absolute Encoder", absoluteArmEncoder.getAbsolutePosition());
+    // System.out.println("Output: " + armPID.calculate(Rotation2d.fromRadians(-0.1888),
+    // Rotation2d.fromDegrees(165)));
+    SmartDashboard.putNumber("Arm Processed Absolute Encoder", getPosition().getRadians());
+    SmartDashboard.putNumber("Arm PID error", armPID.getPositionError());
   }
 }

@@ -57,6 +57,7 @@ public class SwerveDrive {
    * position and degrees of rotation)
    */
   public Matrix<N4, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 0.9);
+
   public Matrix<N3, N1> visionMeasurementStdDevs2D = VecBuilder.fill(0.9, 0.9, 0.9);
   /** Swerve IMU device for sensing the heading of the robot. */
   private SwerveIMU imu;

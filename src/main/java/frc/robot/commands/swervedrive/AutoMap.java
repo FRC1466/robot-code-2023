@@ -49,10 +49,14 @@ public class AutoMap {
                 .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToMid",
-        () -> Commands.run(() -> arm.setArm(ARM.MID), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.runOnce(() -> arm.setArm(ARM.MID))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToVertical",
-        () -> Commands.run(() -> arm.setArm(ARM.VERTICAL), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.runOnce(() -> arm.setArm(ARM.VERTICAL))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
 
     eventMapGetter.put("GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONE)));
     eventMapGetter.put(
