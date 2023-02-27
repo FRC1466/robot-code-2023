@@ -22,6 +22,8 @@ public class AutoMap {
       GrabEnsureNeutral = "GrabEnsureNeutral",
       GrabOpen = "GrabOpen",
       DropObjectAndStore = "DropObjectAndStore",
+      EnsureGrabAndStore = "EnsureGrabAndStore",
+      EnsureGrabAndVertical = "EnsureGrabAndVertical",
       ScoreArmLow = "ScoreArmLow",
       ScoreArmMid = "ScoreArmMid",
       PickupGroundReady = "PickupGroundReady",
@@ -81,6 +83,20 @@ public class AutoMap {
                         Commands.waitSeconds(0.2)
                             .andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
                         getCommandInMap(AutoMap.ArmToStore))));
+
+    eventMapGetter.put(
+        "EnsureGrabAndStore",
+        () ->
+            Commands.parallel(
+                Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
+                getCommandInMap(AutoMap.ArmToStore)));
+
+    eventMapGetter.put(
+        "EnsureGrabAndVertical",
+        () ->
+            Commands.parallel(
+                Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
+                getCommandInMap(AutoMap.ArmToVertical)));
 
     eventMapGetter.put(
         "ScoreArmLow",

@@ -18,7 +18,7 @@
       "stopEvent": {
         "names": [
           "ScoreArmLow",
-          "DropObjectAndStore"
+          "GrabOpen"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
@@ -83,7 +83,7 @@
     {
       "position": 0.047017045454545645,
       "names": [
-        "ArmToVertical"
+        "EnsureGrabAndVertical"
       ]
     },
     {

@@ -87,6 +87,13 @@ public class RobotContainer {
             PathPlanner.loadPathGroup(
                 "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
+    chooser.setDefaultOption(
+        "Default Test Full",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "Test Full Path",
+                new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+
     chooser.addOption(
         "3 Score T1",
         builder.getSwerveCommand(
