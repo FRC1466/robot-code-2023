@@ -1,6 +1,8 @@
 package webblib.util.chargedup;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import webblib.util.HolonomicPose2d;
 import webblib.util.RectanglePoseArea;
 
@@ -30,11 +32,11 @@ public class LoadingArea {
   }
 
   public HolonomicPose2d getDoubleSubstationLeft() {
-    return doubleSubstationLeft;
+    return DriverStation.getAlliance() == Alliance.Blue ? doubleSubstationLeft : doubleSubstationRight;
   }
 
   public HolonomicPose2d getDoubleSubstationRight() {
-    return doubleSubstationRight;
+    return DriverStation.getAlliance() == Alliance.Blue ? doubleSubstationRight : doubleSubstationLeft;
   }
 
   public boolean isPoseWithinScoringArea(Pose2d pose) {
