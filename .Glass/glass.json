@@ -14,10 +14,7 @@
         "PPSwerveControllerCommand": {
           "open": true
         },
-        "open": true,
-        "swerve": {
-          "open": true
-        }
+        "open": true
       }
     },
     "types": {
@@ -30,6 +27,11 @@
       "/SmartDashboard/Pigeon 2 [20]": "Gyro"
     },
     "windows": {
+      "/SmartDashboard/CHOOSE": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "window": {
           "visible": true
@@ -89,7 +91,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <2>": {
       "plots": [
@@ -107,7 +112,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <3>": {
       "plots": [
@@ -146,7 +154,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <5>": {
       "plots": [
@@ -164,7 +175,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

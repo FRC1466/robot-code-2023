@@ -46,10 +46,10 @@
       "stopEvent": {
         "names": [
           "PickupGroundReady",
-          "PickupCubeAndStore"
+          "GrabCube"
         ],
         "executionBehavior": "sequential",
-        "waitBehavior": "before",
+        "waitBehavior": "after",
         "waitTime": 0.5
       }
     },
