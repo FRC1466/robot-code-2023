@@ -32,11 +32,15 @@ public class LoadingArea {
   }
 
   public HolonomicPose2d getDoubleSubstationLeft() {
-    return DriverStation.getAlliance() == Alliance.Blue ? doubleSubstationLeft : doubleSubstationRight;
+    return DriverStation.getAlliance() == Alliance.Blue
+        ? doubleSubstationLeft
+        : doubleSubstationRight;
   }
 
   public HolonomicPose2d getDoubleSubstationRight() {
-    return DriverStation.getAlliance() == Alliance.Blue ? doubleSubstationRight : doubleSubstationLeft;
+    return DriverStation.getAlliance() == Alliance.Blue
+        ? doubleSubstationRight
+        : doubleSubstationLeft;
   }
 
   public boolean isPoseWithinScoringArea(Pose2d pose) {
