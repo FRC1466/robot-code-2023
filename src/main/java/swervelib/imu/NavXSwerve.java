@@ -41,6 +41,13 @@ public class NavXSwerve extends SwerveIMU {
   @Override
   public void clearStickyFaults() {}
 
+  @Override
+  public void getBiasedAccelerometer(double[] accelArray) {
+      accelArray[0] = gyro.getWorldLinearAccelX();
+      accelArray[1] = gyro.getWorldLinearAccelY();
+      accelArray[2] = gyro.getWorldLinearAccelZ();
+  }
+
   /**
    * Set the yaw in degrees.
    *

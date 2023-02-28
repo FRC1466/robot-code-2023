@@ -33,6 +33,13 @@ public class ADXRS450Swerve extends SwerveIMU {
     // Do nothing.
   }
 
+  @Override
+  public void getBiasedAccelerometer(double[] accelArray) {
+    accelArray[0] = 0.0;
+    accelArray[1] = 0.0;
+    accelArray[2] = 0.0;
+  }
+
   /**
    * Set the yaw in degrees.
    *

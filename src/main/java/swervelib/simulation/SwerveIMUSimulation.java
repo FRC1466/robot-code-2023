@@ -52,6 +52,10 @@ public class SwerveIMUSimulation {
     return new Rotation2d();
   }
 
+  public double getAccelZ() {
+    return 0;
+  }
+
   /**
    * Gets the estimated gyro {@link Rotation3d} of the robot.
    *

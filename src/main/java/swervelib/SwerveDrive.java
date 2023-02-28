@@ -60,6 +60,7 @@ public class SwerveDrive {
   public Matrix<N6, N1> visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
   /** Local measurement standard deviation, higher = less trustworthy. */
   public Matrix<N3, N1> localMeasurementStdDev = VecBuilder.fill(0.1, 0.1, 0.1);
+  public Matrix<N1, N1> zAccelerationStdDev = VecBuilder.fill(0.1);
   /** Invert odometry readings of drive motor positions, used as a patch for debugging currently. */
   public boolean invertOdometry = false;
   /** Swerve IMU device for sensing the heading of the robot. */
@@ -110,6 +111,7 @@ public class SwerveDrive {
             kinematics,
             stateStdDevs,
             localMeasurementStdDev,
+            zAccelerationStdDev,
             visionMeasurementStdDevs); // x,y,heading in radians; Vision measurement std dev,
     // higher=less weight
 
@@ -464,6 +466,16 @@ public class SwerveDrive {
     }
   }
 
+  public double getAccelZ() {
+    double[] accel = new double[3];
+    if (!SwerveDriveTelemetry.isSimulation) {
+      imu.getBiasedAccelerometer(accel);
+      return accel[2];
+    } else {
+      return simIMU.getAccelZ();
+    }
+  }
+
   /**
    * Sets the drive motors to brake/coast mode.
    *
@@ -529,7 +541,7 @@ public class SwerveDrive {
    */
   public void updateOdometry() {
     // Update odometry
-    swerveDrivePoseEstimator.update(getGyroRotation3d(), getModuleStates());
+    swerveDrivePoseEstimator.update(getGyroRotation3d(), getAccelZ(), getModuleStates());
 
     // Update angle accumulator if the robot is simulated
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {

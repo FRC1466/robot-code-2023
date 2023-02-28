@@ -23,6 +23,8 @@ public abstract class SwerveIMU {
    */
   public abstract void getYawPitchRoll(double[] yprArray);
 
+  public abstract void getBiasedAccelerometer(double[] accelArray);
+
   /**
    * Get the instantiated IMU object.
    *

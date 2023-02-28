@@ -16,6 +16,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+
 import java.util.function.BiConsumer;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveModuleState2;
@@ -46,6 +48,7 @@ import swervelib.math.SwerveModuleState2;
 public class SwerveDrivePoseEstimator {
 
   private final UnscentedKalmanFilter<N6, N6, N3> m_observer;
+  private final UnscentedKalmanFilter<N1, N1, N1> m_zObserver;
   private final SwerveKinematics2 m_kinematics;
   private final BiConsumer<Matrix<N6, N1>, Matrix<N6, N1>> m_visionCorrect;
   private final KalmanFilterLatencyCompensator<N6, N6, N3> m_latencyCompensator;
@@ -83,6 +86,7 @@ public class SwerveDrivePoseEstimator {
       SwerveKinematics2 kinematics,
       Matrix<N6, N1> stateStdDevs,
       Matrix<N3, N1> localMeasurementStdDevs,
+      Matrix<N1, N1> zAccelerationStdDevs,
       Matrix<N6, N1> visionMeasurementStdDevs) {
     this(
         gyroAngle,
@@ -90,6 +94,7 @@ public class SwerveDrivePoseEstimator {
         kinematics,
         stateStdDevs,
         localMeasurementStdDevs,
+        zAccelerationStdDevs,
         visionMeasurementStdDevs,
         0.02);
   }
@@ -118,6 +123,7 @@ public class SwerveDrivePoseEstimator {
       SwerveKinematics2 kinematics,
       Matrix<N6, N1> stateStdDevs,
       Matrix<N3, N1> localMeasurementStdDevs,
+      Matrix<N1, N1> zAccelerationStdDevs,
       Matrix<N6, N1> visionMeasurementStdDevs,
       double nominalDtSeconds) {
     m_nominalDt = nominalDtSeconds;
@@ -136,6 +142,22 @@ public class SwerveDrivePoseEstimator {
             AngleStatistics.angleResidual(0),
             AngleStatistics.angleAdd(2),
             m_nominalDt);
+
+    m_zObserver = 
+      new UnscentedKalmanFilter<>(
+              Nat.N1(),
+              Nat.N1(),
+              (x, u) -> u,
+              (x, u) -> x.extractRowVector(0),
+              zAccelerationStdDevs,
+              zAccelerationStdDevs,
+              AngleStatistics.angleMean(2),
+              AngleStatistics.angleMean(0),
+              AngleStatistics.angleResidual(2),
+              AngleStatistics.angleResidual(0),
+              AngleStatistics.angleAdd(2),
+              m_nominalDt);
+    
     m_kinematics = kinematics;
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
@@ -275,11 +297,12 @@ public class SwerveDrivePoseEstimator {
    * class.
    *
    * @param gyroAngle The current gyro angle.
+   * @param zAccel The current acceleration in the z axis in m/s/s.
    * @param moduleStates The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose3d update(Rotation3d gyroAngle, SwerveModuleState2... moduleStates) {
-    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, moduleStates);
+  public Pose3d update(Rotation3d gyroAngle, double zAccel, SwerveModuleState2... moduleStates) {
+    return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, zAccel, moduleStates);
   }
 
   /**
@@ -289,12 +312,13 @@ public class SwerveDrivePoseEstimator {
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyroscope angle.
+   * @param zAccel The current acceleration in the z axis in m/s/s.
    * @param moduleStates The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
   @SuppressWarnings("LocalVariableName")
   public Pose3d updateWithTime(
-      double currentTimeSeconds, Rotation3d gyroAngle, SwerveModuleState2... moduleStates) {
+      double currentTimeSeconds, Rotation3d gyroAngle, double zAccel, SwerveModuleState2... moduleStates) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
 
@@ -307,6 +331,12 @@ public class SwerveDrivePoseEstimator {
     var fieldRelativeVelocities =
         new Translation3d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0)
             .rotateBy(angle);
+
+    var uZ = VecBuilder.fill(zAccel);
+    var lZ = VecBuilder.fill(fieldRelativeVelocities.getZ());
+    
+    m_zObserver.predict(uZ, dt);
+    m_zObserver.correct(uZ, lZ);
 
     var u =
         VecBuilder.fill(

@@ -33,6 +33,13 @@ public class ADIS16470Swerve extends SwerveIMU {
     // Do nothing.
   }
 
+  @Override
+  public void getBiasedAccelerometer(double[] accelArray) {
+    accelArray[0] = imu.getAccelX();
+    accelArray[1] = imu.getAccelY();
+    accelArray[2] = imu.getAccelZ();
+  }
+
   /**
    * Set the yaw in degrees.
    *
