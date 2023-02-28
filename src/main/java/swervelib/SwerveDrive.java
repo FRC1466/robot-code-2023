@@ -60,6 +60,7 @@ public class SwerveDrive {
   public Matrix<N6, N1> visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
   /** Local measurement standard deviation, higher = less trustworthy. */
   public Matrix<N3, N1> localMeasurementStdDev = VecBuilder.fill(0.1, 0.1, 0.1);
+
   public Matrix<N1, N1> zAccelerationStdDev = VecBuilder.fill(0.1);
   /** Invert odometry readings of drive motor positions, used as a patch for debugging currently. */
   public boolean invertOdometry = false;

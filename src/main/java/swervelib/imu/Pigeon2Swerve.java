@@ -34,11 +34,11 @@ public class Pigeon2Swerve extends SwerveIMU {
 
   @Override
   public void getBiasedAccelerometer(double[] accelArray) {
-      short[] initial = new short[3];
-      imu.getBiasedAccelerometer(initial);
-      accelArray[0] = initial[0]/16384;
-      accelArray[1] = initial[1]/16384;
-      accelArray[2] = initial[2]/16384;
+    short[] initial = new short[3];
+    imu.getBiasedAccelerometer(initial);
+    accelArray[0] = initial[0] / 16384;
+    accelArray[1] = initial[1] / 16384;
+    accelArray[2] = initial[2] / 16384;
   }
 
   /** Reset IMU to factory default. */

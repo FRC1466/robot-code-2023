@@ -8,7 +8,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.AngleStatistics;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -16,8 +15,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N6;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-
 import java.util.function.BiConsumer;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveModuleState2;
@@ -136,48 +133,27 @@ public class SwerveDrivePoseEstimator {
             (x, u) -> VecBuilder.fill(x.get(3, 0), x.get(4, 0), x.get(5, 0)),
             stateStdDevs,
             localMeasurementStdDevs,
-            AngleStatistics.angleMean(2),
-            AngleStatistics.angleMean(0),
-            AngleStatistics.angleResidual(2),
-            AngleStatistics.angleResidual(0),
-            AngleStatistics.angleAdd(2),
             m_nominalDt);
 
-    m_zObserver = 
-      new UnscentedKalmanFilter<>(
-              Nat.N1(),
-              Nat.N1(),
-              (x, u) -> u,
-              (x, u) -> x.extractRowVector(0),
-              zAccelerationStdDevs,
-              zAccelerationStdDevs,
-              AngleStatistics.angleMean(2),
-              AngleStatistics.angleMean(0),
-              AngleStatistics.angleResidual(2),
-              AngleStatistics.angleResidual(0),
-              AngleStatistics.angleAdd(2),
-              m_nominalDt);
-    
+    m_zObserver =
+        new UnscentedKalmanFilter<>(
+            Nat.N1(),
+            Nat.N1(),
+            (x, u) -> u,
+            (x, u) -> x.extractRowVector(0),
+            zAccelerationStdDevs,
+            zAccelerationStdDevs,
+            m_nominalDt);
+
     m_kinematics = kinematics;
     m_latencyCompensator = new KalmanFilterLatencyCompensator<>();
 
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
-    m_visionCorrect =
-        (u, y) ->
-            m_observer.correct(
-                Nat.N6(),
-                u,
-                y,
-                (x, u1) -> x,
-                m_visionContR,
-                AngleStatistics.angleMean(2),
-                AngleStatistics.angleResidual(2),
-                AngleStatistics.angleResidual(2),
-                AngleStatistics.angleAdd(2));
+    m_visionCorrect = (u, y) -> m_observer.correct(Nat.N6(), u, y, (x, u1) -> x, m_visionContR);
 
-    m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
+    m_gyroOffset = new Rotation3d();
     m_previousAngle = initialPoseMeters.getRotation();
     m_previousRoll = initialPoseMeters.getRotation().getX();
     m_previousPitch = initialPoseMeters.getRotation().getY();
@@ -216,7 +192,7 @@ public class SwerveDrivePoseEstimator {
 
     m_observer.setXhat(poseTo6dVector(poseMeters));
 
-    m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
+    m_gyroOffset = new Rotation3d();
     m_previousRoll = poseMeters.getRotation().getX();
     m_previousPitch = poseMeters.getRotation().getY();
     m_previousYaw = poseMeters.getRotation().getZ();
@@ -229,12 +205,13 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose3d getEstimatedPosition() {
-    var a = new Pose3d(
-      m_observer.getXhat(0),
-      m_observer.getXhat(1),
-      m_observer.getXhat(2),
-      new Rotation3d(m_observer.getXhat(3), m_observer.getXhat(4), m_observer.getXhat(5)));
-    System.out.println(a.getRotation().toRotation2d().toString());
+    var a =
+        new Pose3d(
+            m_observer.getXhat(0),
+            m_observer.getXhat(1),
+            m_observer.getXhat(2),
+            new Rotation3d(m_observer.getXhat(3), m_observer.getXhat(4), m_observer.getXhat(5)));
+    System.out.println(a.toString());
     return a;
   }
 
@@ -318,7 +295,10 @@ public class SwerveDrivePoseEstimator {
    */
   @SuppressWarnings("LocalVariableName")
   public Pose3d updateWithTime(
-      double currentTimeSeconds, Rotation3d gyroAngle, double zAccel, SwerveModuleState2... moduleStates) {
+      double currentTimeSeconds,
+      Rotation3d gyroAngle,
+      double zAccel,
+      SwerveModuleState2... moduleStates) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
 
@@ -331,12 +311,19 @@ public class SwerveDrivePoseEstimator {
     var fieldRelativeVelocities =
         new Translation3d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0)
             .rotateBy(angle);
+    System.out.println(m_gyroOffset.getX() + " " + m_gyroOffset.getY() + " " + m_gyroOffset.getZ());
+    System.out.println(gyroAngle.getX() + " " + gyroAngle.getY() + " " + gyroAngle.getZ());
+    System.out.println(angle.getX() + " " + angle.getY() + " " + angle.getZ());
+    System.out.println(fieldRelativeVelocities.toString());
 
     var uZ = VecBuilder.fill(zAccel);
     var lZ = VecBuilder.fill(fieldRelativeVelocities.getZ());
-    
+
     m_zObserver.predict(uZ, dt);
     m_zObserver.correct(uZ, lZ);
+    fieldRelativeVelocities =
+        new Translation3d(
+            fieldRelativeVelocities.getX(), fieldRelativeVelocities.getY(), m_zObserver.getXhat(0));
 
     var u =
         VecBuilder.fill(
@@ -347,15 +334,21 @@ public class SwerveDrivePoseEstimator {
             omegaY,
             omegaZ);
     m_previousAngle = angle;
-    m_previousPitch = Math.toRadians(placeInAppropriate0To360Scope(Math.toDegrees(m_previousPitch), Math.toDegrees(angle.getX())));
-    m_previousRoll = Math.toRadians(placeInAppropriate0To360Scope(Math.toDegrees(m_previousRoll), Math.toDegrees(angle.getY())));
-    m_previousYaw = Math.toRadians(placeInAppropriate0To360Scope(Math.toDegrees(m_previousYaw), Math.toDegrees(angle.getZ())));
+    m_previousPitch =
+        Math.toRadians(
+            placeInAppropriate0To360Scope(
+                Math.toDegrees(m_previousPitch), Math.toDegrees(angle.getX())));
+    m_previousRoll =
+        Math.toRadians(
+            placeInAppropriate0To360Scope(
+                Math.toDegrees(m_previousRoll), Math.toDegrees(angle.getY())));
+    m_previousYaw =
+        Math.toRadians(
+            placeInAppropriate0To360Scope(
+                Math.toDegrees(m_previousYaw), Math.toDegrees(angle.getZ())));
 
-    var localY = VecBuilder.fill(
-      m_previousPitch, 
-      m_previousRoll, 
-      m_previousYaw);
-    
+    var localY = VecBuilder.fill(m_previousPitch, m_previousRoll, m_previousYaw);
+
     m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);

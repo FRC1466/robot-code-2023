@@ -62,7 +62,7 @@ public class SwerveIMUSimulation {
    * @return The heading as a {@link Rotation3d} angle
    */
   public Rotation3d getGyroRotation3d() {
-    return new Rotation3d(0, 0, angle);
+    return new Rotation3d(0, 0, angle).rotateBy(new Rotation3d(0.20, 0, 0));
   }
 
   /**

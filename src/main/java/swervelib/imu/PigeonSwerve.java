@@ -35,9 +35,9 @@ public class PigeonSwerve extends SwerveIMU {
   public void getBiasedAccelerometer(double[] accelArray) {
     short[] initial = new short[3];
     imu.getBiasedAccelerometer(initial);
-    accelArray[0] = initial[0]/16384;
-    accelArray[1] = initial[1]/16384;
-    accelArray[2] = initial[2]/16384;
+    accelArray[0] = initial[0] / 16384;
+    accelArray[1] = initial[1] / 16384;
+    accelArray[2] = initial[2] / 16384;
   }
 
   /**
