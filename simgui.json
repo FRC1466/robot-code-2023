@@ -105,15 +105,18 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Shuffleboard": {
+        "open": true
+      },
       "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
         "Pigeon 2 [20]": {
           "open": true
         },
         "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

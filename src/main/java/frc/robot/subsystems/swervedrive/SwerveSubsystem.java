@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -73,7 +74,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, true);
+    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, false);
   }
 
   @Override
@@ -101,7 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param initialHolonomicPose The pose to set the odometry to
    */
   public void resetOdometry(Pose2d initialHolonomicPose) {
-    swerveDrive.resetOdometry(initialHolonomicPose);
+    swerveDrive.resetOdometry(new Pose3d(initialHolonomicPose));
   }
 
   /**

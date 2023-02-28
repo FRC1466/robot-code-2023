@@ -234,4 +234,9 @@ public class SwerveModule {
   public void setMotorBrake(boolean brake) {
     driveMotor.setMotorBrake(brake);
   }
+
+  /** Reset the drive motor position to 0. */
+  public void resetEncoder() {
+    driveMotor.setPosition(0);
+  }
 }
