@@ -33,13 +33,6 @@ public class ADIS16470Swerve extends SwerveIMU {
     // Do nothing.
   }
 
-  @Override
-  public void getBiasedAccelerometer(double[] accelArray) {
-    accelArray[0] = imu.getAccelX();
-    accelArray[1] = imu.getAccelY();
-    accelArray[2] = imu.getAccelZ();
-  }
-
   /**
    * Set the yaw in degrees.
    *
@@ -60,6 +53,18 @@ public class ADIS16470Swerve extends SwerveIMU {
     yprArray[0] = (imu.getAngle() % 360) - yawOffset;
     yprArray[1] = imu.getXComplementaryAngle() % 360;
     yprArray[2] = imu.getYComplementaryAngle() % 360;
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU.
+   *
+   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   */
+  @Override
+  public void getAccel(Double[] accel) {
+    accel[0] = imu.getAccelX() / 9.81;
+    accel[1] = imu.getAccelY() / 9.81;
+    accel[2] = imu.getAccelZ() / 9.81;
   }
 
   /**

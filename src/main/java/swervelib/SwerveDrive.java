@@ -54,14 +54,22 @@ public class SwerveDrive {
    */
   public Matrix<N6, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
   /**
+   * Trustworthiness of the internal model of robot speed updating in the z direction in std
+   * deviations.
+   */
+  public Matrix<N1, N1> accelStateStdDevs = VecBuilder.fill(0.5);
+  /**
+   * Trustworthiness of the measurements of acceleration updating in the z direction in std
+   * deviations.
+   */
+  public Matrix<N1, N1> accelMeasurementStdDevs = VecBuilder.fill(0.7);
+  /**
    * Trustworthiness of the vision system Measured in expected standard deviation (meters of
    * position and degrees of rotation)
    */
-  public Matrix<N6, N1> visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
+  public Matrix<N6, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 0.9, 0.9, 0.9);
   /** Local measurement standard deviation, higher = less trustworthy. */
   public Matrix<N3, N1> localMeasurementStdDev = VecBuilder.fill(0.1, 0.1, 0.1);
-
-  public Matrix<N1, N1> zAccelerationStdDev = VecBuilder.fill(0.1);
   /** Invert odometry readings of drive motor positions, used as a patch for debugging currently. */
   public boolean invertOdometry = false;
   /** Swerve IMU device for sensing the heading of the robot. */
@@ -112,7 +120,8 @@ public class SwerveDrive {
             kinematics,
             stateStdDevs,
             localMeasurementStdDev,
-            zAccelerationStdDev,
+            accelStateStdDevs,
+            accelMeasurementStdDevs,
             visionMeasurementStdDevs); // x,y,heading in radians; Vision measurement std dev,
     // higher=less weight
 
@@ -148,10 +157,11 @@ public class SwerveDrive {
   }
 
   /**
-   * The primary method for controlling the drivebase. Takes a Translation2d and a rotation rate,
-   * and calculates and commands module states accordingly. Can use either open-loop or closed-loop
-   * velocity control for the wheel velocities. Also has field- and robot-relative modes, which
-   * affect how the translation vector is used. This method defaults to no heading correction.
+   * The primary method for controlling the drivebase. Takes a {@link Translation2d} and a rotation
+   * rate, and calculates and commands module states accordingly. Can use either open-loop or
+   * closed-loop velocity control for the wheel velocities. Also has field- and robot-relative
+   * modes, which affect how the translation vector is used. This method defaults to no heading
+   * correction.
    *
    * @param translation {@link Translation2d} that is the commanded linear velocity of the robot, in
    *     meters per second. In robot-relative mode, positive x is torwards the bow (front) and
@@ -467,13 +477,14 @@ public class SwerveDrive {
     }
   }
 
-  public double getAccelZ() {
-    double[] accel = new double[3];
+  public Double getZAccel() {
+    Double[] accel = new Double[3];
     if (!SwerveDriveTelemetry.isSimulation) {
-      imu.getBiasedAccelerometer(accel);
+      imu.getAccel(accel);
       return accel[2];
     } else {
-      return simIMU.getAccelZ();
+      simIMU.getAccel(accel);
+      return accel[2];
     }
   }
 
@@ -542,7 +553,7 @@ public class SwerveDrive {
    */
   public void updateOdometry() {
     // Update odometry
-    swerveDrivePoseEstimator.update(getGyroRotation3d(), getAccelZ(), getModuleStates());
+    swerveDrivePoseEstimator.update(getGyroRotation3d(), getZAccel(), getModuleStates());
 
     // Update angle accumulator if the robot is simulated
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {
@@ -610,7 +621,7 @@ public class SwerveDrive {
    * @param timestamp Timestamp the measurement was taken as time since startup, should be taken
    *     from {@link Timer#getFPGATimestamp()} or similar sources.
    * @param soft Add vision estimate using the {@link
-   *     SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d, double)} function, or hard reset
+   *     SwerveDrivePoseEstimator#addVisionMeasurement(Pose3d, double)} function, or hard reset
    *     odometry with the given position with {@link
    *     edu.wpi.first.math.kinematics.SwerveDriveOdometry#resetPosition(Rotation2d,
    *     SwerveModulePosition[], Pose2d)}.

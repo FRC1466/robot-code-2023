@@ -41,13 +41,6 @@ public class NavXSwerve extends SwerveIMU {
   @Override
   public void clearStickyFaults() {}
 
-  @Override
-  public void getBiasedAccelerometer(double[] accelArray) {
-    accelArray[0] = gyro.getWorldLinearAccelX();
-    accelArray[1] = gyro.getWorldLinearAccelY();
-    accelArray[2] = gyro.getWorldLinearAccelZ();
-  }
-
   /**
    * Set the yaw in degrees.
    *
@@ -70,6 +63,18 @@ public class NavXSwerve extends SwerveIMU {
     yprArray[0] = (gyro.getYaw() % 360) - yawOffset;
     yprArray[1] = (gyro.getPitch() % 360);
     yprArray[2] = (gyro.getRoll() % 360);
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU.
+   *
+   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   */
+  @Override
+  public void getAccel(Double[] accel) {
+    accel[0] = (Double) (double) gyro.getWorldLinearAccelX() * 9.81;
+    accel[1] = (Double) (double) gyro.getWorldLinearAccelY() * 9.81;
+    accel[2] = (Double) (double) gyro.getWorldLinearAccelZ() * 9.81;
   }
 
   /**

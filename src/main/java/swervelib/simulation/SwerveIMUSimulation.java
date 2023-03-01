@@ -52,17 +52,24 @@ public class SwerveIMUSimulation {
     return new Rotation2d();
   }
 
-  public double getAccelZ() {
-    return 0;
-  }
-
   /**
    * Gets the estimated gyro {@link Rotation3d} of the robot.
    *
    * @return The heading as a {@link Rotation3d} angle
    */
   public Rotation3d getGyroRotation3d() {
-    return new Rotation3d(0, 0, angle).rotateBy(new Rotation3d(0.20, 0, 0));
+    return new Rotation3d(0, 0, angle);
+  }
+
+  /**
+   * Gets the acceleration of the robot in m/s/s. This is not currently simulated so returns 0.
+   *
+   * @param accel the acceleration array to fill [x, y, z]
+   */
+  public void getAccel(Double[] accel) {
+    accel[0] = Double.NaN;
+    accel[1] = Double.NaN;
+    accel[2] = Double.NaN;
   }
 
   /**

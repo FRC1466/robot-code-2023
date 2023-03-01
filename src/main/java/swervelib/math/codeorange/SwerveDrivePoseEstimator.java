@@ -8,6 +8,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.StateSpaceUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.AngleStatistics;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -45,7 +46,7 @@ import swervelib.math.SwerveModuleState2;
 public class SwerveDrivePoseEstimator {
 
   private final UnscentedKalmanFilter<N6, N6, N3> m_observer;
-  private final UnscentedKalmanFilter<N1, N1, N1> m_zObserver;
+  private final UnscentedKalmanFilter<N1, N1, N1> m_accelObserver;
   private final SwerveKinematics2 m_kinematics;
   private final BiConsumer<Matrix<N6, N1>, Matrix<N6, N1>> m_visionCorrect;
   private final KalmanFilterLatencyCompensator<N6, N6, N3> m_latencyCompensator;
@@ -73,6 +74,11 @@ public class SwerveDrivePoseEstimator {
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
    *     is in the form [theta], with units in radians.
+   * @param accelStateStdDevs Standard deviations of the z axis robot speeds. Increase these numbers
+   *     to trust the z axis speed state estimate less. In units of m/s.
+   * @param accelMeasurementStdDevs Standard deviations of the z axis robot acceleration
+   *     measurements. Increase these numbers to trust the z axis robot acceleration measurements
+   *     less. In units of m/s/s.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
@@ -83,7 +89,8 @@ public class SwerveDrivePoseEstimator {
       SwerveKinematics2 kinematics,
       Matrix<N6, N1> stateStdDevs,
       Matrix<N3, N1> localMeasurementStdDevs,
-      Matrix<N1, N1> zAccelerationStdDevs,
+      Matrix<N1, N1> accelStateStdDevs,
+      Matrix<N1, N1> accelMeasurementStdDevs,
       Matrix<N6, N1> visionMeasurementStdDevs) {
     this(
         gyroAngle,
@@ -91,7 +98,8 @@ public class SwerveDrivePoseEstimator {
         kinematics,
         stateStdDevs,
         localMeasurementStdDevs,
-        zAccelerationStdDevs,
+        accelStateStdDevs,
+        accelMeasurementStdDevs,
         visionMeasurementStdDevs,
         0.02);
   }
@@ -108,6 +116,11 @@ public class SwerveDrivePoseEstimator {
    * @param localMeasurementStdDevs Standard deviations of the encoder and gyro measurements.
    *     Increase these numbers to trust sensor readings from encoders and gyros less. This matrix
    *     is in the form [theta], with units in radians.
+   * @param accelStateStdDevs Standard deviations of the z axis robot speeds. Increase these numbers
+   *     to trust the z axis speed state estimate less. In units of m/s.
+   * @param accelMeasurementStdDevs Standard deviations of the z axis robot acceleration
+   *     measurements. Increase these numbers to trust the z axis robot acceleration measurements
+   *     less. In units of m/s/s.
    * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
    *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
    *     theta]ᵀ, with units in meters and radians.
@@ -120,7 +133,8 @@ public class SwerveDrivePoseEstimator {
       SwerveKinematics2 kinematics,
       Matrix<N6, N1> stateStdDevs,
       Matrix<N3, N1> localMeasurementStdDevs,
-      Matrix<N1, N1> zAccelerationStdDevs,
+      Matrix<N1, N1> accelStateStdDevs,
+      Matrix<N1, N1> accelMeasurementStdDevs,
       Matrix<N6, N1> visionMeasurementStdDevs,
       double nominalDtSeconds) {
     m_nominalDt = nominalDtSeconds;
@@ -133,16 +147,21 @@ public class SwerveDrivePoseEstimator {
             (x, u) -> VecBuilder.fill(x.get(3, 0), x.get(4, 0), x.get(5, 0)),
             stateStdDevs,
             localMeasurementStdDevs,
+            AngleStatistics.angleMean(2),
+            AngleStatistics.angleMean(0),
+            AngleStatistics.angleResidual(2),
+            AngleStatistics.angleResidual(0),
+            AngleStatistics.angleAdd(2),
             m_nominalDt);
 
-    m_zObserver =
+    m_accelObserver =
         new UnscentedKalmanFilter<>(
             Nat.N1(),
             Nat.N1(),
             (x, u) -> u,
             (x, u) -> x.extractRowVector(0),
-            zAccelerationStdDevs,
-            zAccelerationStdDevs,
+            accelStateStdDevs,
+            accelMeasurementStdDevs,
             m_nominalDt);
 
     m_kinematics = kinematics;
@@ -151,9 +170,20 @@ public class SwerveDrivePoseEstimator {
     // Initialize vision R
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
 
-    m_visionCorrect = (u, y) -> m_observer.correct(Nat.N6(), u, y, (x, u1) -> x, m_visionContR);
+    m_visionCorrect =
+        (u, y) ->
+            m_observer.correct(
+                Nat.N6(),
+                u,
+                y,
+                (x, u1) -> x,
+                m_visionContR,
+                AngleStatistics.angleMean(2),
+                AngleStatistics.angleResidual(2),
+                AngleStatistics.angleResidual(2),
+                AngleStatistics.angleAdd(2));
 
-    m_gyroOffset = new Rotation3d();
+    m_gyroOffset = initialPoseMeters.getRotation().minus(gyroAngle);
     m_previousAngle = initialPoseMeters.getRotation();
     m_previousRoll = initialPoseMeters.getRotation().getX();
     m_previousPitch = initialPoseMeters.getRotation().getY();
@@ -192,7 +222,7 @@ public class SwerveDrivePoseEstimator {
 
     m_observer.setXhat(poseTo6dVector(poseMeters));
 
-    m_gyroOffset = new Rotation3d();
+    m_gyroOffset = getEstimatedPosition().getRotation().minus(gyroAngle);
     m_previousRoll = poseMeters.getRotation().getX();
     m_previousPitch = poseMeters.getRotation().getY();
     m_previousYaw = poseMeters.getRotation().getZ();
@@ -205,14 +235,11 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated robot pose in meters.
    */
   public Pose3d getEstimatedPosition() {
-    var a =
-        new Pose3d(
-            m_observer.getXhat(0),
-            m_observer.getXhat(1),
-            m_observer.getXhat(2),
-            new Rotation3d(m_observer.getXhat(3), m_observer.getXhat(4), m_observer.getXhat(5)));
-    System.out.println(a.toString());
-    return a;
+    return new Pose3d(
+        m_observer.getXhat(0),
+        m_observer.getXhat(1),
+        m_observer.getXhat(2),
+        new Rotation3d(m_observer.getXhat(3), m_observer.getXhat(4), m_observer.getXhat(5)));
   }
 
   /**
@@ -274,11 +301,11 @@ public class SwerveDrivePoseEstimator {
    * class.
    *
    * @param gyroAngle The current gyro angle.
-   * @param zAccel The current acceleration in the z axis in m/s/s.
+   * @param zAccel The current acceleration in the z direction. In m/s/s.
    * @param moduleStates The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose3d update(Rotation3d gyroAngle, double zAccel, SwerveModuleState2... moduleStates) {
+  public Pose3d update(Rotation3d gyroAngle, Double zAccel, SwerveModuleState2... moduleStates) {
     return updateWithTime(WPIUtilJNI.now() * 1.0e-6, gyroAngle, zAccel, moduleStates);
   }
 
@@ -289,7 +316,7 @@ public class SwerveDrivePoseEstimator {
    *
    * @param currentTimeSeconds Time at which this method was called, in seconds.
    * @param gyroAngle The current gyroscope angle.
-   * @param zAccel The current acceleration in the z axis in m/s/s.
+   * @param zAccel The current acceleration in the z direction. In m/s/s.
    * @param moduleStates The current velocities and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
@@ -297,7 +324,7 @@ public class SwerveDrivePoseEstimator {
   public Pose3d updateWithTime(
       double currentTimeSeconds,
       Rotation3d gyroAngle,
-      double zAccel,
+      Double zAccel,
       SwerveModuleState2... moduleStates) {
     double dt = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : m_nominalDt;
     m_prevTimeSeconds = currentTimeSeconds;
@@ -311,29 +338,26 @@ public class SwerveDrivePoseEstimator {
     var fieldRelativeVelocities =
         new Translation3d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0)
             .rotateBy(angle);
-    System.out.println(m_gyroOffset.getX() + " " + m_gyroOffset.getY() + " " + m_gyroOffset.getZ());
-    System.out.println(gyroAngle.getX() + " " + gyroAngle.getY() + " " + gyroAngle.getZ());
-    System.out.println(angle.getX() + " " + angle.getY() + " " + angle.getZ());
-    System.out.println(fieldRelativeVelocities.toString());
+    var z = fieldRelativeVelocities.getZ();
+    if (!zAccel.isNaN()) {
+      var uZ = VecBuilder.fill(zAccel);
+      var lZ = VecBuilder.fill(fieldRelativeVelocities.getZ());
 
-    var uZ = VecBuilder.fill(zAccel);
-    var lZ = VecBuilder.fill(fieldRelativeVelocities.getZ());
-
-    m_zObserver.predict(uZ, dt);
-    m_zObserver.correct(uZ, lZ);
-    fieldRelativeVelocities =
-        new Translation3d(
-            fieldRelativeVelocities.getX(), fieldRelativeVelocities.getY(), m_zObserver.getXhat(0));
+      m_accelObserver.predict(uZ, dt);
+      m_accelObserver.correct(uZ, lZ);
+      z = m_accelObserver.getXhat(0);
+    }
 
     var u =
         VecBuilder.fill(
             fieldRelativeVelocities.getX(),
             fieldRelativeVelocities.getY(),
-            fieldRelativeVelocities.getZ(),
+            z,
             omegaX,
             omegaY,
             omegaZ);
     m_previousAngle = angle;
+
     m_previousPitch =
         Math.toRadians(
             placeInAppropriate0To360Scope(
@@ -348,7 +372,6 @@ public class SwerveDrivePoseEstimator {
                 Math.toDegrees(m_previousYaw), Math.toDegrees(angle.getZ())));
 
     var localY = VecBuilder.fill(m_previousPitch, m_previousRoll, m_previousYaw);
-
     m_latencyCompensator.addObserverState(m_observer, u, localY, currentTimeSeconds);
     m_observer.predict(u, dt);
     m_observer.correct(u, localY);

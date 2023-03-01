@@ -31,15 +31,6 @@ public class PigeonSwerve extends SwerveIMU {
     imu.clearStickyFaults();
   }
 
-  @Override
-  public void getBiasedAccelerometer(double[] accelArray) {
-    short[] initial = new short[3];
-    imu.getBiasedAccelerometer(initial);
-    accelArray[0] = initial[0] / 16384;
-    accelArray[1] = initial[1] / 16384;
-    accelArray[2] = initial[2] / 16384;
-  }
-
   /**
    * Set the yaw in degrees.
    *
@@ -58,6 +49,20 @@ public class PigeonSwerve extends SwerveIMU {
   @Override
   public void getYawPitchRoll(double[] yprArray) {
     imu.getYawPitchRoll(yprArray);
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU.
+   *
+   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   */
+  @Override
+  public void getAccel(Double[] accel) {
+    short[] initial = new short[3];
+    imu.getBiasedAccelerometer(initial);
+    accel[0] = initial[0] / 16384.0 * 9.81;
+    accel[1] = initial[1] / 16384.0 * 9.81;
+    accel[2] = initial[2] / 16384.0 * 9.81;
   }
 
   /**

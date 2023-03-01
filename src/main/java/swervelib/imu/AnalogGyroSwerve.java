@@ -38,13 +38,6 @@ public class AnalogGyroSwerve extends SwerveIMU {
     // Do nothing.
   }
 
-  @Override
-  public void getBiasedAccelerometer(double[] accelArray) {
-    accelArray[0] = 0.0;
-    accelArray[1] = 0.0;
-    accelArray[2] = 0.0;
-  }
-
   /**
    * Set the yaw in degrees.
    *
@@ -65,6 +58,18 @@ public class AnalogGyroSwerve extends SwerveIMU {
     yprArray[0] = (gyro.getAngle() % 360) - yawOffset;
     yprArray[1] = 0;
     yprArray[2] = 0;
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU.
+   *
+   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   */
+  @Override
+  public void getAccel(Double[] accel) {
+    accel[0] = Double.NaN;
+    accel[1] = Double.NaN;
+    accel[2] = Double.NaN;
   }
 
   /**
