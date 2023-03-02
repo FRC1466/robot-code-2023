@@ -5,19 +5,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * Communicates with the NavX as the IMU.
- */
-public class NavXSwerve extends SwerveIMU
-{
+/** Communicates with the NavX as the IMU. */
+public class NavXSwerve extends SwerveIMU {
 
-  /**
-   * NavX IMU.
-   */
-  private AHRS   gyro;
-  /**
-   * Offset for the NavX yaw reading.
-   */
+  /** NavX IMU. */
+  private AHRS gyro;
+  /** Offset for the NavX yaw reading. */
   private double yawOffset = 0;
 
   /**
@@ -25,38 +18,28 @@ public class NavXSwerve extends SwerveIMU
    *
    * @param port Serial Port to connect to.
    */
-  public NavXSwerve(SerialPort.Port port)
-  {
-    try
-    {
+  public NavXSwerve(SerialPort.Port port) {
+    try {
       /* Communicate w/navX-MXP via the MXP SPI Bus.                                     */
       /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
       /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
       gyro = new AHRS(port);
       SmartDashboard.putData(gyro);
-    } catch (RuntimeException ex)
-    {
+    } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
     }
   }
 
-  /**
-   * Reset IMU to factory default.
-   */
+  /** Reset IMU to factory default. */
   @Override
-  public void factoryDefault()
-  {
+  public void factoryDefault() {
     // gyro.reset(); // Reported to be slow
     yawOffset = gyro.getYaw() % 360;
   }
 
-  /**
-   * Clear sticky faults on IMU.
-   */
+  /** Clear sticky faults on IMU. */
   @Override
-  public void clearStickyFaults()
-  {
-  }
+  public void clearStickyFaults() {}
 
   /**
    * Set the yaw in degrees.
@@ -64,8 +47,7 @@ public class NavXSwerve extends SwerveIMU
    * @param yaw Yaw angle in degrees.
    */
   @Override
-  public void setYaw(double yaw)
-  {
+  public void setYaw(double yaw) {
     // gyro.reset(); // Reported to be slow using the offset.
     yawOffset = (yaw % 360) + (gyro.getYaw() % 360);
   }
@@ -76,8 +58,7 @@ public class NavXSwerve extends SwerveIMU
    * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
    */
   @Override
-  public void getYawPitchRoll(double[] yprArray)
-  {
+  public void getYawPitchRoll(double[] yprArray) {
 
     yprArray[0] = (gyro.getYaw() % 360) - yawOffset;
     yprArray[1] = (gyro.getPitch() % 360);
@@ -86,14 +67,14 @@ public class NavXSwerve extends SwerveIMU
 
   /**
    * Fetch the acceleration [x, y, z] from the IMU.
-   * 
+   *
    * @param accel Array which will be filled with {x, y, z} in m/s/s.
    */
   @Override
   public void getAccel(Double[] accel) {
-      accel[0] = (Double)(double) gyro.getWorldLinearAccelX() * 9.81;
-      accel[1] = (Double)(double) gyro.getWorldLinearAccelY() * 9.81;
-      accel[2] = (Double)(double) gyro.getWorldLinearAccelZ() * 9.81;
+    accel[0] = (Double) (double) gyro.getWorldLinearAccelX() * 9.81;
+    accel[1] = (Double) (double) gyro.getWorldLinearAccelY() * 9.81;
+    accel[2] = (Double) (double) gyro.getWorldLinearAccelZ() * 9.81;
   }
 
   /**
@@ -102,8 +83,7 @@ public class NavXSwerve extends SwerveIMU
    * @return IMU object.
    */
   @Override
-  public Object getIMU()
-  {
+  public Object getIMU() {
     return gyro;
   }
 }

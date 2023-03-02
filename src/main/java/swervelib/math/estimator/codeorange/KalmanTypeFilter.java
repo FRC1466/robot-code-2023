@@ -2,16 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package swervelib.math.codeorange;
-
+package swervelib.math.estimator.codeorange;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Num;
 import edu.wpi.first.math.numbers.N1;
 
 @SuppressWarnings({"ParameterName", "InterfaceTypeParameterName"})
-public interface KalmanTypeFilter<States extends Num, Inputs extends Num, Outputs extends Num>
-{
+public interface KalmanTypeFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
 
   Matrix<States, States> getP();
 

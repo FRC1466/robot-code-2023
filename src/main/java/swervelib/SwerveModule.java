@@ -13,53 +13,36 @@ import swervelib.simulation.SwerveModuleSimulation;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
-/**
- * The Swerve Module class which represents and controls Swerve Modules for the swerve drive.
- */
-public class SwerveModule
-{
+/** The Swerve Module class which represents and controls Swerve Modules for the swerve drive. */
+public class SwerveModule {
 
+  /** Swerve module configuration options. */
+  public final SwerveModuleConfiguration configuration;
+  /** Angle offset from the absolute encoder. */
+  private final double angleOffset;
+  /** Swerve Motors. */
+  private final SwerveMotor angleMotor, driveMotor;
+  /** Absolute encoder for swerve drive. */
+  private final SwerveAbsoluteEncoder absoluteEncoder;
   /**
-   * Swerve module configuration options.
+   * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back
+   * right.
    */
-  public final  SwerveModuleConfiguration configuration;
-  /**
-   * Angle offset from the absolute encoder.
-   */
-  private final double                    angleOffset;
-  /**
-   * Swerve Motors.
-   */
-  private final SwerveMotor               angleMotor, driveMotor;
-  /**
-   * Absolute encoder for swerve drive.
-   */
-  private final SwerveAbsoluteEncoder  absoluteEncoder;
-  /**
-   * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back right.
-   */
-  public        int                    moduleNumber;
-  /**
-   * Feedforward for drive motor during closed loop control.
-   */
-  public        SimpleMotorFeedforward feedforward;
-  /**
-   * Last angle set for the swerve module.
-   */
-  public        double                 lastAngle;
-  /**
-   * Simulated swerve module.
-   */
-  private       SwerveModuleSimulation simModule;
+  public int moduleNumber;
+  /** Feedforward for drive motor during closed loop control. */
+  public SimpleMotorFeedforward feedforward;
+  /** Last angle set for the swerve module. */
+  public double lastAngle;
+  /** Simulated swerve module. */
+  private SwerveModuleSimulation simModule;
 
   /**
    * Construct the swerve module and initialize the swerve module motors and absolute encoder.
    *
-   * @param moduleNumber        Module number for kinematics.
+   * @param moduleNumber Module number for kinematics.
    * @param moduleConfiguration Module constants containing CAN ID's and offsets.
    */
-  public SwerveModule(int moduleNumber, SwerveModuleConfiguration moduleConfiguration)
-  {
+  public SwerveModule(int moduleNumber, SwerveModuleConfiguration moduleConfiguration) {
     //    angle = 0;
     //    speed = 0;
     //    omega = 0;
@@ -87,16 +70,14 @@ public class SwerveModule
 
     // Config angle encoders
     absoluteEncoder = moduleConfiguration.absoluteEncoder;
-    if (absoluteEncoder != null)
-    {
+    if (absoluteEncoder != null) {
       absoluteEncoder.factoryDefault();
       absoluteEncoder.configure(moduleConfiguration.absoluteEncoderInverted);
       angleMotor.setPosition(getAbsolutePosition() - angleOffset);
     }
 
     // Config angle motor/controller
-    angleMotor.configureIntegratedEncoder(
-        moduleConfiguration.getPositionEncoderConversion(false));
+    angleMotor.configureIntegratedEncoder(moduleConfiguration.getPositionEncoderConversion(false));
     angleMotor.configurePIDF(moduleConfiguration.anglePIDF);
     angleMotor.configurePIDWrapping(-180, 180);
     angleMotor.setInverted(moduleConfiguration.angleMotorInverted);
@@ -111,21 +92,16 @@ public class SwerveModule
     driveMotor.burnFlash();
     angleMotor.burnFlash();
 
-    if (SwerveDriveTelemetry.isSimulation)
-    {
+    if (SwerveDriveTelemetry.isSimulation) {
       simModule = new SwerveModuleSimulation();
     }
 
     lastAngle = getState().angle.getDegrees();
   }
 
-  /**
-   * Synchronize the integrated angle encoder with the absolute encoder.
-   */
-  public void synchronizeEncoders()
-  {
-    if (absoluteEncoder != null)
-    {
+  /** Synchronize the integrated angle encoder with the absolute encoder. */
+  public void synchronizeEncoders() {
+    if (absoluteEncoder != null) {
       angleMotor.setPosition(getAbsolutePosition() - angleOffset);
     }
   }
@@ -134,18 +110,16 @@ public class SwerveModule
    * Set the desired state of the swerve module.
    *
    * @param desiredState Desired swerve module state.
-   * @param isOpenLoop   Whether to use open loop (direct percent) or direct velocity control.
+   * @param isOpenLoop Whether to use open loop (direct percent) or direct velocity control.
    */
-  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop)
-  {
+  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop) {
     SwerveModuleState simpleState =
         new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     simpleState = SwerveModuleState.optimize(simpleState, getState().angle);
     desiredState =
         new SwerveModuleState2(
             simpleState.speedMetersPerSecond, simpleState.angle, desiredState.omegaRadPerSecond);
-    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
-    {
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber(
           "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
       SmartDashboard.putNumber(
@@ -154,12 +128,10 @@ public class SwerveModule
           "Module " + moduleNumber + " Omega: ", Math.toDegrees(desiredState.omegaRadPerSecond));
     }
 
-    if (isOpenLoop)
-    {
+    if (isOpenLoop) {
       double percentOutput = desiredState.speedMetersPerSecond / configuration.maxSpeed;
       driveMotor.set(percentOutput);
-    } else
-    {
+    } else {
       double velocity = desiredState.speedMetersPerSecond;
       driveMotor.setReference(velocity, feedforward.calculate(velocity));
     }
@@ -167,14 +139,13 @@ public class SwerveModule
     // Prevents module rotation if speed is less than 1%
     double angle =
         (Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01)
-         ? lastAngle
-         : desiredState.angle.getDegrees());
+            ? lastAngle
+            : desiredState.angle.getDegrees());
     angleMotor.setReference(
         angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
     lastAngle = angle;
 
-    if (SwerveDriveTelemetry.isSimulation)
-    {
+    if (SwerveDriveTelemetry.isSimulation) {
       simModule.updateStateAndPosition(desiredState);
     }
   }
@@ -184,8 +155,7 @@ public class SwerveModule
    *
    * @param angle Angle in degrees.
    */
-  public void setAngle(double angle)
-  {
+  public void setAngle(double angle) {
     angleMotor.setReference(angle, configuration.angleKV);
     lastAngle = angle;
   }
@@ -195,18 +165,15 @@ public class SwerveModule
    *
    * @return Current SwerveModule state.
    */
-  public SwerveModuleState2 getState()
-  {
-    double     velocity;
+  public SwerveModuleState2 getState() {
+    double velocity;
     Rotation2d azimuth;
-    double     omega;
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
+    double omega;
+    if (!SwerveDriveTelemetry.isSimulation) {
       velocity = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
       omega = Math.toRadians(angleMotor.getVelocity());
-    } else
-    {
+    } else {
       return simModule.getState();
     }
     return new SwerveModuleState2(velocity, azimuth, omega);
@@ -217,20 +184,16 @@ public class SwerveModule
    *
    * @return {@link SwerveModulePosition} of the swerve module.
    */
-  public SwerveModulePosition getPosition()
-  {
-    double     position;
+  public SwerveModulePosition getPosition() {
+    double position;
     Rotation2d azimuth;
-    if (!SwerveDriveTelemetry.isSimulation)
-    {
+    if (!SwerveDriveTelemetry.isSimulation) {
       position = driveMotor.getPosition();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
-    } else
-    {
+    } else {
       return simModule.getPosition();
     }
-    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
-    {
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber("Module " + moduleNumber + "Angle", azimuth.getDegrees());
     }
     return new SwerveModulePosition(position, azimuth);
@@ -241,13 +204,10 @@ public class SwerveModule
    *
    * @return Absolute encoder angle in degrees.
    */
-  public double getAbsolutePosition()
-  {
-    if (absoluteEncoder != null)
-    {
+  public double getAbsolutePosition() {
+    if (absoluteEncoder != null) {
       double angle = absoluteEncoder.getAbsolutePosition();
-      if (absoluteEncoder.readingError)
-      {
+      if (absoluteEncoder.readingError) {
         angle = getRelativePosition();
       }
 
@@ -262,8 +222,7 @@ public class SwerveModule
    *
    * @return Angle in degrees.
    */
-  public double getRelativePosition()
-  {
+  public double getRelativePosition() {
     return angleMotor.getPosition();
   }
 
@@ -272,16 +231,12 @@ public class SwerveModule
    *
    * @param brake Set the brake mode.
    */
-  public void setMotorBrake(boolean brake)
-  {
+  public void setMotorBrake(boolean brake) {
     driveMotor.setMotorBrake(brake);
   }
 
-  /**
-   * Reset the drive motor position to 0.
-   */
-  public void resetEncoder()
-  {
+  /** Reset the drive motor position to 0. */
+  public void resetEncoder() {
     driveMotor.setPosition(0);
   }
 }
