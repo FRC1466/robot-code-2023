@@ -141,8 +141,6 @@ public class SwerveDrive {
                 visionMeasurementStdDevs);
         break;
       case "speeds":
-        System.out.println(localMeasurementStdDev.getNumCols());
-        System.out.println(localMeasurementStdDev.getNumRows());
         swerveDrivePoseEstimator =
             new SwerveDrivePoseEstimator(
                 getGyroRotation3d(),
