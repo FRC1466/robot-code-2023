@@ -387,6 +387,11 @@ public class SwerveDrivePoseEstimatorFused extends SwervePose {
       z = m_accelObserver.getXhat(0);
     }
 
+    // Find angle between previous translation and current translation.
+    // (this would signify the current curve)
+    // Weighted filter to use depending on the curve. Since twist does better for curves and
+    // chassisSpeeds does better for straight.
+
     var u =
         VecBuilder.fill(
             fieldRelativeVelocities.getX(),

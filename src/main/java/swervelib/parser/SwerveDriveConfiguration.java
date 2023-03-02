@@ -20,7 +20,7 @@ public class SwerveDriveConfiguration {
   /** Swerve Modules. */
   public SwerveModule[] modules;
 
-  public String poseType = "speeds";
+  public String poseType = "fused";
 
   /**
    * Create swerve drive configuration.
