@@ -1,2 +1,4 @@
-/** Mathematics for swerve drives. */
+/**
+ * Mathematics for swerve drives.
+ */
 package swervelib.math;
