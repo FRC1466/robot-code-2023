@@ -102,7 +102,7 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("Arm PID Setpoint", setpoint.getRadians());
     SmartDashboard.putNumber("Arm PID Output", motorOutput);
     SmartDashboard.putNumber("Arm Feedforward", feedforward);
-    armMotor.set(motorOutput + feedforward);
+    // armMotor.set(motorOutput + feedforward);
   }
 
   public void setArm(ARM height) {

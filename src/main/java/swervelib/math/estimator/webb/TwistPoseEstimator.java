@@ -14,13 +14,14 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.numbers.N6;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveModuleState2;
 import swervelib.math.estimator.SwervePose;
 
@@ -61,7 +62,7 @@ public class TwistPoseEstimator extends SwervePose {
    * @param initialPoseMeters The starting pose estimate.
    */
   public TwistPoseEstimator(
-      SwerveDriveKinematics kinematics,
+      SwerveKinematics2 kinematics,
       Rotation3d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose3d initialPoseMeters) {
@@ -89,7 +90,7 @@ public class TwistPoseEstimator extends SwervePose {
    *     the vision pose measurement less.
    */
   public TwistPoseEstimator(
-      SwerveDriveKinematics kinematics,
+      SwerveKinematics2 kinematics,
       Rotation3d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose3d initialPoseMeters,

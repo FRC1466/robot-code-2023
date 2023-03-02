@@ -1,7 +1,6 @@
 package frc.robot.subsystems.manipulator;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,16 +26,16 @@ public class Gripper extends SubsystemBase {
   /** Create a new Gripper subsystem. */
   public Gripper() {
 
-    gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
-    gripperMotor.enableVoltageCompensation(12.0);
-    gripperMotor.setSmartCurrentLimit(40);
-    gripperMotor.burnFlash();
+    // gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
+    // gripperMotor.enableVoltageCompensation(12.0);
+    // gripperMotor.setSmartCurrentLimit(40);
+    // gripperMotor.burnFlash();
 
-    pidController = gripperMotor.getPIDController();
-    initializePID();
+    // pidController = gripperMotor.getPIDController();
+    // initializePID();
 
-    encoder = gripperMotor.getEncoder();
-    initializeEncoder();
+    // encoder = gripperMotor.getEncoder();
+    // initializeEncoder();
   }
 
   private void initializePID() {
@@ -84,7 +83,7 @@ public class Gripper extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Gripper Encoder Position", encoder.getPosition());
-    SmartDashboard.putNumber("Gripper Amps", gripperMotor.getOutputCurrent());
+    // SmartDashboard.putNumber("Gripper Encoder Position", encoder.getPosition());
+    // SmartDashboard.putNumber("Gripper Amps", gripperMotor.getOutputCurrent());
   }
 }
