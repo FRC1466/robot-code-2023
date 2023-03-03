@@ -1,7 +1,7 @@
 {
   "wheelDiameter": 3.89,
   "gearRatio": {
-    "drive": 7.13,
+    "drive": 8.14,
     "angle": 12.8
   },
   "encoderPulsePerRotation": {

@@ -11,9 +11,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N6;
+import edu.wpi.first.math.numbers.N4;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,11 +24,9 @@ import java.util.Optional;
 import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveMath;
+import swervelib.math.SwerveModulePosition2;
 import swervelib.math.SwerveModuleState2;
-import swervelib.math.estimator.SwervePose;
-import swervelib.math.estimator.codeorange.SwerveDrivePoseEstimator;
-import swervelib.math.estimator.codeorange.SwerveDrivePoseEstimatorFused;
-import swervelib.math.estimator.webb.TwistPoseEstimator;
+import swervelib.math.estimator.SwerveDrivePoseEstimator;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.simulation.SwerveIMUSimulation;
@@ -44,7 +41,7 @@ public class SwerveDrive {
   /** Swerve drive configuration. */
   public final SwerveDriveConfiguration swerveDriveConfiguration;
   /** Swerve odometry. */
-  public final SwervePose swerveDrivePoseEstimator;
+  public final SwerveDrivePoseEstimator swerveDrivePoseEstimator;
   /** Swerve modules. */
   private final SwerveModule[] swerveModules;
   /** Field object. */
@@ -52,27 +49,10 @@ public class SwerveDrive {
   /** Swerve controller for controlling heading of the robot. */
   public SwerveController swerveController;
   /**
-   * Trustworthiness of the internal model of how motors should be moving Measured in expected
-   * standard deviation (meters of position and degrees of rotation)
-   */
-  public Matrix<N6, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
-  /**
-   * Trustworthiness of the internal model of robot speed updating in the z direction in std
-   * deviations.
-   */
-  public Matrix<N1, N1> accelStateStdDevs = VecBuilder.fill(0.5);
-  /**
-   * Trustworthiness of the measurements of acceleration updating in the z direction in std
-   * deviations.
-   */
-  public Matrix<N1, N1> accelMeasurementStdDevs = VecBuilder.fill(0.7);
-  /**
    * Trustworthiness of the vision system Measured in expected standard deviation (meters of
    * position and degrees of rotation)
    */
-  public Matrix<N6, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 0.9, 0.9, 0.9);
-  /** Local measurement standard deviation, higher = less trustworthy. */
-  public Matrix<N6, N1> localMeasurementStdDev = VecBuilder.fill(5.0, 5.0, 1.0, 1.0, 1.0, 1.0);
+  public Matrix<N4, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 0.9);
   /** Invert odometry readings of drive motor positions, used as a patch for debugging currently. */
   public boolean invertOdometry = false;
   /** Swerve IMU device for sensing the heading of the robot. */
@@ -83,17 +63,6 @@ public class SwerveDrive {
   private int moduleSynchronizationCounter = 0;
   /** The last heading set in radians. */
   private double lastHeadingRadians = 0;
-
-  private boolean useAccel = false;
-
-  public enum kPoseEstimator {
-    /** Fuses ChassisSpeeds and Twists */
-    kFused,
-    /** Kalman Filter Chassis Speeds */
-    kSpeeds,
-    /** Traditional Pose3d updater with Twists */
-    kTwists
-  }
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive}
@@ -126,47 +95,12 @@ public class SwerveDrive {
 
     this.swerveModules = config.modules;
 
-    switch (config.poseType) {
-      case "fused":
-        swerveDrivePoseEstimator =
-            new SwerveDrivePoseEstimatorFused(
-                getGyroRotation3d(),
-                new Pose3d(new Translation3d(0, 0, 0), new Rotation3d()),
-                kinematics,
-                getModulePositions(),
-                stateStdDevs,
-                localMeasurementStdDev,
-                accelStateStdDevs,
-                accelMeasurementStdDevs,
-                visionMeasurementStdDevs);
-        break;
-      case "speeds":
-        swerveDrivePoseEstimator =
-            new SwerveDrivePoseEstimator(
-                getGyroRotation3d(),
-                new Pose3d(new Translation3d(0, 0, 0), new Rotation3d()),
-                kinematics,
-                getModulePositions(),
-                stateStdDevs,
-                VecBuilder.fill(
-                    localMeasurementStdDev.get(3, 0),
-                    localMeasurementStdDev.get(4, 0),
-                    localMeasurementStdDev.get(5, 0)),
-                accelStateStdDevs,
-                accelMeasurementStdDevs,
-                visionMeasurementStdDevs);
-        break;
-      case "twist":
-        swerveDrivePoseEstimator =
-            new TwistPoseEstimator(
-                kinematics,
-                getGyroRotation3d(),
-                getModulePositions(),
-                new Pose3d(new Translation3d(0, 0, 0), new Rotation3d()));
-        break;
-      default:
-        throw new IllegalArgumentException("Pose type not recognized.");
-    }
+    swerveDrivePoseEstimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            getGyroRotation3d(),
+            getModulePositions(),
+            new Pose3d(new Translation3d(0, 0, 0), new Rotation3d()));
     // x,y,heading in radians; Vision measurement std dev,
     // higher=less weight
 
@@ -334,7 +268,7 @@ public class SwerveDrive {
    * @return The robot's pose
    */
   public Pose2d getPose() {
-    return swerveDrivePoseEstimator.getPoseMeters().toPose2d();
+    return swerveDrivePoseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -343,7 +277,7 @@ public class SwerveDrive {
    * @return The robot's pose
    */
   public Pose3d getPose3d() {
-    return swerveDrivePoseEstimator.getPoseMeters();
+    return swerveDrivePoseEstimator.getEstimatedPosition3d();
   }
 
   /**
@@ -409,11 +343,11 @@ public class SwerveDrive {
    * Gets the current module positions (azimuth and wheel position (meters)). Inverts the distance
    * from each module if {@link #invertOdometry} is true.
    *
-   * @return A list of SwerveModulePositions containg the current module positions
+   * @return A list of SwerveModulePosition2s containg the current module positions
    */
-  public SwerveModulePosition[] getModulePositions() {
-    SwerveModulePosition[] positions =
-        new SwerveModulePosition[swerveDriveConfiguration.moduleCount];
+  public SwerveModulePosition2[] getModulePositions() {
+    SwerveModulePosition2[] positions =
+        new SwerveModulePosition2[swerveDriveConfiguration.moduleCount];
     for (SwerveModule module : swerveModules) {
       positions[module.moduleNumber] = module.getPosition();
       if (invertOdometry) {
@@ -427,7 +361,7 @@ public class SwerveDrive {
    * Gets the current module positions (azimuth and wheel position (meters)). Inverts the distance
    * from each module if {@link #invertOdometry} is true.
    *
-   * @return A list of SwerveModulePositions containg the current module positions
+   * @return A list of SwerveModulePosition2s containg the current module positions
    */
   public SwerveModuleState2[] getModuleStates() {
     SwerveModuleState2[] states = new SwerveModuleState2[swerveDriveConfiguration.moduleCount];
@@ -511,32 +445,25 @@ public class SwerveDrive {
   public Rotation3d getGyroRotation3d() {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
     if (!SwerveDriveTelemetry.isSimulation) {
-      double[] ypr = new double[3];
-      imu.getYawPitchRoll(ypr);
-      return new Rotation3d(
-          Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[2] : ypr[2]),
-          Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[1] : ypr[1]),
-          Math.toRadians(swerveDriveConfiguration.invertedIMU ? 360 - ypr[0] : ypr[0]));
+      return swerveDriveConfiguration.invertedIMU
+          ? imu.getRotation3d().unaryMinus()
+          : imu.getRotation3d();
     } else {
       return simIMU.getGyroRotation3d();
     }
   }
 
   /**
-   * Gets current acceleration of the robot in m/s/s
+   * Gets current acceleration of the robot in m/s/s. If gyro unsupported returns empty.
    *
    * @return acceleration of the robot as a {@link Translation3d}
    */
   public Optional<Translation3d> getAccel() {
-    Double[] accel = new Double[3];
     if (!SwerveDriveTelemetry.isSimulation) {
-      imu.getAccel(accel);
+      return imu.getAccel();
     } else {
-      simIMU.getAccel(accel);
+      return simIMU.getAccel();
     }
-    return (!accel[0].isNaN() || !accel[1].isNaN() || !accel[2].isNaN()) && useAccel
-        ? Optional.of(new Translation3d(accel[0], accel[1], accel[2]).rotateBy(getGyroRotation3d()))
-        : Optional.empty();
   }
 
   /**
@@ -604,13 +531,11 @@ public class SwerveDrive {
    */
   public void updateOdometry() {
     // Update odometry
-    swerveDrivePoseEstimator.update(
-        getGyroRotation3d(), getAccel(), getModuleStates(), getModulePositions());
+    swerveDrivePoseEstimator.update(getGyroRotation3d(), getModulePositions());
 
     // Update angle accumulator if the robot is simulated
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {
-      Pose2d[] modulePoses =
-          getSwerveModulePoses(swerveDrivePoseEstimator.getPoseMeters().toPose2d());
+      Pose2d[] modulePoses = getSwerveModulePoses(swerveDrivePoseEstimator.getEstimatedPosition());
       if (SwerveDriveTelemetry.isSimulation) {
         simIMU.updateOdometry(kinematics, getStates(), modulePoses, field);
       }
@@ -624,7 +549,7 @@ public class SwerveDrive {
     }
 
     if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.LOW.ordinal()) {
-      field.setRobotPose(swerveDrivePoseEstimator.getPoseMeters().toPose2d());
+      field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
     }
 
     double sumOmega = 0;
@@ -676,7 +601,7 @@ public class SwerveDrive {
    *     SwerveDrivePoseEstimator#addVisionMeasurement(Pose3d, double)} function, or hard reset
    *     odometry with the given position with {@link
    *     edu.wpi.first.math.kinematics.SwerveDriveOdometry#resetPosition(Rotation2d,
-   *     SwerveModulePosition[], Pose2d)}.
+   *     SwerveModulePosition2[], Pose2d)}.
    * @param trustWorthiness Trust level of vision reading when using a soft measurement, used to
    *     multiply the standard deviation. Set to 1 for full trust.
    */
@@ -691,10 +616,10 @@ public class SwerveDrive {
     }
 
     if (!SwerveDriveTelemetry.isSimulation) {
-      imu.setYaw(swerveDrivePoseEstimator.getPoseMeters().getRotation().getZ());
+      imu.setYaw(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
       // Yaw reset recommended by Team 1622
     } else {
-      simIMU.setAngle(swerveDrivePoseEstimator.getPoseMeters().getRotation().getZ());
+      simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
     }
   }
 

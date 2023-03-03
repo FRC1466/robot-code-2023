@@ -1,5 +1,9 @@
 package swervelib.imu;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import java.util.Optional;
+
 /** Swerve IMU abstraction to define a standard interface with a swerve drive. */
 public abstract class SwerveIMU {
 
@@ -24,11 +28,18 @@ public abstract class SwerveIMU {
   public abstract void getYawPitchRoll(double[] yprArray);
 
   /**
+   * Fetch the {@link Rotation3d} from the IMU. Robot relative.
+   *
+   * @return {@link Rotation3d} from the IMU.
+   */
+  public abstract Rotation3d getRotation3d();
+
+  /**
    * Fetch the acceleration [x, y, z] from the IMU.
    *
-   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   * @return {@link Translation3d} of the acceleration.
    */
-  public abstract void getAccel(Double[] accel);
+  public abstract Optional<Translation3d> getAccel();
 
   /**
    * Get the instantiated IMU object.

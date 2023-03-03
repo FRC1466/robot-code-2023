@@ -1,7 +1,10 @@
 package swervelib.imu;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Optional;
 
 /** IMU Swerve class for the {@link ADXRS450_Gyro} device. */
 public class ADXRS450Swerve extends SwerveIMU {
@@ -56,15 +59,23 @@ public class ADXRS450Swerve extends SwerveIMU {
   }
 
   /**
+   * Fetch the {@link Rotation3d} from the IMU. Robot relative.
+   *
+   * @return {@link Rotation3d} from the IMU.
+   */
+  public Rotation3d getRotation3d() {
+    return new Rotation3d(0, 0, imu.getAngle())
+        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
+  }
+
+  /**
    * Fetch the acceleration [x, y, z] from the IMU.
    *
-   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   * @return {@link Translation3d} of the acceleration.
    */
   @Override
-  public void getAccel(Double[] accel) {
-    accel[0] = Double.NaN;
-    accel[1] = Double.NaN;
-    accel[2] = Double.NaN;
+  public Optional<Translation3d> getAccel() {
+    return Optional.empty();
   }
 
   /**

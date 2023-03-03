@@ -2,7 +2,10 @@ package swervelib.imu;
 
 import com.ctre.phoenix.sensors.Pigeon2Configuration;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Optional;
 
 /** SwerveIMU interface for the Pigeon2 */
 public class Pigeon2Swerve extends SwerveIMU {
@@ -65,17 +68,27 @@ public class Pigeon2Swerve extends SwerveIMU {
   }
 
   /**
-   * Fetch the acceleration [x, y, z] from the IMU.
+   * Fetch the {@link Rotation3d} from the IMU. Robot relative.
    *
-   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   * @return {@link Rotation3d} from the IMU.
    */
   @Override
-  public void getAccel(Double[] accel) {
+  public Rotation3d getRotation3d() {
+    double[] yprArray = new double[3];
+    imu.getYawPitchRoll(yprArray);
+    return new Rotation3d(yprArray[2], yprArray[1], yprArray[0]);
+  }
+
+  /**
+   * Fetch the acceleration [x, y, z] from the IMU.
+   *
+   * @return {@link Translation3d} of the acceleration.
+   */
+  @Override
+  public Optional<Translation3d> getAccel() {
     short[] initial = new short[3];
     imu.getBiasedAccelerometer(initial);
-    accel[0] = initial[0] / 16384.0 * 9.81;
-    accel[1] = initial[1] / 16384.0 * 9.81;
-    accel[2] = initial[2] / 16384.0 * 9.81;
+    return Optional.of(new Translation3d(initial[0], initial[1], initial[2]).times(9.81 / 16384.0));
   }
 
   /**

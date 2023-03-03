@@ -1,9 +1,12 @@
 package swervelib.imu;
 
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Optional;
 
 /** Communicates with the NavX as the IMU. */
 public class NavXSwerve extends SwerveIMU {
@@ -66,15 +69,28 @@ public class NavXSwerve extends SwerveIMU {
   }
 
   /**
+   * Fetch the {@link Rotation3d} from the IMU. Robot relative.
+   *
+   * @return {@link Rotation3d} from the IMU.
+   */
+  public Rotation3d getRotation3d() {
+    return new Rotation3d(gyro.getRoll(), gyro.getPitch(), gyro.getYaw())
+        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
+  }
+
+  /**
    * Fetch the acceleration [x, y, z] from the IMU.
    *
-   * @param accel Array which will be filled with {x, y, z} in m/s/s.
+   * @return {@link Translation3d} of the acceleration.
    */
   @Override
-  public void getAccel(Double[] accel) {
-    accel[0] = (Double) (double) gyro.getWorldLinearAccelX() * 9.81;
-    accel[1] = (Double) (double) gyro.getWorldLinearAccelY() * 9.81;
-    accel[2] = (Double) (double) gyro.getWorldLinearAccelZ() * 9.81;
+  public Optional<Translation3d> getAccel() {
+    return Optional.of(
+        new Translation3d(
+                gyro.getWorldLinearAccelX(),
+                gyro.getWorldLinearAccelY(),
+                gyro.getWorldLinearAccelZ())
+            .times(9.81));
   }
 
   /**

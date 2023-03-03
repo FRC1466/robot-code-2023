@@ -2,10 +2,10 @@ package swervelib;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.encoders.SwerveAbsoluteEncoder;
+import swervelib.math.SwerveModulePosition2;
 import swervelib.math.SwerveModuleState2;
 import swervelib.motors.SwerveMotor;
 import swervelib.parser.SwerveModuleConfiguration;
@@ -182,21 +182,23 @@ public class SwerveModule {
   /**
    * Get the position of the swerve module.
    *
-   * @return {@link SwerveModulePosition} of the swerve module.
+   * @return {@link SwerveModulePosition2} of the swerve module.
    */
-  public SwerveModulePosition getPosition() {
+  public SwerveModulePosition2 getPosition() {
     double position;
     Rotation2d azimuth;
+    double omega;
     if (!SwerveDriveTelemetry.isSimulation) {
       position = driveMotor.getPosition();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
+      omega = Math.toRadians(angleMotor.getVelocity());
     } else {
       return simModule.getPosition();
     }
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber("Module " + moduleNumber + "Angle", azimuth.getDegrees());
     }
-    return new SwerveModulePosition(position, azimuth);
+    return new SwerveModulePosition2(position, azimuth, omega);
   }
 
   /**

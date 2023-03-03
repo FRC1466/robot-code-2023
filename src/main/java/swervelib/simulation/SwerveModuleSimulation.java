@@ -1,8 +1,8 @@
 package swervelib.simulation;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.Timer;
+import swervelib.math.SwerveModulePosition2;
 import swervelib.math.SwerveModuleState2;
 
 /** Class to hold simulation data for {@link swervelib.SwerveModule} */
@@ -52,11 +52,10 @@ public class SwerveModuleSimulation {
   /**
    * Get the simulated swerve module position.
    *
-   * @return {@link SwerveModulePosition} of the simulated module.
+   * @return {@link SwerveModulePosition2} of the simulated module.
    */
-  public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(
-        fakePos, state.angle.plus(new Rotation2d(state.omegaRadPerSecond * dt)));
+  public SwerveModulePosition2 getPosition() {
+    return new SwerveModulePosition2(fakePos, state.angle, state.omegaRadPerSecond);
   }
 
   /**
