@@ -275,9 +275,6 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
               + "constructor");
     }
     var moduleStatesMatrix = new SimpleMatrix(m_numModules * 2, 1);
-    var time = WPIUtilJNI.now() * 1.0e-6;
-    var dt = time - m_lastTimeChassisSpeeds;
-    m_lastTimeChassisSpeeds = time;
 
     for (int i = 0; i < m_numModules; i++) {
       var module = wheelStates[i];
@@ -312,10 +309,14 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
 
     var accelerationVector = bigForwardKinematics.mult(moduleAccelerationStatesMatrix);
 
+    var time = WPIUtilJNI.now() * 1.0e-6;
+    var dt = time - m_lastTimeChassisSpeeds;
+    m_lastTimeChassisSpeeds = time;
+
     return new ChassisSpeeds(
-        chassisSpeedsVector.get(0, 0) - accelerationVector.get(0, 0) * dt,
-        chassisSpeedsVector.get(1, 0) - accelerationVector.get(1, 0) * dt,
-        chassisSpeedsVector.get(2, 0) - accelerationVector.get(3, 0) * dt);
+        chassisSpeedsVector.get(0, 0) - accelerationVector.get(0, 0) * dt * 1000,
+        chassisSpeedsVector.get(1, 0) - accelerationVector.get(1, 0) * dt * 1000,
+        chassisSpeedsVector.get(2, 0) - accelerationVector.get(3, 0) * dt * 1000);
   }
 
   /**
@@ -335,8 +336,6 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
               + "constructor");
     }
     var moduleDeltaMatrix = new SimpleMatrix(m_numModules * 2, 1);
-    var dt = WPIUtilJNI.now() * 1.0e-6 - m_lastTimeTwist;
-    m_lastTimeTwist = WPIUtilJNI.now() * 1.0e-6;
 
     for (int i = 0; i < m_numModules; i++) {
       var module = wheelDeltas[i];
@@ -371,6 +370,10 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
 
     var accelerationVector = bigForwardKinematics.mult(moduleAccelerationStatesMatrix);
     System.out.println(accelerationVector.toString());
+
+    var time = WPIUtilJNI.now() * 1.0e-6;
+    var dt = time - m_lastTimeTwist;
+    m_lastTimeTwist = time;
 
     return new Twist2d(
         chassisDeltaVector.get(0, 0) - accelerationVector.get(0, 0) * dt * 1.1,
