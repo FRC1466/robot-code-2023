@@ -3,6 +3,7 @@ package swervelib;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.math.SwerveModulePosition2;
@@ -24,6 +25,7 @@ public class SwerveModule {
   private final SwerveMotor angleMotor, driveMotor;
   /** Absolute encoder for swerve drive. */
   private final SwerveAbsoluteEncoder absoluteEncoder;
+  private final Timer timer;
   /**
    * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back
    * right.
@@ -33,6 +35,8 @@ public class SwerveModule {
   public SimpleMotorFeedforward feedforward;
   /** Last angle set for the swerve module. */
   public double lastAngle;
+  private double pastVel = 0;
+  private double lastTime;
   /** Simulated swerve module. */
   private SwerveModuleSimulation simModule;
 
@@ -47,6 +51,9 @@ public class SwerveModule {
     //    speed = 0;
     //    omega = 0;
     //    fakePos = 0;
+    timer = new Timer();
+    timer.start();
+    lastTime = timer.get();
     this.moduleNumber = moduleNumber;
     configuration = moduleConfiguration;
     angleOffset = moduleConfiguration.angleOffset;
@@ -118,7 +125,7 @@ public class SwerveModule {
     simpleState = SwerveModuleState.optimize(simpleState, getState().angle);
     desiredState =
         new SwerveModuleState2(
-            simpleState.speedMetersPerSecond, simpleState.angle, desiredState.omegaRadPerSecond);
+            simpleState.speedMetersPerSecond, desiredState.accelMetersPerSecondSq, simpleState.angle, desiredState.omegaRadPerSecond);
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber(
           "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
@@ -167,16 +174,21 @@ public class SwerveModule {
    */
   public SwerveModuleState2 getState() {
     double velocity;
+    double accel;
     Rotation2d azimuth;
     double omega;
+    var dt = timer.get() - lastTime;
+    lastTime = timer.get();
+
     if (!SwerveDriveTelemetry.isSimulation) {
       velocity = driveMotor.getVelocity();
+      accel = (velocity - pastVel)/dt;
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
       omega = Math.toRadians(angleMotor.getVelocity());
     } else {
       return simModule.getState();
     }
-    return new SwerveModuleState2(velocity, azimuth, omega);
+    return new SwerveModuleState2(velocity, accel, azimuth, omega);
   }
 
   /**
@@ -186,10 +198,12 @@ public class SwerveModule {
    */
   public SwerveModulePosition2 getPosition() {
     double position;
+    double vel;
     Rotation2d azimuth;
     double omega;
     if (!SwerveDriveTelemetry.isSimulation) {
       position = driveMotor.getPosition();
+      vel = driveMotor.getVelocity();
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
       omega = Math.toRadians(angleMotor.getVelocity());
     } else {
@@ -198,7 +212,7 @@ public class SwerveModule {
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber("Module " + moduleNumber + "Angle", azimuth.getDegrees());
     }
-    return new SwerveModulePosition2(position, azimuth, omega);
+    return new SwerveModulePosition2(position, vel, azimuth, omega);
   }
 
   /**

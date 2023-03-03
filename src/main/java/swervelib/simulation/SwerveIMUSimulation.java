@@ -87,7 +87,7 @@ public class SwerveIMUSimulation {
       Pose2d[] modulePoses,
       Field2d field) {
 
-    System.out.println(kinematics.toChassisSpeeds(states).toString());
+    // System.out.println(kinematics.toChassisSpeeds(states).toString());
     angle += kinematics.toChassisSpeeds(states).omegaRadiansPerSecond * (timer.get() - lastTime);
     lastTime = timer.get();
     field.getObject("XModules").setPoses(modulePoses);

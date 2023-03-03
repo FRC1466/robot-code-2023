@@ -485,7 +485,7 @@ public class SwerveDrive {
     // Sets states
     for (SwerveModule swerveModule : swerveModules) {
       SwerveModuleState2 desiredState =
-          new SwerveModuleState2(0, swerveModule.configuration.moduleLocation.getAngle(), 0);
+          new SwerveModuleState2(0, 0, swerveModule.configuration.moduleLocation.getAngle(), 0);
       if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {
         SwerveDriveTelemetry.desiredStates[swerveModule.moduleNumber * 2] =
             desiredState.angle.getDegrees();

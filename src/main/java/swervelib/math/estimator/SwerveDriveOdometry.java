@@ -54,6 +54,7 @@ public class SwerveDriveOdometry {
       m_previousModulePositions[index] =
           new SwerveModulePosition2(
               modulePositions[index].distanceMeters,
+              modulePositions[index].velocityMetersPerSecond,
               modulePositions[index].angle,
               modulePositions[index].omegaRadPerSecond);
     }
@@ -132,6 +133,7 @@ public class SwerveDriveOdometry {
       m_previousModulePositions[index] =
           new SwerveModulePosition2(
               modulePositions[index].distanceMeters,
+              modulePositions[index].velocityMetersPerSecond,
               modulePositions[index].angle,
               modulePositions[index].omegaRadPerSecond);
     }
@@ -199,6 +201,7 @@ public class SwerveDriveOdometry {
       moduleDeltas[index] =
           new SwerveModulePosition2(
               current.distanceMeters - previous.distanceMeters,
+              current.velocityMetersPerSecond - previous.velocityMetersPerSecond,
               current.angle,
               current.omegaRadPerSecond);
       previous.distanceMeters = current.distanceMeters;

@@ -18,6 +18,8 @@ public class SwerveModuleSimulation {
    * The fake speed of the previous state, used to calculate {@link SwerveModuleSimulation#fakePos}.
    */
   private double fakeSpeed;
+  private double fakeAccel;
+  private double pastSpeed;
   /** Last time queried. */
   private double lastTime;
   /** Current simulated swerve module state. */
@@ -28,8 +30,10 @@ public class SwerveModuleSimulation {
     timer = new Timer();
     timer.start();
     lastTime = timer.get();
-    state = new SwerveModuleState2(0, Rotation2d.fromDegrees(0), 0);
+    state = new SwerveModuleState2();
     fakeSpeed = 0;
+    pastSpeed = 0;
+    fakeAccel = 0;
     fakePos = 0;
     dt = 0;
   }
@@ -46,6 +50,9 @@ public class SwerveModuleSimulation {
 
     state = desiredState;
     fakeSpeed = desiredState.speedMetersPerSecond;
+    fakeAccel = (desiredState.speedMetersPerSecond - pastSpeed)/dt;
+    state.accelMetersPerSecondSq = fakeAccel;
+    pastSpeed = desiredState.speedMetersPerSecond;
     fakePos += (fakeSpeed * dt);
   }
 
@@ -55,7 +62,7 @@ public class SwerveModuleSimulation {
    * @return {@link SwerveModulePosition2} of the simulated module.
    */
   public SwerveModulePosition2 getPosition() {
-    return new SwerveModulePosition2(fakePos, state.angle, state.omegaRadPerSecond);
+    return new SwerveModulePosition2(fakePos, fakeSpeed, state.angle, state.omegaRadPerSecond);
   }
 
   /**
