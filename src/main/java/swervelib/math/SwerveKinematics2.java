@@ -2,6 +2,7 @@ package swervelib.math;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -9,7 +10,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-
 import java.util.Arrays;
 import java.util.Collections;
 import org.ejml.simple.SimpleMatrix;
@@ -37,8 +37,12 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
   private final SwerveModuleState2[] m_moduleStates;
   /** Previous CoR */
   private Translation2d m_prevCoR = new Translation2d();
+
   private double m_lastTimeTwist = 0;
   private double m_lastTimeChassisSpeeds = 0;
+
+  private Pose2d m_lastVelocityChassis = new Pose2d();
+  private Pose2d m_lastAccelChassis = new Pose2d();
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations
@@ -292,7 +296,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
 
       double vel = module.speedMetersPerSecond;
       double accel = module.accelMetersPerSecondSq;
-      Rotation2d angle = module.angle;
+      var angle = module.angle;
       double angleVel = module.omegaRadPerSecond;
 
       var omegaVector = new SimpleMatrix(2, 1);
@@ -316,9 +320,9 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     m_lastTimeChassisSpeeds = time;
 
     return new ChassisSpeeds(
-      chassisSpeedsVector.get(0, 0) - accelerationVector.get(0, 0) * dt,
-      chassisSpeedsVector.get(1, 0) - accelerationVector.get(1, 0) * dt,
-      chassisSpeedsVector.get(2, 0) - accelerationVector.get(3, 0) * dt);
+        chassisSpeedsVector.get(0, 0) - accelerationVector.get(0, 0) * dt,
+        chassisSpeedsVector.get(1, 0) - accelerationVector.get(1, 0) * dt,
+        chassisSpeedsVector.get(2, 0) - accelerationVector.get(3, 0) * dt);
   }
 
   /**
@@ -331,6 +335,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
    *     should be same as passed into the constructor of this class.
    * @return The resulting Twist2d.
    */
+  @SuppressWarnings("DuplicatedCode")
   public Twist2d toTwist2d(SwerveModulePosition2... wheelDeltas) {
     if (wheelDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
@@ -354,7 +359,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
 
       double pos = module.distanceMeters;
       double vel = module.speedMetersPerSecond;
-      Rotation2d angle = module.angle;
+      var angle = module.angle;
       double angleVel = module.omegaRadPerSecond;
 
       var omegaVector = new SimpleMatrix(2, 1);
@@ -378,8 +383,14 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     m_lastTimeTwist = time;
 
     return new Twist2d(
-        chassisDeltaVector.get(0, 0) - accelerationVector.get(0, 0) * dt,
-        chassisDeltaVector.get(1, 0) - accelerationVector.get(1, 0) * dt,
+        chassisDeltaVector.get(0, 0)
+            - accelerationVector.get(0, 0)
+                * dt
+                * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
+        chassisDeltaVector.get(1, 0)
+            - accelerationVector.get(1, 0)
+                * dt
+                * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
         chassisDeltaVector.get(2, 0) - accelerationVector.get(3, 0) * dt);
   }
 }

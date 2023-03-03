@@ -8,6 +8,7 @@ public class SwerveModulePosition2 extends SwerveModuleState {
 
   /** Swerve module speed in meters per second. */
   public double distanceMeters = 0;
+
   public double velocityMetersPerSecond = 0;
   /** Rad per sec */
   public double omegaRadPerSecond = 0;
@@ -26,7 +27,10 @@ public class SwerveModulePosition2 extends SwerveModuleState {
    * @param omegaRadPerSecond The angular velocity of the module.
    */
   public SwerveModulePosition2(
-      double distanceMeters, double velocityMetersPerSecond, Rotation2d angle, double omegaRadPerSecond) {
+      double distanceMeters,
+      double velocityMetersPerSecond,
+      Rotation2d angle,
+      double omegaRadPerSecond) {
     this.distanceMeters = distanceMeters;
     this.velocityMetersPerSecond = velocityMetersPerSecond;
     this.angle = angle;

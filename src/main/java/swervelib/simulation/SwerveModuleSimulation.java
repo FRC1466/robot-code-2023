@@ -1,6 +1,5 @@
 package swervelib.simulation;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import swervelib.math.SwerveModulePosition2;
 import swervelib.math.SwerveModuleState2;
@@ -18,6 +17,7 @@ public class SwerveModuleSimulation {
    * The fake speed of the previous state, used to calculate {@link SwerveModuleSimulation#fakePos}.
    */
   private double fakeSpeed;
+
   private double fakeAccel;
   private double pastSpeed;
   /** Last time queried. */
@@ -50,8 +50,9 @@ public class SwerveModuleSimulation {
 
     state = desiredState;
     fakeSpeed = desiredState.speedMetersPerSecond;
-    fakeAccel = (desiredState.speedMetersPerSecond - pastSpeed)/dt;
-    state.accelMetersPerSecondSq = fakeAccel;
+    fakeAccel = (desiredState.speedMetersPerSecond - pastSpeed) / dt;
+    // System.out.println(desiredState.accelMetersPerSecondSq);
+    state.accelMetersPerSecondSq = desiredState.accelMetersPerSecondSq;
     pastSpeed = desiredState.speedMetersPerSecond;
     fakePos += (fakeSpeed * dt);
   }

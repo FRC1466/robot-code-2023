@@ -25,6 +25,7 @@ public class SwerveModule {
   private final SwerveMotor angleMotor, driveMotor;
   /** Absolute encoder for swerve drive. */
   private final SwerveAbsoluteEncoder absoluteEncoder;
+
   private final Timer timer;
   /**
    * Module number for kinematics, usually 0 to 3. front left -> front right -> back left -> back
@@ -35,6 +36,7 @@ public class SwerveModule {
   public SimpleMotorFeedforward feedforward;
   /** Last angle set for the swerve module. */
   public double lastAngle;
+
   private double pastVel = 0;
   private double lastTime;
   /** Simulated swerve module. */
@@ -125,7 +127,10 @@ public class SwerveModule {
     simpleState = SwerveModuleState.optimize(simpleState, getState().angle);
     desiredState =
         new SwerveModuleState2(
-            simpleState.speedMetersPerSecond, desiredState.accelMetersPerSecondSq, simpleState.angle, desiredState.omegaRadPerSecond);
+            simpleState.speedMetersPerSecond,
+            desiredState.accelMetersPerSecondSq,
+            simpleState.angle,
+            desiredState.omegaRadPerSecond);
     if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber(
           "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
@@ -182,7 +187,7 @@ public class SwerveModule {
 
     if (!SwerveDriveTelemetry.isSimulation) {
       velocity = driveMotor.getVelocity();
-      accel = (velocity - pastVel)/dt;
+      accel = (velocity - pastVel) / dt;
       azimuth = Rotation2d.fromDegrees(angleMotor.getPosition());
       omega = Math.toRadians(angleMotor.getVelocity());
     } else {
