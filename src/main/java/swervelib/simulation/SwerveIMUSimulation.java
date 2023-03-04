@@ -64,9 +64,9 @@ public class SwerveIMUSimulation {
   }
 
   /**
-   * Fetch the acceleration [x, y, z] from the IMU.
+   * Gets the acceleration of the robot in m/s/s. This is not currently simulated so returns 0.
    *
-   * @return {@link Translation3d} of the acceleration.
+   * @param accel the acceleration array to fill [x, y, z]
    */
   public Optional<Translation3d> getAccel() {
     return Optional.empty();
@@ -86,8 +86,6 @@ public class SwerveIMUSimulation {
       SwerveModuleState2[] states,
       Pose2d[] modulePoses,
       Field2d field) {
-
-    // System.out.println(kinematics.toChassisSpeeds(states).toString());
     angle += kinematics.toChassisSpeeds(states).omegaRadiansPerSecond * (timer.get() - lastTime);
     lastTime = timer.get();
     field.getObject("XModules").setPoses(modulePoses);

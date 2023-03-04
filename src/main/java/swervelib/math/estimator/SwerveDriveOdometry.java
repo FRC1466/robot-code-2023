@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import swervelib.math.SwerveKinematics2;
-import swervelib.math.SwerveModulePosition2;
+import swervelib.math.SwerveModuleState2;
 
 /**
  * Class for swerve drive odometry. Odometry allows you to track the robot's position on the field
@@ -28,7 +28,7 @@ public class SwerveDriveOdometry {
   private Rotation3d m_gyroOffset;
   private Rotation3d m_previousAngle;
   private final int m_numModules;
-  private SwerveModulePosition2[] m_previousModulePositions;
+  private SwerveModuleState2[] m_previousModulePositions;
 
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -41,7 +41,7 @@ public class SwerveDriveOdometry {
   public SwerveDriveOdometry(
       SwerveKinematics2 kinematics,
       Rotation3d gyroAngle,
-      SwerveModulePosition2[] modulePositions,
+      SwerveModuleState2[] modulePositions,
       Pose3dFix initialPose) {
     m_kinematics = kinematics;
     m_poseMeters = initialPose;
@@ -49,12 +49,13 @@ public class SwerveDriveOdometry {
     m_previousAngle = initialPose.getRotation();
     m_numModules = modulePositions.length;
 
-    m_previousModulePositions = new SwerveModulePosition2[m_numModules];
+    m_previousModulePositions = new SwerveModuleState2[m_numModules];
     for (int index = 0; index < m_numModules; index++) {
       m_previousModulePositions[index] =
-          new SwerveModulePosition2(
+          new SwerveModuleState2(
               modulePositions[index].distanceMeters,
-              modulePositions[index].velocityMetersPerSecond,
+              modulePositions[index].speedMetersPerSecond,
+              modulePositions[index].accelMetersPerSecondSq,
               modulePositions[index].angle,
               modulePositions[index].omegaRadPerSecond);
     }
@@ -73,7 +74,7 @@ public class SwerveDriveOdometry {
   public SwerveDriveOdometry(
       SwerveKinematics2 kinematics,
       Rotation2d gyroAngle,
-      SwerveModulePosition2[] modulePositions,
+      SwerveModuleState2[] modulePositions,
       Pose2d initialPose) {
     this(
         kinematics,
@@ -90,7 +91,7 @@ public class SwerveDriveOdometry {
    * @param modulePositions The wheel positions reported by each module.
    */
   public SwerveDriveOdometry(
-      SwerveKinematics2 kinematics, Rotation3d gyroAngle, SwerveModulePosition2[] modulePositions) {
+      SwerveKinematics2 kinematics, Rotation3d gyroAngle, SwerveModuleState2[] modulePositions) {
     this(kinematics, gyroAngle, modulePositions, new Pose3dFix());
   }
 
@@ -102,7 +103,7 @@ public class SwerveDriveOdometry {
    * @param modulePositions The wheel positions reported by each module.
    */
   public SwerveDriveOdometry(
-      SwerveKinematics2 kinematics, Rotation2d gyroAngle, SwerveModulePosition2[] modulePositions) {
+      SwerveKinematics2 kinematics, Rotation2d gyroAngle, SwerveModuleState2[] modulePositions) {
     this(kinematics, gyroAngle, modulePositions, new Pose2d());
   }
 
@@ -119,7 +120,7 @@ public class SwerveDriveOdometry {
    * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation3d gyroAngle, SwerveModulePosition2[] modulePositions, Pose3dFix pose) {
+      Rotation3d gyroAngle, SwerveModuleState2[] modulePositions, Pose3dFix pose) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -131,9 +132,10 @@ public class SwerveDriveOdometry {
     m_gyroOffset = m_poseMeters.getRotation().minus(gyroAngle);
     for (int index = 0; index < m_numModules; index++) {
       m_previousModulePositions[index] =
-          new SwerveModulePosition2(
+          new SwerveModuleState2(
               modulePositions[index].distanceMeters,
-              modulePositions[index].velocityMetersPerSecond,
+              modulePositions[index].speedMetersPerSecond,
+              modulePositions[index].accelMetersPerSecondSq,
               modulePositions[index].angle,
               modulePositions[index].omegaRadPerSecond);
     }
@@ -152,7 +154,7 @@ public class SwerveDriveOdometry {
    * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition2[] modulePositions, Pose2d pose) {
+      Rotation2d gyroAngle, SwerveModuleState2[] modulePositions, Pose2d pose) {
     resetPosition(
         new Rotation3d(0, 0, gyroAngle.getRadians()), modulePositions, new Pose3dFix(pose));
   }
@@ -187,24 +189,27 @@ public class SwerveDriveOdometry {
    *     in the same order in which you instantiated your SwerveDriveKinematics.
    * @return The new pose of the robot.
    */
-  public Pose3dFix update(Rotation3d gyroAngle, SwerveModulePosition2[] modulePositions) {
+  public Pose3dFix update(Rotation3d gyroAngle, SwerveModuleState2[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
-    var moduleDeltas = new SwerveModulePosition2[m_numModules];
+    var moduleDeltas = new SwerveModuleState2[m_numModules];
     for (int index = 0; index < m_numModules; index++) {
       var current = modulePositions[index];
       var previous = m_previousModulePositions[index];
 
       moduleDeltas[index] =
-          new SwerveModulePosition2(
+          new SwerveModuleState2(
               current.distanceMeters - previous.distanceMeters,
-              current.velocityMetersPerSecond - previous.velocityMetersPerSecond,
+              current.speedMetersPerSecond - previous.speedMetersPerSecond,
+              current.accelMetersPerSecondSq - previous.accelMetersPerSecondSq,
               current.angle,
               current.omegaRadPerSecond);
       previous.distanceMeters = current.distanceMeters;
+      previous.speedMetersPerSecond = current.speedMetersPerSecond;
+      previous.accelMetersPerSecondSq = current.accelMetersPerSecondSq;
     }
 
     var angle = gyroAngle.plus(m_gyroOffset);
@@ -240,7 +245,7 @@ public class SwerveDriveOdometry {
    *     in the same order in which you instantiated your SwerveDriveKinematics.
    * @return The new pose of the robot.
    */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition2[] modulePositions) {
+  public Pose2d update(Rotation2d gyroAngle, SwerveModuleState2[] modulePositions) {
     return update(new Rotation3d(0, 0, gyroAngle.getRadians()), modulePositions).toPose2d();
   }
 }

@@ -13,11 +13,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Twist3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
@@ -216,7 +212,7 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
     double A;
     double B;
     double C;
-    if (Math.abs(theta) < 1E-8) {
+    if (Math.abs(theta) < 1E-7) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
@@ -278,7 +274,7 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
     // System.out.println(theta);
 
     double C;
-    if (Math.abs(theta) < 1E-8) {
+    if (Math.abs(theta) < 1E-7) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!

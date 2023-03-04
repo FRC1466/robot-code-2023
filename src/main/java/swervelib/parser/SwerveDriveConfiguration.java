@@ -20,8 +20,6 @@ public class SwerveDriveConfiguration {
   /** Swerve Modules. */
   public SwerveModule[] modules;
 
-  public String poseType = "twist";
-
   /**
    * Create swerve drive configuration.
    *

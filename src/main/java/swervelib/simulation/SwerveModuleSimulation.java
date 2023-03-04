@@ -1,7 +1,7 @@
 package swervelib.simulation;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
-import swervelib.math.SwerveModulePosition2;
 import swervelib.math.SwerveModuleState2;
 
 /** Class to hold simulation data for {@link swervelib.SwerveModule} */
@@ -17,9 +17,6 @@ public class SwerveModuleSimulation {
    * The fake speed of the previous state, used to calculate {@link SwerveModuleSimulation#fakePos}.
    */
   private double fakeSpeed;
-
-  private double fakeAccel;
-  private double pastSpeed;
   /** Last time queried. */
   private double lastTime;
   /** Current simulated swerve module state. */
@@ -30,10 +27,8 @@ public class SwerveModuleSimulation {
     timer = new Timer();
     timer.start();
     lastTime = timer.get();
-    state = new SwerveModuleState2();
+    state = new SwerveModuleState2(0, 0, 0, Rotation2d.fromDegrees(0), 0);
     fakeSpeed = 0;
-    pastSpeed = 0;
-    fakeAccel = 0;
     fakePos = 0;
     dt = 0;
   }
@@ -50,28 +45,17 @@ public class SwerveModuleSimulation {
 
     state = desiredState;
     fakeSpeed = desiredState.speedMetersPerSecond;
-    fakeAccel = (desiredState.speedMetersPerSecond - pastSpeed) / dt;
-    // System.out.println(desiredState.accelMetersPerSecondSq);
-    state.accelMetersPerSecondSq = desiredState.accelMetersPerSecondSq;
-    pastSpeed = desiredState.speedMetersPerSecond;
     fakePos += (fakeSpeed * dt);
   }
 
   /**
-   * Get the simulated swerve module position.
-   *
-   * @return {@link SwerveModulePosition2} of the simulated module.
-   */
-  public SwerveModulePosition2 getPosition() {
-    return new SwerveModulePosition2(fakePos, fakeSpeed, state.angle, state.omegaRadPerSecond);
-  }
-
-  /**
-   * Get the {@link SwerveModuleState2} of the simulated module.
+   * Get the simulated swerve module state.
    *
    * @return {@link SwerveModuleState2} of the simulated module.
    */
   public SwerveModuleState2 getState() {
-    return state;
+
+    return new SwerveModuleState2(
+        fakePos, fakeSpeed, state.accelMetersPerSecondSq, state.angle, state.omegaRadPerSecond);
   }
 }
