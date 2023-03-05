@@ -1,6 +1,7 @@
 package swervelib.imu;
 
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -74,12 +75,12 @@ public class NavXSwerve extends SwerveIMU {
    * @return {@link Rotation3d} from the IMU.
    */
   public Rotation3d getRotation3d() {
-    return new Rotation3d(gyro.getRoll(), gyro.getPitch(), gyro.getYaw())
+    return new Rotation3d(new Quaternion(gyro.getQuaternionW(), gyro.getQuaternionX(), gyro.getQuaternionY(), gyro.getQuaternionZ()))
         .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
   }
 
   /**
-   * Fetch the acceleration [x, y, z] from the IMU in meters per second quared. If acceleration
+   * Fetch the acceleration [x, y, z] from the IMU in meters per second squared. If acceleration
    * isn't supported returns empty.
    *
    * @return {@link Translation3d} of the acceleration as an {@link Optional}.

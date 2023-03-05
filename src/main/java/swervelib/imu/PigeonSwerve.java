@@ -1,6 +1,7 @@
 package swervelib.imu;
 
 import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -61,13 +62,13 @@ public class PigeonSwerve extends SwerveIMU {
    */
   @Override
   public Rotation3d getRotation3d() {
-    double[] yprArray = new double[3];
-    imu.getYawPitchRoll(yprArray);
-    return new Rotation3d(yprArray[2], yprArray[1], yprArray[0]);
+    double[] wxyz = new double[4];
+    imu.get6dQuaternion(wxyz);
+    return new Rotation3d(new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]));
   }
 
   /**
-   * Fetch the acceleration [x, y, z] from the IMU in meters per second quared. If acceleration
+   * Fetch the acceleration [x, y, z] from the IMU in meters per second squared. If acceleration
    * isn't supported returns empty.
    *
    * @return {@link Translation3d} of the acceleration as an {@link Optional}.
