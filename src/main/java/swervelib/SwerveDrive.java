@@ -364,13 +364,14 @@ public class SwerveDrive {
   public void zeroGyro() {
     // Resets the real gyro or the angle accumulator, depending on whether the robot is being
     // simulated
+    var current = getPose3d().getTranslation();
     if (!SwerveDriveTelemetry.isSimulation) {
       imu.setYaw(0);
     } else {
       simIMU.setAngle(0);
     }
     swerveController.lastAngleScalar = 0;
-    resetOdometry(new Pose3d(getPose3d().getTranslation(), new Rotation3d()));
+    resetOdometry(new Pose3d(current, new Rotation3d()));
   }
 
   /**
