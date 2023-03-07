@@ -34,7 +34,7 @@ public class SwerveModule {
   /** Timer to use for approximating module acceleration. */
   private final Timer timer;
   /** Last angle set for the swerve module. */
-  public double lastAngle;
+  public Rotation2d lastAngle;
   /** Last measured velocity the swerve module. */
   private double lastVel = 0;
   /** Last time on the timer. */
@@ -105,7 +105,7 @@ public class SwerveModule {
       simModule = new SwerveModuleSimulation();
     }
 
-    lastAngle = getState().angle.getDegrees();
+    lastAngle = getState().angle;
   }
 
   /** Synchronize the integrated angle encoder with the absolute encoder. */
@@ -150,12 +150,15 @@ public class SwerveModule {
     }
 
     // Prevents module rotation if speed is less than 1%
-    double angle =
+    Rotation2d angle =
         (Math.abs(desiredState.speedMetersPerSecond) <= (configuration.maxSpeed * 0.01)
             ? lastAngle
-            : desiredState.angle.getDegrees());
+            : desiredState.angle);
+    double feedforward = Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV;
+    if (Math.abs(feedforward) > 12)
+      System.out.println(feedforward);
     angleMotor.setReference(
-        angle, Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
+        angle.getDegrees(), feedforward);
     lastAngle = angle;
 
     if (SwerveDriveTelemetry.isSimulation) {
@@ -170,7 +173,7 @@ public class SwerveModule {
    */
   public void setAngle(double angle) {
     angleMotor.setReference(angle, configuration.angleKV);
-    lastAngle = angle;
+    lastAngle = Rotation2d.fromDegrees(angle);
   }
 
   /**
