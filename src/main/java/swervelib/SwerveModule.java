@@ -155,8 +155,6 @@ public class SwerveModule {
             ? lastAngle
             : desiredState.angle);
     double feedforward = Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV;
-    if (Math.abs(feedforward) > 12)
-      System.out.println(feedforward);
     angleMotor.setReference(
         angle.getDegrees(), feedforward);
     lastAngle = angle;

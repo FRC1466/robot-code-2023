@@ -211,6 +211,11 @@ public class SwerveDrive {
 
     // Calculate required module states via kinematics
     SwerveModuleState2[] swerveModuleStates = kinematics.toSwerveModuleStates(velocity);
+    if (Math.abs(rotation) < 0.01) {
+      for (var moduleState : swerveModuleStates) {
+        moduleState.omegaRadPerSecond = 0;
+      }
+    }
 
     setModuleStates(swerveModuleStates, isOpenLoop);
   }

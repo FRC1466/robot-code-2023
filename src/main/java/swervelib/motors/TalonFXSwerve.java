@@ -307,12 +307,6 @@ public class TalonFXSwerve extends SwerveMotor {
 
     burnFlash();
 
-    if (!isDriveMotor) {
-      feedforward = Math.abs(feedforward) > 1e-5 ? feedforward : 0;
-      //System.out.println(feedforward);
-    }
-
-
     motor.set(
         isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
         convertToNativeSensorUnits(setpoint),
