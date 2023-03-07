@@ -44,14 +44,14 @@ public class VirtualFourBar extends SubsystemBase {
     armPID.setTolerance(0.15);
 
     if (Robot.isSimulation()) {
-//      sim = new VirtualFourBarSimulation(absoluteArmEncoder);
-//      SmartDashboard.putData("Arm Sim", sim.getMech2d());
+      //      sim = new VirtualFourBarSimulation(absoluteArmEncoder);
+      //      SmartDashboard.putData("Arm Sim", sim.getMech2d());
     }
   }
 
   @Override
   public void simulationPeriodic() {
-    //sim.update(armMotor.get());
+    // sim.update(armMotor.get());
   }
 
   /** Configure arm motor. */

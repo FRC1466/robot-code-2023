@@ -64,9 +64,10 @@ public class SwerveIMUSimulation {
   }
 
   /**
-   * Gets the acceleration of the robot in m/s/s. This is not currently simulated so returns 0.
+   * Fetch the acceleration [x, y, z] from the IMU in m/s/s. If acceleration isn't supported returns
+   * empty.
    *
-   * @param accel the acceleration array to fill [x, y, z]
+   * @return {@link Translation3d} of the acceleration as an {@link Optional}.
    */
   public Optional<Translation3d> getAccel() {
     return Optional.empty();

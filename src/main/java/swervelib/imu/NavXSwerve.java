@@ -75,7 +75,12 @@ public class NavXSwerve extends SwerveIMU {
    * @return {@link Rotation3d} from the IMU.
    */
   public Rotation3d getRotation3d() {
-    return new Rotation3d(new Quaternion(gyro.getQuaternionW(), gyro.getQuaternionX(), gyro.getQuaternionY(), gyro.getQuaternionZ()))
+    return new Rotation3d(
+            new Quaternion(
+                gyro.getQuaternionW(),
+                gyro.getQuaternionX(),
+                gyro.getQuaternionY(),
+                gyro.getQuaternionZ()))
         .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
   }
 
