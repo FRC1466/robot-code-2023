@@ -276,9 +276,10 @@ public class TalonSRXSwerve extends SwerveMotor {
    * @param setpoint Setpoint to mutate. In meters per second or degrees.
    * @return Setpoint as native sensor units. Encoder ticks per 100ms, or Encoder tick.
    */
-  public double convertToNativeSensorUnits(double setpoint) {
+  public double convertToNativeSensorUnits(double setpoint, double position)
+  {
     setpoint =
-        isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(getPosition(), setpoint);
+            isDriveMotor ? setpoint * .1 : placeInAppropriate0To360Scope(position, setpoint);
     return setpoint / positionConversionFactor;
   }
 
@@ -290,17 +291,24 @@ public class TalonSRXSwerve extends SwerveMotor {
    */
   @Override
   public void setReference(double setpoint, double feedforward) {
-    if (SwerveDriveTelemetry.isSimulation) {
+    setReference(setpoint, feedforward, getPosition());
+  }
+
+  @Override
+  public void setReference(double setpoint, double feedforward, double position)
+  {
+    if (SwerveDriveTelemetry.isSimulation)
+    {
       PhysicsSim.getInstance().run();
     }
 
     burnFlash();
 
     motor.set(
-        isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
-        convertToNativeSensorUnits(setpoint),
-        DemandType.ArbitraryFeedForward,
-        feedforward / nominalVoltage);
+            isDriveMotor ? ControlMode.Velocity : ControlMode.Position,
+            convertToNativeSensorUnits(setpoint, position),
+            DemandType.ArbitraryFeedForward,
+            feedforward / nominalVoltage);
   }
 
   /**
