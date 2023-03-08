@@ -15,7 +15,6 @@ import java.io.File;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveKinematics2;
-import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -27,8 +26,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /** Swerve drive object. */
   private final SwerveDrive swerveDrive;
 
-  private final SwerveBalance swerveBalance =
-      new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
+  private final SwerveBalance swerveBalance;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -42,17 +40,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  /**
-   * Construct the swerve drive.
-   *
-   * @param driveCfg SwerveDriveConfiguration for the swerve.
-   * @param controllerCfg Swerve Controller.
-   */
-  public SwerveSubsystem(
-      SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-    swerveDrive = new SwerveDrive(driveCfg, controllerCfg);
+    swerveBalance = new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow, swerveDrive.getGyroRotation3d());
   }
 
   /**
@@ -146,7 +134,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return translation of the robot.
    */
   public Translation2d getBalanceTranslation() {
-    return swerveBalance.update(swerveDrive.getPitch(), swerveDrive.getRoll()).unaryMinus();
+    return swerveBalance.calculate(swerveDrive.getGyroRotation3d()).unaryMinus();
   }
 
   /**

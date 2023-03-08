@@ -1,12 +1,13 @@
 package webblib.util.swerve;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import webblib.math.BetterMath;
 
 public class SwerveBalance {
-  private double scale;
-  private double scalePow;
+  private final double scale;
+  private final double scalePow;
+  private final Rotation3d gyroOffset;
 
   /**
    * Initialize SwerveBalance class.
@@ -15,27 +16,27 @@ public class SwerveBalance {
    * @param scalePow Weight the result to be nonlinear (faster to balance when farther away). Set to
    *     1 to be linear. Must be greater than 0.
    */
-  public SwerveBalance(double scale, double scalePow) {
+  public SwerveBalance(double scale, double scalePow, Rotation3d gyroOffset) {
     if (scalePow <= 0) {
       throw new IllegalArgumentException("scalePow must be greater than 0");
     }
     this.scale = scale;
     this.scalePow = scalePow;
+    this.gyroOffset = gyroOffset;
   }
 
   /**
-   * Update ChassisSpeeds for balancing based on pitch and roll. Create a plane through the z
-   * function found in the last row of the rotation matrix calculatior for the transformation of a
-   * point. Is essentially the derivative plane of a function in R3. Scales it according to
-   * constants in instance.
+   * Update robot speeds for balancing based on pitch and roll. Creates a plane which
+   * the robot sits on to update its speeds accordingly. Tunable with contructor.
    *
-   * @param pitch The pitch measurement of the gyro.
-   * @param roll The roll measurement of the gyro.
-   * @return ChassisSpeeds object to set to module states.
+   * @param gyroAngle The angle of the gyro as a {@link Rotation3d}.
+   * @return {@link Translation2d} object for use with {@link edu.wpi.first.math.kinematics.ChassisSpeeds}.
    */
-  public Translation2d update(Rotation2d pitch, Rotation2d roll) {
-    var xGrad = pitch.getTan();
-    var yGrad = -roll.getTan();
+  public Translation2d calculate(Rotation3d gyroAngle) {
+    var angle = gyroAngle.minus(gyroOffset);
+
+    var xGrad = Math.tan(angle.getY());
+    var yGrad = -Math.tan(angle.getX());
 
     var vyMetersPerSecond =
         BetterMath.signedAbsFunc(yGrad, (x) -> Math.pow(Math.abs(x * scale), scalePow));
