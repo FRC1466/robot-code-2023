@@ -63,8 +63,6 @@ public class SwerveDrive {
   /** The last heading set in radians. */
   private double lastHeadingRadians = 0;
 
-  private Rotation3d gyroOffset = new Rotation3d();
-
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive}
    * method, or via the {@link SwerveDrive#setModuleStates} method. The {@link SwerveDrive#drive}
@@ -373,9 +371,9 @@ public class SwerveDrive {
     // Resets the real gyro or the angle accumulator, depending on whether the robot is being
     // simulated
     if (!SwerveDriveTelemetry.isSimulation) {
-      gyroOffset = imu.getRotation3d();
+      imu.setOffset(imu.getRawRotation3d());
     } else {
-      gyroOffset = simIMU.getGyroRotation3d();
+      simIMU.setAngle(0);
     }
     swerveController.lastAngleScalar = 0;
     lastHeadingRadians = 0;
@@ -391,8 +389,8 @@ public class SwerveDrive {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
     if (!SwerveDriveTelemetry.isSimulation) {
       return swerveDriveConfiguration.invertedIMU
-          ? Rotation2d.fromRadians(imu.getRotation3d().minus(gyroOffset).unaryMinus().getZ())
-          : Rotation2d.fromRadians(imu.getRotation3d().minus(gyroOffset).getZ());
+          ? Rotation2d.fromRadians(imu.getRotation3d().unaryMinus().getZ())
+          : Rotation2d.fromRadians(imu.getRotation3d().getZ());
     } else {
       return simIMU.getYaw();
     }
@@ -407,8 +405,8 @@ public class SwerveDrive {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
     if (!SwerveDriveTelemetry.isSimulation) {
       return swerveDriveConfiguration.invertedIMU
-          ? Rotation2d.fromRadians(imu.getRotation3d().minus(gyroOffset).unaryMinus().getY())
-          : Rotation2d.fromRadians(imu.getRotation3d().minus(gyroOffset).getY());
+          ? Rotation2d.fromRadians(imu.getRotation3d().unaryMinus().getY())
+          : Rotation2d.fromRadians(imu.getRotation3d().getY());
     } else {
       return simIMU.getPitch();
     }
@@ -423,8 +421,8 @@ public class SwerveDrive {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
     if (!SwerveDriveTelemetry.isSimulation) {
       return swerveDriveConfiguration.invertedIMU
-          ? Rotation2d.fromRadians(imu.getRotation3d().minus(gyroOffset).unaryMinus().getX())
-          : Rotation2d.fromRadians(imu.getRotation3d().minus(gyroOffset).getX());
+          ? Rotation2d.fromRadians(imu.getRotation3d().unaryMinus().getX())
+          : Rotation2d.fromRadians(imu.getRotation3d().getX());
     } else {
       return simIMU.getRoll();
     }
@@ -439,8 +437,8 @@ public class SwerveDrive {
     // Read the imu if the robot is real or the accumulator if the robot is simulated.
     if (!SwerveDriveTelemetry.isSimulation) {
       return swerveDriveConfiguration.invertedIMU
-          ? imu.getRotation3d().minus(gyroOffset).unaryMinus()
-          : imu.getRotation3d().minus(gyroOffset);
+          ? imu.getRotation3d().unaryMinus()
+          : imu.getRotation3d();
     } else {
       return simIMU.getGyroRotation3d();
     }
@@ -608,7 +606,7 @@ public class SwerveDrive {
     }
 
     if (!SwerveDriveTelemetry.isSimulation) {
-      imu.setYaw(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
+      imu.setOffset(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation());
       // Yaw reset recommended by Team 1622
     } else {
       simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
@@ -620,5 +618,14 @@ public class SwerveDrive {
     for (SwerveModule module : swerveModules) {
       module.resetEncoder();
     }
+  }
+
+  /**
+   * Set the Gyroscope offset using a {@link Rotation3d} object.
+   *
+   * @param gyro Gyroscope offset.
+   */
+  public void setGyro(Rotation3d gyro) {
+    imu.setOffset(gyro);
   }
 }
