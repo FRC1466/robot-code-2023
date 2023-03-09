@@ -26,11 +26,12 @@ public class SwerveBalance {
   }
 
   /**
-   * Update robot speeds for balancing based on pitch and roll. Creates a plane which
-   * the robot sits on to update its speeds accordingly. Tunable with contructor.
+   * Update robot speeds for balancing based on pitch and roll. Creates a plane which the robot sits
+   * on to update its speeds accordingly. Tunable with contructor.
    *
    * @param gyroAngle The angle of the gyro as a {@link Rotation3d}.
-   * @return {@link Translation2d} object for use with {@link edu.wpi.first.math.kinematics.ChassisSpeeds}.
+   * @return {@link Translation2d} object for use with {@link
+   *     edu.wpi.first.math.kinematics.ChassisSpeeds}.
    */
   public Translation2d calculate(Rotation3d gyroAngle) {
     var angle = gyroAngle.minus(gyroOffset);

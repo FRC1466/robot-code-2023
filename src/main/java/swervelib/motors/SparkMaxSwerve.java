@@ -261,17 +261,15 @@ public class SparkMaxSwerve extends SwerveMotor {
         feedforward);
   }
 
-
   /**
    * Set the closed loop PID controller reference point.
    *
-   * @param setpoint    Setpoint in meters per second or angle in degrees.
+   * @param setpoint Setpoint in meters per second or angle in degrees.
    * @param feedforward Feedforward in volt-meter-per-second or kV.
-   * @param position    Only used on the angle motor, the position of the motor in degrees.
+   * @param position Only used on the angle motor, the position of the motor in degrees.
    */
   @Override
-  public void setReference(double setpoint, double feedforward, double position)
-  {
+  public void setReference(double setpoint, double feedforward, double position) {
     setReference(setpoint, feedforward);
   }
 

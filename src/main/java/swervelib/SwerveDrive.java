@@ -62,6 +62,7 @@ public class SwerveDrive {
   private int moduleSynchronizationCounter = 0;
   /** The last heading set in radians. */
   private double lastHeadingRadians = 0;
+
   private Rotation3d gyroOffset = new Rotation3d();
 
   /**

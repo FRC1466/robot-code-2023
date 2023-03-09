@@ -41,6 +41,7 @@ public class SwerveModule {
   private double lastTime;
   /** Simulated swerve module. */
   private SwerveModuleSimulation simModule;
+
   private boolean synchronizeEncoderQueued = false;
 
   /**
@@ -122,62 +123,59 @@ public class SwerveModule {
    * @param desiredState Desired swerve module state.
    * @param isOpenLoop Whether to use open loop (direct percent) or direct velocity control.
    */
-  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop)
-  {
+  public void setDesiredState(SwerveModuleState2 desiredState, boolean isOpenLoop) {
     SwerveModuleState simpleState =
-            new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+        new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     simpleState = SwerveModuleState.optimize(simpleState, getState().angle);
     desiredState =
-            new SwerveModuleState2(
-                    0, simpleState.speedMetersPerSecond, desiredState.accelMetersPerSecondSq, simpleState.angle, desiredState.omegaRadPerSecond);
-    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH)
-    {
+        new SwerveModuleState2(
+            0,
+            simpleState.speedMetersPerSecond,
+            desiredState.accelMetersPerSecondSq,
+            simpleState.angle,
+            desiredState.omegaRadPerSecond);
+    if (SwerveDriveTelemetry.verbosity == TelemetryVerbosity.HIGH) {
       SmartDashboard.putNumber(
-              "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
+          "Optimized " + moduleNumber + " Speed Setpoint: ", desiredState.speedMetersPerSecond);
       SmartDashboard.putNumber(
-              "Optimized " + moduleNumber + " Angle Setpoint: ", desiredState.angle.getDegrees());
+          "Optimized " + moduleNumber + " Angle Setpoint: ", desiredState.angle.getDegrees());
       SmartDashboard.putNumber(
-              "Module " + moduleNumber + " Omega: ", Math.toDegrees(desiredState.omegaRadPerSecond));
+          "Module " + moduleNumber + " Omega: ", Math.toDegrees(desiredState.omegaRadPerSecond));
     }
 
-    if (isOpenLoop)
-    {
+    if (isOpenLoop) {
       double percentOutput = desiredState.speedMetersPerSecond / configuration.maxSpeed;
       driveMotor.set(percentOutput);
-    } else
-    {
+    } else {
       double velocity = desiredState.speedMetersPerSecond;
-      if (velocity != lastVelocity)
-      {
+      if (velocity != lastVelocity) {
         driveMotor.setReference(velocity, feedforward.calculate(velocity));
       }
       lastVelocity = velocity;
     }
 
     // Prevents module rotation if speed is less than 1%
-    Rotation2d angle =
-    desiredState.angle;
-    if (angle != lastAngle || synchronizeEncoderQueued)
-    {
-      // Synchronize encoders if queued and send in the current position as the value from the absolute encoder.
-      if (absoluteEncoder != null && synchronizeEncoderQueued)
-      {
+    Rotation2d angle = desiredState.angle;
+    if (angle != lastAngle || synchronizeEncoderQueued) {
+      // Synchronize encoders if queued and send in the current position as the value from the
+      // absolute encoder.
+      if (absoluteEncoder != null && synchronizeEncoderQueued) {
         double absoluteEncoderPosition = getAbsolutePosition();
         angleMotor.setPosition(absoluteEncoderPosition - angleOffset);
-        angleMotor.setReference(angle.getDegrees(),
-                Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV,
-                absoluteEncoderPosition);
-        synchronizeEncoderQueued = false;
-      } else
-      {
         angleMotor.setReference(
-                angle.getDegrees(), Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
+            angle.getDegrees(),
+            Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV,
+            absoluteEncoderPosition);
+        synchronizeEncoderQueued = false;
+      } else {
+        angleMotor.setReference(
+            angle.getDegrees(),
+            Math.toDegrees(desiredState.omegaRadPerSecond) * configuration.angleKV);
       }
     }
     lastAngle = angle;
 
-    if (SwerveDriveTelemetry.isSimulation)
-    {
+    if (SwerveDriveTelemetry.isSimulation) {
       simModule.updateStateAndPosition(desiredState);
     }
   }
