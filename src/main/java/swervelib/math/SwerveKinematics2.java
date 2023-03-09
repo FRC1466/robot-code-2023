@@ -231,8 +231,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
       var omegaVector = trigThetaAngle.mult(accelVector);
 
       double omega = (omegaVector.get(1, 0) / speed) - chassisSpeeds.omegaRadiansPerSecond;
-      double accel = omegaVector.get(0, 0);
-      m_moduleStates[i] = new SwerveModuleState2(0, speed, accel, angle, omega);
+      m_moduleStates[i] = new SwerveModuleState2(0, speed, 0, angle, omega);
     }
 
     return m_moduleStates;
@@ -274,7 +273,6 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     }
 
     var chassisSpeedsVector = m_forwardKinematics.mult(moduleStatesMatrix);
-
     return new ChassisSpeeds(
         chassisSpeedsVector.get(0, 0),
         chassisSpeedsVector.get(1, 0),
@@ -291,7 +289,6 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
    *     should be same as passed into the constructor of this class.
    * @return The resulting Twist2d.
    */
-  @SuppressWarnings("DuplicatedCode")
   public Twist2d toTwist2d(SwerveModuleState2... wheelDeltas) {
     if (wheelDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
@@ -307,7 +304,6 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     }
 
     var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
-
     return new Twist2d(
         chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
   }

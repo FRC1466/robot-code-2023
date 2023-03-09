@@ -5,13 +5,11 @@ package swervelib.math.estimator;
 // the WPILib BSD license file in the root directory of this project.
 
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import java.util.Objects;
 
 /** Represents a transformation for a Pose3d. */
-public class Transform3dFix extends Transform3d {
-
+public class Transform3d {
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
 
@@ -21,7 +19,7 @@ public class Transform3dFix extends Transform3d {
    * @param initial The initial pose for the transformation.
    * @param last The final pose for the transformation.
    */
-  public Transform3dFix(Pose3dFix initial, Pose3dFix last) {
+  public Transform3d(Pose3dFix initial, Pose3dFix last) {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
@@ -39,13 +37,13 @@ public class Transform3dFix extends Transform3d {
    * @param translation Translational component of the transform.
    * @param rotation Rotational component of the transform.
    */
-  public Transform3dFix(Translation3d translation, Rotation3d rotation) {
+  public Transform3d(Translation3d translation, Rotation3d rotation) {
     m_translation = translation;
     m_rotation = rotation;
   }
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
-  public Transform3dFix() {
+  public Transform3d() {
     m_translation = new Translation3d();
     m_rotation = new Rotation3d();
   }
@@ -56,8 +54,8 @@ public class Transform3dFix extends Transform3d {
    * @param scalar The scalar.
    * @return The scaled Transform3d.
    */
-  public Transform3dFix times(double scalar) {
-    return new Transform3dFix(m_translation.times(scalar), m_rotation.times(scalar));
+  public Transform3d times(double scalar) {
+    return new Transform3d(m_translation.times(scalar), m_rotation.times(scalar));
   }
 
   /**
@@ -66,7 +64,7 @@ public class Transform3dFix extends Transform3d {
    * @param scalar The scalar.
    * @return The scaled Transform3d.
    */
-  public Transform3dFix div(double scalar) {
+  public Transform3d div(double scalar) {
     return times(1.0 / scalar);
   }
 
@@ -76,9 +74,8 @@ public class Transform3dFix extends Transform3d {
    * @param other The transform to compose with this one.
    * @return The composition of the two transformations.
    */
-  public Transform3dFix plus(Transform3dFix other) {
-    return new Transform3dFix(
-        new Pose3dFix(), new Pose3dFix().transformBy(this).transformBy(other));
+  public Transform3d plus(Transform3d other) {
+    return new Transform3d(new Pose3dFix(), new Pose3dFix().transformBy(this).transformBy(other));
   }
 
   /**
@@ -131,11 +128,11 @@ public class Transform3dFix extends Transform3d {
    *
    * @return The inverted transformation.
    */
-  public Transform3dFix inverse() {
+  public Transform3d inverse() {
     // We are rotating the difference between the translations
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
-    return new Transform3dFix(
+    return new Transform3d(
         getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
         getRotation().unaryMinus());
   }
@@ -153,9 +150,9 @@ public class Transform3dFix extends Transform3d {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Transform3dFix) {
-      return ((Transform3dFix) obj).m_translation.equals(m_translation)
-          && ((Transform3dFix) obj).m_rotation.equals(m_rotation);
+    if (obj instanceof Transform3d) {
+      return ((Transform3d) obj).m_translation.equals(m_translation)
+          && ((Transform3d) obj).m_rotation.equals(m_rotation);
     }
     return false;
   }

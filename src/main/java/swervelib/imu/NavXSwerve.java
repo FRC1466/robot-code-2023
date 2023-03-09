@@ -14,8 +14,8 @@ public class NavXSwerve extends SwerveIMU {
 
   /** NavX IMU. */
   private AHRS gyro;
-  /** Offset for the NavX. */
-  private Rotation3d offset = new Rotation3d();
+  /** Offset for the NavX yaw reading. */
+  private double yawOffset = 0;
 
   /**
    * Constructor for the NavX swerve.
@@ -28,7 +28,6 @@ public class NavXSwerve extends SwerveIMU {
       /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
       /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
       gyro = new AHRS(port);
-      factoryDefault();
       SmartDashboard.putData(gyro);
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
@@ -39,13 +38,7 @@ public class NavXSwerve extends SwerveIMU {
   @Override
   public void factoryDefault() {
     // gyro.reset(); // Reported to be slow
-    offset =
-        new Rotation3d(
-            new Quaternion(
-                gyro.getQuaternionW(),
-                gyro.getQuaternionX(),
-                gyro.getQuaternionY(),
-                gyro.getQuaternionZ()));
+    yawOffset = gyro.getYaw() % 360;
   }
 
   /** Clear sticky faults on IMU. */
@@ -53,26 +46,27 @@ public class NavXSwerve extends SwerveIMU {
   public void clearStickyFaults() {}
 
   /**
-   * Set the gyro offset.
+   * Set the yaw in degrees.
    *
-   * @param offset gyro offset as a {@link Rotation3d}.
+   * @param yaw Yaw angle in degrees.
    */
-  public void setOffset(Rotation3d offset) {
-    offset = getRotation3d();
+  @Override
+  public void setYaw(double yaw) {
+    // gyro.reset(); // Reported to be slow using the offset.
+    yawOffset = (yaw % 360) + (gyro.getYaw() % 360);
   }
 
   /**
-   * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
+   * Fetch the yaw/pitch/roll from the IMU.
    *
-   * @return {@link Rotation3d} from the IMU.
+   * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
    */
-  public Rotation3d getRawRotation3d() {
-    return new Rotation3d(
-        new Quaternion(
-            gyro.getQuaternionW(),
-            gyro.getQuaternionX(),
-            gyro.getQuaternionY(),
-            gyro.getQuaternionZ()));
+  @Override
+  public void getYawPitchRoll(double[] yprArray) {
+
+    yprArray[0] = (gyro.getYaw() % 360) - yawOffset;
+    yprArray[1] = (gyro.getPitch() % 360);
+    yprArray[2] = (gyro.getRoll() % 360);
   }
 
   /**
@@ -80,9 +74,14 @@ public class NavXSwerve extends SwerveIMU {
    *
    * @return {@link Rotation3d} from the IMU.
    */
-  @Override
   public Rotation3d getRotation3d() {
-    return getRawRotation3d().minus(offset);
+    return new Rotation3d(
+            new Quaternion(
+                gyro.getQuaternionW(),
+                gyro.getQuaternionX(),
+                gyro.getQuaternionY(),
+                gyro.getQuaternionZ()))
+        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
   }
 
   /**

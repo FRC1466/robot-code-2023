@@ -11,8 +11,8 @@ public class ADXRS450Swerve extends SwerveIMU {
 
   /** {@link ADXRS450_Gyro} device to read the current headings from. */
   private final ADXRS450_Gyro imu;
-  /** Offset for the ADXRS450. */
-  private Rotation3d offset = new Rotation3d();
+  /** Offset for the ADXRS450 yaw reading. */
+  private double yawOffset = 0;
 
   /**
    * Construct the ADXRS450 imu and reset default configurations. Publish the gyro to the
@@ -27,7 +27,7 @@ public class ADXRS450Swerve extends SwerveIMU {
   /** Reset IMU to factory default. */
   @Override
   public void factoryDefault() {
-    offset = new Rotation3d(0, 0, Math.toRadians(imu.getAngle()));
+    yawOffset = imu.getAngle() % 360;
   }
 
   /** Clear sticky faults on IMU. */
@@ -37,21 +37,25 @@ public class ADXRS450Swerve extends SwerveIMU {
   }
 
   /**
-   * Set the gyro offset.
+   * Set the yaw in degrees.
    *
-   * @param offset gyro offset as a {@link Rotation3d}.
+   * @param yaw Yaw angle in degrees.
    */
-  public void setOffset(Rotation3d offset) {
-    offset = getRotation3d();
+  @Override
+  public void setYaw(double yaw) {
+    yawOffset = (yaw % 360) + (imu.getAngle() % 360);
   }
 
   /**
-   * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
+   * Fetch the yaw/pitch/roll from the IMU.
    *
-   * @return {@link Rotation3d} from the IMU.
+   * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
    */
-  public Rotation3d getRawRotation3d() {
-    return new Rotation3d(0, 0, Math.toRadians(imu.getAngle()));
+  @Override
+  public void getYawPitchRoll(double[] yprArray) {
+    yprArray[0] = (imu.getAngle() % 360) - yawOffset;
+    yprArray[1] = 0;
+    yprArray[2] = 0;
   }
 
   /**
@@ -59,9 +63,9 @@ public class ADXRS450Swerve extends SwerveIMU {
    *
    * @return {@link Rotation3d} from the IMU.
    */
-  @Override
   public Rotation3d getRotation3d() {
-    return getRawRotation3d().minus(offset);
+    return new Rotation3d(0, 0, imu.getAngle())
+        .minus(new Rotation3d(0, 0, Math.toRadians(yawOffset)));
   }
 
   /**

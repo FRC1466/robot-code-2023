@@ -12,8 +12,6 @@ public class PigeonSwerve extends SwerveIMU {
 
   /** Pigeon v1 IMU device. */
   WPI_PigeonIMU imu;
-  /** Offset for the Pigeon. */
-  private Rotation3d offset = new Rotation3d();
 
   /**
    * Generate the SwerveIMU for pigeon.
@@ -22,7 +20,6 @@ public class PigeonSwerve extends SwerveIMU {
    */
   public PigeonSwerve(int canid) {
     imu = new WPI_PigeonIMU(canid);
-    offset = new Rotation3d();
     SmartDashboard.putData(imu);
   }
 
@@ -39,24 +36,23 @@ public class PigeonSwerve extends SwerveIMU {
   }
 
   /**
-   * Set the gyro offset.
+   * Set the yaw in degrees.
    *
-   * @param offset gyro offset as a {@link Rotation3d}.
+   * @param yaw Angle in degrees.
    */
-  public void setOffset(Rotation3d offset) {
-    offset = getRotation3d();
+  @Override
+  public void setYaw(double yaw) {
+    imu.setYaw(yaw);
   }
 
   /**
-   * Fetch the {@link Rotation3d} from the IMU without any zeroing. Robot relative.
+   * Fetch the yaw/pitch/roll from the IMU, inverts them all if SwerveIMU is inverted.
    *
-   * @return {@link Rotation3d} from the IMU.
+   * @param yprArray Array which will be filled with {yaw, pitch, roll} in degrees.
    */
   @Override
-  public Rotation3d getRawRotation3d() {
-    double[] wxyz = new double[4];
-    imu.get6dQuaternion(wxyz);
-    return new Rotation3d(new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]));
+  public void getYawPitchRoll(double[] yprArray) {
+    imu.getYawPitchRoll(yprArray);
   }
 
   /**
@@ -66,7 +62,9 @@ public class PigeonSwerve extends SwerveIMU {
    */
   @Override
   public Rotation3d getRotation3d() {
-    return getRawRotation3d().minus(offset);
+    double[] wxyz = new double[4];
+    imu.get6dQuaternion(wxyz);
+    return new Rotation3d(new Quaternion(wxyz[0], wxyz[1], wxyz[2], wxyz[3]));
   }
 
   /**

@@ -22,12 +22,12 @@ import swervelib.math.SwerveModuleState2;
  * Furthermore, odometry can be used for latency compensation when using computer-vision systems.
  */
 public class SwerveDriveOdometry {
-
   private final SwerveKinematics2 m_kinematics;
-  private final int m_numModules;
   private Pose3dFix m_poseMeters;
+
   private Rotation3d m_gyroOffset;
   private Rotation3d m_previousAngle;
+  private final int m_numModules;
   private SwerveModuleState2[] m_previousModulePositions;
 
   /**

@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.wpilibj.Timer;
 import swervelib.encoders.SwerveAbsoluteEncoder;
 import swervelib.parser.PIDFConfig;
 import swervelib.simulation.ctre.PhysicsSim;
@@ -222,7 +221,6 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public void setInverted(boolean inverted) {
-    Timer.delay(1);
     motor.setInverted(inverted);
   }
 
@@ -287,7 +285,6 @@ public class TalonFXSwerve extends SwerveMotor {
    * Convert the setpoint into native sensor units.
    *
    * @param setpoint Setpoint to mutate. In meters per second or degrees.
-   * @param position Position in degrees, only used on angle motors.
    * @return Setpoint as native sensor units. Encoder ticks per 100ms, or Encoder tick.
    */
   public double convertToNativeSensorUnits(double setpoint, double position) {
@@ -345,16 +342,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getPosition() {
-    if (isDriveMotor) {
-      return motor.getSelectedSensorPosition() * positionConversionFactor;
-    } else {
-      var pos = motor.getSelectedSensorPosition() * positionConversionFactor;
-      pos %= 360;
-      if (pos < 360) {
-        pos += 360;
-      }
-      return pos;
-    }
+    return motor.getSelectedSensorPosition() * positionConversionFactor;
   }
 
   /**
@@ -365,6 +353,7 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void setPosition(double position) {
     if (!absoluteEncoder && !SwerveDriveTelemetry.isSimulation) {
+      position = position < 0 ? (position % 360) + 360 : position; // Fixes initial 360 movement.
       motor.setSelectedSensorPosition(position / positionConversionFactor, 0, 250);
     }
   }
