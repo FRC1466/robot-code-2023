@@ -218,7 +218,7 @@ public class SwerveDrive {
       }
     }
 
-    setModuleStates(swerveModuleStates, isOpenLoop);
+    setRawModuleStates(swerveModuleStates, isOpenLoop);
   }
 
   /**
@@ -228,7 +228,7 @@ public class SwerveDrive {
    * @param isOpenLoop Whether to use closed-loop velocity control. Set to true to disable
    *     closed-loop.
    */
-  public void setModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop) {
+  private void setRawModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop) {
     // Desaturates wheel speeds
     SwerveKinematics2.desaturateWheelSpeeds(desiredStates, swerveDriveConfiguration.maxSpeed);
 
@@ -253,6 +253,10 @@ public class SwerveDrive {
     }
   }
 
+  public void setModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop) {
+    setRawModuleStates(kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates)), isOpenLoop);
+  }
+
   /**
    * Set chassis speeds with closed-loop velocity control.
    *
@@ -264,7 +268,7 @@ public class SwerveDrive {
     SwerveDriveTelemetry.desiredChassisSpeeds[2] =
         Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond);
 
-    setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
+    setRawModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
   }
 
   /**
@@ -485,6 +489,7 @@ public class SwerveDrive {
       }
       swerveModule.setDesiredState(desiredState, false);
     }
+    kinematics.toSwerveModuleStates(new ChassisSpeeds());
   }
 
   /**

@@ -345,16 +345,7 @@ public class TalonFXSwerve extends SwerveMotor {
    */
   @Override
   public double getPosition() {
-    if (isDriveMotor) {
-      return motor.getSelectedSensorPosition() * positionConversionFactor;
-    } else {
-      var pos = motor.getSelectedSensorPosition() * positionConversionFactor;
-      pos %= 360;
-      if (pos < 360) {
-        pos += 360;
-      }
-      return pos;
-    }
+    return motor.getSelectedSensorPosition() * positionConversionFactor;
   }
 
   /**
@@ -365,6 +356,7 @@ public class TalonFXSwerve extends SwerveMotor {
   @Override
   public void setPosition(double position) {
     if (!absoluteEncoder && !SwerveDriveTelemetry.isSimulation) {
+      position = position < 0 ? (position % 360) + 360 : position;
       motor.setSelectedSensorPosition(position / positionConversionFactor, 0, 250);
     }
   }
