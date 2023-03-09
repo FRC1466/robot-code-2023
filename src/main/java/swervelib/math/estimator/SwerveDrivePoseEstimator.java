@@ -1,4 +1,4 @@
-package webblib.math;
+package swervelib.math.estimator;
 
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
@@ -8,17 +8,14 @@ import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Twist3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N4;
 import java.util.NoSuchElementException;
+import swervelib.math.SwerveKinematics2;
+import swervelib.math.SwerveModuleState2;
 
 /**
  * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
@@ -41,7 +38,7 @@ public class SwerveDrivePoseEstimator {
   private final TimeInterpolatableBuffer<Pose3d> m_poseBuffer =
       TimeInterpolatableBuffer.createBuffer(kBufferDuration);
 
-  private Pose3d m_poseEstimate;
+  private Pose3dFix m_poseEstimate;
 
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
@@ -57,9 +54,9 @@ public class SwerveDrivePoseEstimator {
    * @param initialPoseMeters The starting pose estimate.
    */
   public SwerveDrivePoseEstimator(
-      SwerveDriveKinematics kinematics,
+      SwerveKinematics2 kinematics,
       Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
+      SwerveModuleState2[] modulePositions,
       Pose2d initialPoseMeters) {
     this(
         kinematics,
@@ -84,9 +81,9 @@ public class SwerveDrivePoseEstimator {
    * @param initialPoseMeters The starting pose estimate.
    */
   public SwerveDrivePoseEstimator(
-      SwerveDriveKinematics kinematics,
+      SwerveKinematics2 kinematics,
       Rotation3d gyroAngle,
-      SwerveModulePosition[] modulePositions,
+      SwerveModuleState2[] modulePositions,
       Pose3d initialPoseMeters) {
     this(
         kinematics,
@@ -112,13 +109,18 @@ public class SwerveDrivePoseEstimator {
    *     the vision pose measurement less.
    */
   public SwerveDrivePoseEstimator(
-      SwerveDriveKinematics kinematics,
+      SwerveKinematics2 kinematics,
       Rotation3d gyroAngle,
-      SwerveModulePosition[] modulePositions,
+      SwerveModuleState2[] modulePositions,
       Pose3d initialPoseMeters,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
-    m_odometry = new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters);
+    m_odometry =
+        new SwerveDriveOdometry(
+            kinematics,
+            gyroAngle,
+            modulePositions,
+            new Pose3dFix(initialPoseMeters.getTranslation(), initialPoseMeters.getRotation()));
     m_poseEstimate = m_odometry.getPoseMeters3d();
 
     for (int i = 0; i < 4; ++i) {
@@ -145,9 +147,9 @@ public class SwerveDrivePoseEstimator {
    *     the vision pose measurement less.
    */
   public SwerveDrivePoseEstimator(
-      SwerveDriveKinematics kinematics,
+      SwerveKinematics2 kinematics,
       Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
+      SwerveModuleState2[] modulePositions,
       Pose2d initialPoseMeters,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
@@ -220,9 +222,12 @@ public class SwerveDrivePoseEstimator {
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation3d gyroAngle, SwerveModulePosition[] modulePositions, Pose3d poseMeters) {
+      Rotation3d gyroAngle, SwerveModuleState2[] modulePositions, Pose3d poseMeters) {
     // Reset state estimate and error covariance
-    m_odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
+    m_odometry.resetPosition(
+        gyroAngle,
+        modulePositions,
+        new Pose3dFix(poseMeters.getTranslation(), poseMeters.getRotation()));
     m_poseBuffer.clear();
     m_poseEstimate = m_odometry.getPoseMeters3d();
   }
@@ -238,7 +243,7 @@ public class SwerveDrivePoseEstimator {
    * @param poseMeters The position on the field that your robot is at.
    */
   public void resetPosition(
-      Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
+      Rotation2d gyroAngle, SwerveModuleState2[] modulePositions, Pose2d poseMeters) {
     resetPosition(
         new Rotation3d(0, 0, gyroAngle.getRadians()), modulePositions, new Pose3d(poseMeters));
   }
@@ -266,7 +271,7 @@ public class SwerveDrivePoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * DifferentialDrivePoseEstimator#update} every loop.
+   * SwerveDrivePoseEstimator#update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -275,11 +280,11 @@ public class SwerveDrivePoseEstimator {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     or sync the epochs.
+   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you must use
+   *     a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
+   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
+   *     sync the epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
     addVisionMeasurement(new Pose3d(visionRobotPoseMeters), timestampSeconds);
@@ -290,7 +295,7 @@ public class SwerveDrivePoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * DifferentialDrivePoseEstimator#update} every loop.
+   * SwerveDrivePoseEstimator#update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -299,14 +304,16 @@ public class SwerveDrivePoseEstimator {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     or sync the epochs.
+   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)} then you must use
+   *     a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
+   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
+   *     sync the epochs.
    */
   public void addVisionMeasurement(Pose3d visionRobotPoseMeters, double timestampSeconds) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
+    visionRobotPoseMeters =
+        new Pose3dFix(visionRobotPoseMeters.getTranslation(), visionRobotPoseMeters.getRotation());
     try {
       if (m_poseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestampSeconds) {
         return;
@@ -365,7 +372,7 @@ public class SwerveDrivePoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * DifferentialDrivePoseEstimator#update} every loop.
+   * SwerveDrivePoseEstimator#update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -373,16 +380,16 @@ public class SwerveDrivePoseEstimator {
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
-   * DifferentialDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
+   * SwerveDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     in this case.
+   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you must
+   *     use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the
+   *     same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
+   *     this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
@@ -400,7 +407,7 @@ public class SwerveDrivePoseEstimator {
    * while still accounting for measurement noise.
    *
    * <p>This method can be called as infrequently as you want, as long as you are calling {@link
-   * DifferentialDrivePoseEstimator#update} every loop.
+   * SwerveDrivePoseEstimator#update} every loop.
    *
    * <p>To promote stability of the pose estimate and make it robust to bad vision data, we
    * recommend only adding vision measurements that are already within one meter or so of the
@@ -408,16 +415,16 @@ public class SwerveDrivePoseEstimator {
    *
    * <p>Note that the vision measurement standard deviations passed into this method will continue
    * to apply to future measurements until a subsequent call to {@link
-   * DifferentialDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
+   * SwerveDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)} or this method.
    *
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     DifferentialDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you
-   *     must use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is
-   *     the same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that
-   *     you should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source
-   *     in this case.
+   *     SwerveDrivePoseEstimator#updateWithTime(double,Rotation2d,double,double)}, then you must
+   *     use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the
+   *     same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}). This means that you
+   *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source in
+   *     this case.
    * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
    *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
    *     the vision pose measurement less.
@@ -438,7 +445,7 @@ public class SwerveDrivePoseEstimator {
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose3d update(Rotation3d gyroAngle, SwerveModulePosition[] modulePositions) {
+  public Pose3d update(Rotation3d gyroAngle, SwerveModuleState2[] modulePositions) {
     return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, modulePositions);
   }
 
@@ -450,7 +457,7 @@ public class SwerveDrivePoseEstimator {
    * @param modulePositions The current distance measurements and rotations of the swerve modules.
    * @return The estimated pose of the robot in meters.
    */
-  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+  public Pose2d update(Rotation2d gyroAngle, SwerveModuleState2[] modulePositions) {
     return updateWithTime(MathSharedStore.getTimestamp(), gyroAngle, modulePositions);
   }
 
@@ -464,7 +471,7 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModuleState2[] modulePositions) {
     return updateWithTime(
             currentTimeSeconds, new Rotation3d(0, 0, gyroAngle.getRadians()), modulePositions)
         .toPose2d();
@@ -480,7 +487,7 @@ public class SwerveDrivePoseEstimator {
    * @return The estimated pose of the robot in meters.
    */
   public Pose3d updateWithTime(
-      double currentTimeSeconds, Rotation3d gyroAngle, SwerveModulePosition[] modulePositions) {
+      double currentTimeSeconds, Rotation3d gyroAngle, SwerveModuleState2[] modulePositions) {
     if (modulePositions.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -492,6 +499,17 @@ public class SwerveDrivePoseEstimator {
     m_poseBuffer.addSample(currentTimeSeconds, currOdom);
 
     m_poseEstimate = m_poseEstimate.exp(lastOdom.log(currOdom));
+    // var a = new Pose3dFix(new Translation3d(3.75, 2.95, 0.00), new Rotation3d(new
+    // Quaternion(0.9999999999999793, 0.0, 0.0, 2.0352360299846772E-7)));
+    // var b = new Pose3dFix(new Translation3d(3.66, 2.93, 0.00), new Rotation3d(new
+    // Quaternion(0.9999999999999782, 0.0, 0.0, 2.0859477994905617E-7)));
+    // System.out.println(a.log(b));
+    // System.out.println(lastOdom.log(currOdom).toString());
+    // System.out.println(m_poseEstimate.exp(lastOdom.log(currOdom)).toString());
+
+    if (((Double) m_poseEstimate.getX()).isNaN()) {
+      throw new IllegalArgumentException("no");
+    }
     return getEstimatedPosition3d();
   }
 }

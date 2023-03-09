@@ -1,4 +1,4 @@
-package frc.robot.commands.swervedrive2.auto;
+package frc.robot.commands.swervedrive;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,6 +22,8 @@ public class AutoMap {
       GrabEnsureNeutral = "GrabEnsureNeutral",
       GrabOpen = "GrabOpen",
       DropObjectAndStore = "DropObjectAndStore",
+      EnsureGrabAndStore = "EnsureGrabAndStore",
+      EnsureGrabAndVertical = "EnsureGrabAndVertical",
       ScoreArmLow = "ScoreArmLow",
       ScoreArmMid = "ScoreArmMid",
       PickupGroundReady = "PickupGroundReady",
@@ -40,8 +42,8 @@ public class AutoMap {
     eventMapGetter.put(
         "ArmToLoadingStation",
         () ->
-        Commands.runOnce(() -> arm.setArm(ARM.STATION))
-            .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
+            Commands.runOnce(() -> arm.setArm(ARM.STATION))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToStore",
         () ->
@@ -49,10 +51,14 @@ public class AutoMap {
                 .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToMid",
-        () -> Commands.run(() -> arm.setArm(ARM.MID), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.runOnce(() -> arm.setArm(ARM.MID))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
     eventMapGetter.put(
         "ArmToVertical",
-        () -> Commands.run(() -> arm.setArm(ARM.VERTICAL), arm).until(() -> arm.isAtSetpoint()));
+        () ->
+            Commands.runOnce(() -> arm.setArm(ARM.VERTICAL))
+                .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
 
     eventMapGetter.put("GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONE)));
     eventMapGetter.put(
@@ -77,6 +83,20 @@ public class AutoMap {
                         Commands.waitSeconds(0.2)
                             .andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
                         getCommandInMap(AutoMap.ArmToStore))));
+
+    eventMapGetter.put(
+        "EnsureGrabAndStore",
+        () ->
+            Commands.parallel(
+                Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
+                getCommandInMap(AutoMap.ArmToStore)));
+
+    eventMapGetter.put(
+        "EnsureGrabAndVertical",
+        () ->
+            Commands.parallel(
+                Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
+                getCommandInMap(AutoMap.ArmToVertical)));
 
     eventMapGetter.put(
         "ScoreArmLow",

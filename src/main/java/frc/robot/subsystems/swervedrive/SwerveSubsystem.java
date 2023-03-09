@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,9 +15,10 @@ import java.io.File;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveKinematics2;
-import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import webblib.util.swerve.SwerveBalance;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -24,8 +26,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /** Swerve drive object. */
   private final SwerveDrive swerveDrive;
 
-  private final SwerveBalance swerveBalance =
-      new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
+  private final SwerveBalance swerveBalance;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -33,22 +34,15 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param directory Directory of swerve drive config files.
    */
   public SwerveSubsystem(File directory) {
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  /**
-   * Construct the swerve drive.
-   *
-   * @param driveCfg SwerveDriveConfiguration for the swerve.
-   * @param controllerCfg Swerve Controller.
-   */
-  public SwerveSubsystem(
-      SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-    swerveDrive = new SwerveDrive(driveCfg, controllerCfg);
+    swerveBalance =
+        new SwerveBalance(
+            Auton.balanceScale, Auton.balanceScalePow, swerveDrive.getGyroRotation3d());
   }
 
   /**
@@ -70,7 +64,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
+    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, true);
   }
 
   @Override
@@ -98,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param initialHolonomicPose The pose to set the odometry to
    */
   public void resetOdometry(Pose2d initialHolonomicPose) {
-    swerveDrive.resetOdometry(initialHolonomicPose);
+    swerveDrive.resetOdometry(new Pose3d(initialHolonomicPose));
   }
 
   /**
@@ -142,7 +136,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return translation of the robot.
    */
   public Translation2d getBalanceTranslation() {
-    return swerveBalance.update(swerveDrive.getPitch(), swerveDrive.getRoll()).unaryMinus();
+    return swerveBalance.calculate(swerveDrive.getGyroRotation3d()).unaryMinus();
   }
 
   /**

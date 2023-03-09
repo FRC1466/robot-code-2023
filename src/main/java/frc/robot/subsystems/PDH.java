@@ -15,4 +15,9 @@ public class PDH extends SubsystemBase {
   public void setSwitchableChannel(boolean isSwitchedOn) {
     power.setSwitchableChannel(isSwitchedOn);
   }
+
+  @Override
+  public void periodic() {
+    // SmartDashboard.putNumber("PDH Current", power.getTotalCurrent());
+  }
 }

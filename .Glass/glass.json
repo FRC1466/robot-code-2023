@@ -8,9 +8,6 @@
         "open": true
       },
       "SmartDashboard": {
-        "DutyCycle Encoder[0]": {
-          "open": true
-        },
         "Field": {
           "open": true
         },
@@ -30,7 +27,17 @@
       "/SmartDashboard/Pigeon 2 [20]": "Gyro"
     },
     "windows": {
+      "/SmartDashboard/CHOOSE": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Pigeon 2 [20]": {
         "window": {
           "visible": true
         }
@@ -89,7 +96,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <2>": {
       "plots": [
@@ -107,7 +117,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <3>": {
       "plots": [
@@ -146,7 +159,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <5>": {
       "plots": [
@@ -164,7 +180,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

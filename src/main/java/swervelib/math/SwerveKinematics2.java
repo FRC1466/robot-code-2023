@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.Arrays;
 import java.util.Collections;
@@ -232,7 +231,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
       var omegaVector = trigThetaAngle.mult(accelVector);
 
       double omega = (omegaVector.get(1, 0) / speed) - chassisSpeeds.omegaRadiansPerSecond;
-      m_moduleStates[i] = new SwerveModuleState2(speed, angle, omega);
+      m_moduleStates[i] = new SwerveModuleState2(0, speed, 0, angle, omega);
     }
 
     return m_moduleStates;
@@ -290,7 +289,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
    *     should be same as passed into the constructor of this class.
    * @return The resulting Twist2d.
    */
-  public Twist2d toTwist2d(SwerveModulePosition... wheelDeltas) {
+  public Twist2d toTwist2d(SwerveModuleState2... wheelDeltas) {
     if (wheelDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "

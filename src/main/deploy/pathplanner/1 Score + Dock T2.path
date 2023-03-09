@@ -10,13 +10,16 @@
         "x": 2.7360976792106237,
         "y": 2.7336487305856862
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "ScoreArmMid",
+          "GrabOpen"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -28,14 +31,14 @@
         "y": 2.7674762609511734
       },
       "prevControl": {
-        "x": 4.199301359279367,
-        "y": 2.735622015709596
+        "x": 4.198975614004732,
+        "y": 2.7515322853722943
       },
       "nextControl": {
-        "x": 6.533568444240423,
-        "y": 2.7993305061927507
+        "x": 6.5597819658095915,
+        "y": 2.7837737855380227
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -57,7 +60,7 @@
         "y": 2.7154557478292785
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -73,5 +76,12 @@
   "maxVelocity": 3.5,
   "maxAcceleration": 2.5,
   "isReversed": null,
-  "markers": []
+  "markers": [
+    {
+      "position": 0.1945201526988637,
+      "names": [
+        "EnsureGrabAndStore"
+      ]
+    }
+  ]
 }

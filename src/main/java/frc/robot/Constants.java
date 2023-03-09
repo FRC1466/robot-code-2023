@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
+import swervelib.math.Matter;
 import swervelib.parser.PIDFConfig;
 import webblib.util.Gains;
 import webblib.util.HolonomicPose2d;
@@ -35,7 +36,9 @@ public final class Constants {
 
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final double CHASSIS_MASS = ROBOT_MASS;
-  public static final Translation3d CHASSIS_CG = new Translation3d(0, 0, Units.inchesToMeters(8));
+  public static final Matter CHASSIS =
+      new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  ;
   public static final double LOOP_TIME = 0.02; // s, 20ms + 110ms sprk max velocity lag
   public static final double STOP_SECONDS = 3.0;
 
@@ -50,11 +53,11 @@ public final class Constants {
   public static final class Auton {
     public static final PIDFConfig xAutoPID = new PIDFConfig(4.0, 0, 0);
     public static final PIDFConfig yAutoPID = new PIDFConfig(4.0, 0, 0);
-    public static final PIDFConfig angleAutoPID = new PIDFConfig(2.2, 0, 0.0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(8.2, 0, 0.0);
 
     public static final double maxSpeedMPS = 3;
     public static final double maxAccelerationMPS = 2;
-    public static final double balanceScale = 0.8, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
+    public static final double balanceScale = 3.0, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -99,10 +102,10 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.77, 0, 0, 0, 0, 0.9);
+    public static final Gains armPosition = new Gains(0.9, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.312153;
-    public static final double maxRadians = 4.44;
+    public static final double maxRadians = 4.24;
     public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
@@ -138,9 +141,9 @@ public final class Constants {
   public static final class GripperConstants {
     public static final Gains gripperPosition = new Gains(0.28, 0, 0, 0, 0, 0.5);
     public static final double positionOpen = 0.20,
-        positionCube = -12.38,
+        positionCube = -10.0,
         positionCone = -32.0,
-        positionStore = -16.0;
+        positionStore = -12.0;
     public static final int gripperID = 34;
   }
 
