@@ -42,7 +42,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     swerveBalance =
         new SwerveBalance(
-            Auton.balanceScale, Auton.balanceScalePow, swerveDrive.getGyroRotation3d());
+            Auton.balanceScale, Auton.balanceScalePow);
   }
 
   /**
