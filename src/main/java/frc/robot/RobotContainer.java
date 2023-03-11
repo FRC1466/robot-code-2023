@@ -66,9 +66,9 @@ public class RobotContainer {
                   : 0,
           () ->
               (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                  ? -driverController.getZ() * 0.6
+                  ? -driverController.getZ() * 0.8
                   : 0,
-          () -> true, // driverController.button(3).negate(),
+          driverController.button(8).negate(), // driverController.button(3).negate(),
           false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -172,7 +172,7 @@ public class RobotContainer {
                     (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
                         ? -driverController.getZ() * OIConstants.InputLimits.reduced
                         : 0,
-                () -> true, // driverController.button(3).negate(),
+                driverController.button(8).negate(), // driverController.button(3).negate(),
                 false));
 
     new Trigger(() -> DriverStation.isTeleopEnabled())

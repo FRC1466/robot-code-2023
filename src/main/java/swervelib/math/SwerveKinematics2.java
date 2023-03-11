@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
    * Second order kinematics inverse matrix.
    */
   private final SimpleMatrix         bigInverseKinematics;
+  private final SimpleMatrix m_bigForwardKinematics;
   /**
    * Number of swerve modules.
    */
@@ -53,6 +55,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
   private       ChassisSpeeds m_prevChassisSpeeds   = new ChassisSpeeds();
   private final Timer         m_moduleAccelTimer    = new Timer();
   private       double        m_prevModuleAccelTime = 0.0;
+  private double m_lastTimeTwist = 0.0;
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations as
@@ -87,6 +90,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
           i * 2 + 1, 0, /* Start Data */ 0, 1, -m_modules[i].getY(), +m_modules[i].getX());
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
+    m_bigForwardKinematics = bigInverseKinematics.pseudoInverse();
     m_moduleAccelTimer.start();
 
     MathSharedStore.reportUsage(MathUsageId.kKinematics_SwerveDrive, 1);
@@ -349,23 +353,65 @@ public class SwerveKinematics2 extends SwerveDriveKinematics
    */
   public Twist2d toTwist2d(SwerveModuleState2... wheelDeltas)
   {
-    if (wheelDeltas.length != m_numModules)
-    {
+    if (wheelDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
-          "Number of modules is not consistent with number of wheel locations provided in "
-          + "constructor");
+              "Number of modules is not consistent with number of wheel locations provided in "
+                      + "constructor");
     }
     var moduleDeltaMatrix = new SimpleMatrix(m_numModules * 2, 1);
+    var moduleSpeedsMatrix = new SimpleMatrix(m_numModules * 2, 1);
 
-    for (int i = 0; i < m_numModules; i++)
-    {
+    for (int i = 0; i < m_numModules; i++) {
       var module = wheelDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distanceMeters * module.angle.getCos());
       moduleDeltaMatrix.set(i * 2 + 1, module.distanceMeters * module.angle.getSin());
+      moduleSpeedsMatrix.set(i * 2, 0, module.speedMetersPerSecond * module.angle.getCos());
+      moduleSpeedsMatrix.set(i * 2 + 1, module.speedMetersPerSecond * module.angle.getSin());
     }
 
     var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
+    var chassisSpeedsVector = m_forwardKinematics.mult(moduleSpeedsMatrix);
+
+    var moduleAccelerationStatesMatrix = new SimpleMatrix(m_numModules * 2, 1);
+
+    for (int i = 0; i < m_numModules; i++) {
+      var module = wheelDeltas[i];
+
+      double pos = module.distanceMeters;
+      double vel = module.speedMetersPerSecond;
+      double accel = module.accelMetersPerSecondSq;
+      var angle = module.angle;
+      double angleVel = module.omegaRadPerSecond;
+
+      var omegaVector = new SimpleMatrix(2, 1);
+
+      omegaVector.setColumn(0, 0, vel, (angleVel + chassisSpeedsVector.get(2, 0)) * pos);
+
+      var trigThetaAngle = new SimpleMatrix(2, 2);
+      trigThetaAngle.setColumn(0, 0, angle.getCos(), angle.getSin());
+      trigThetaAngle.setColumn(1, 0, -angle.getSin(), angle.getCos());
+
+      var accelVector = trigThetaAngle.mult(omegaVector);
+      moduleAccelerationStatesMatrix.set(i * 2, 0, accelVector.get(0, 0));
+      moduleAccelerationStatesMatrix.set(i * 2 + 1, 0, accelVector.get(1, 0));
+    }
+
+    var accelerationVector = m_bigForwardKinematics.mult(moduleAccelerationStatesMatrix);
+    // System.out.println(accelerationVector.toString());
+
+    var time = WPIUtilJNI.now() * 1.0e-6;
+    var dt = time - m_lastTimeTwist;
+    m_lastTimeTwist = time;
+
+    var scale = (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.4) / 0.30);
+    // System.out.println(scale);
+    // System.out.println(accelerationVector.toString());
+
     return new Twist2d(
-        chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
+            chassisDeltaVector.get(0, 0),
+//                    * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
+            chassisDeltaVector.get(1, 0),
+//                    * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
+            chassisDeltaVector.get(2, 0));
   }
 }
