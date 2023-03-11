@@ -64,10 +64,10 @@ public class Gripper extends SubsystemBase {
         currentGripper = GripperConstants.positionOpen;
         break;
       case CUBE:
-        currentGripper = GripperConstants.positionCube;
+        currentGripper = GripperConstants.cubeInConeOut;
         break;
       case CONE:
-        currentGripper = GripperConstants.positionCone;
+        currentGripper = GripperConstants.cubeOutConeIn;
         break;
       case STORE:
         currentGripper = GripperConstants.positionStore;
