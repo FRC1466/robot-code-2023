@@ -10,7 +10,7 @@
     "canbus": null
   },
   "encoder": {
-    "type": "none",
+    "type": "cancoder",
     "id": 12,
     "canbus": null
   },
@@ -20,7 +20,7 @@
   },
   "absoluteEncoderOffset": 28.212891,
   "location": {
-    "x": -8.5,
-    "y": -8.5
+    "x": -9.5,
+    "y": -9.5
   }
 }

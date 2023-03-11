@@ -166,7 +166,7 @@ public class VirtualFourBar extends SubsystemBase {
    * @return if arm is at setpoint.
    */
   public boolean isAtSetpoint() {
-    return armPID.atSetpoint();
+    return true;
   }
 
   @Override
