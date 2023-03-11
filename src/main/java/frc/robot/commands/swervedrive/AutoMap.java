@@ -19,8 +19,9 @@ public class AutoMap {
       ArmToVertical = "ArmToVertical",
       GrabCone = "GrabCone",
       GrabCube = "GrabCube",
-      GrabEnsureNeutral = "GrabEnsureNeutral",
-      GrabOpen = "GrabOpen",
+      FreeCone = "FreeCone",
+      FreeCube = "FreeCube",
+      GripperOff = "GripperOff",
       DropObjectAndStore = "DropObjectAndStore",
       EnsureGrabAndStore = "EnsureGrabAndStore",
       EnsureGrabAndVertical = "EnsureGrabAndVertical",
@@ -60,68 +61,40 @@ public class AutoMap {
             Commands.runOnce(() -> arm.setArm(ARM.VERTICAL))
                 .andThen(Commands.waitUntil(() -> arm.isAtSetpoint())));
 
-    eventMapGetter.put("GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONE)));
-    eventMapGetter.put(
-        "GrabEnsureNeutral",
-        () ->
-            Commands.runOnce(
-                () -> {
-                  if (gripper.getCurrentIntake() == INTAKE.OPEN) {
-                    gripper.setGripper(INTAKE.STORE);
-                  }
-                }));
-    eventMapGetter.put("GrabCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBE)));
-    eventMapGetter.put("GrabOpen", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.OPEN)));
+    eventMapGetter.put("GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONEIN)));
+    eventMapGetter.put("GrabCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBEIN)));
+    eventMapGetter.put("FreeCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONEOUT)));
+    eventMapGetter.put("FreeCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBEOUT)));
+    eventMapGetter.put("GripperOff", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.STOP)));
 
     /* Compositions */
     eventMapGetter.put(
-        "DropObjectAndStore",
+        "DropConeAndStore",
         () ->
-            getCommandInMap(AutoMap.GrabOpen)
+            getCommandInMap(AutoMap.FreeCone)
                 .andThen(
                     Commands.parallel(
-                        Commands.waitSeconds(0.2)
-                            .andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
+                        Commands.waitSeconds(0.2),
                         getCommandInMap(AutoMap.ArmToStore))));
-
     eventMapGetter.put(
-        "EnsureGrabAndStore",
+        "DropCubeAndStore",
         () ->
-            Commands.parallel(
-                Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
-                getCommandInMap(AutoMap.ArmToStore)));
-
-    eventMapGetter.put(
-        "EnsureGrabAndVertical",
-        () ->
-            Commands.parallel(
-                Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GrabEnsureNeutral)),
-                getCommandInMap(AutoMap.ArmToVertical)));
-
-    eventMapGetter.put(
-        "ScoreArmLow",
-        () ->
-            getCommandInMap(AutoMap.GrabEnsureNeutral)
-                .andThen(getCommandInMap(AutoMap.ArmToGround)));
-
-    eventMapGetter.put(
-        "ScoreArmMid",
-        () ->
-            getCommandInMap(AutoMap.GrabEnsureNeutral).andThen(getCommandInMap(AutoMap.ArmToMid)));
-
+            getCommandInMap(AutoMap.FreeCube)
+                .andThen(
+                    Commands.parallel(
+                         Commands.waitSeconds(0.2),
+                        getCommandInMap(AutoMap.ArmToStore))));
     eventMapGetter.put(
         "PickupGroundReady",
         () ->
-            getCommandInMap(AutoMap.GrabEnsureNeutral)
-                .andThen(getCommandInMap(AutoMap.ArmToGround))
-                .andThen(getCommandInMap(AutoMap.GrabOpen)));
+            getCommandInMap(AutoMap.ArmToGround)
+                .andThen(getCommandInMap(AutoMap.GripperOff)));
 
     eventMapGetter.put(
         "PickupLoadingStationReady",
         () ->
-            getCommandInMap(AutoMap.GrabEnsureNeutral)
-                .andThen(getCommandInMap(AutoMap.ArmToLoadingStation))
-                .andThen(getCommandInMap(AutoMap.GrabOpen)));
+            getCommandInMap(AutoMap.ArmToLoadingStation)
+                .andThen(getCommandInMap(AutoMap.GripperOff)));
 
     eventMapGetter.put(
         "PickupConeAndStore",

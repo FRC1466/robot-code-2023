@@ -202,6 +202,27 @@ public class RobotContainer {
         .button(6)
         .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
         .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    driverController
+        .button(13)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.GrabCone))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
+    driverController
+        .button(14)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.FreeCone))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
+        driverController
+        .button(12)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.GrabCube))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
+        driverController
+        .button(15)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.FreeCube))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
+    driverController
+        .button(11)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.GripperOff))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
+
 
     scoreController
         .button(1)

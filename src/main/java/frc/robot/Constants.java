@@ -140,10 +140,9 @@ public final class Constants {
 
   public static final class GripperConstants {
     public static final Gains gripperPosition = new Gains(0.28, 0, 0, 0, 0, 0.5);
-    public static final double positionOpen = 0.20,
-        cubeInConeOut = -10.0,
-        cubeOutConeIn = -32.0,
-        positionStore = -12.0;
+    public static final double  cubeInConeOut = 0.35,
+        cubeOutConeIn = -0.35;
+ 
     public static final int gripperID = 34;
   }
 

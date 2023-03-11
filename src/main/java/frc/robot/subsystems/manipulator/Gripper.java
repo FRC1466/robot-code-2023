@@ -3,6 +3,8 @@ package frc.robot.subsystems.manipulator;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GripperConstants;
@@ -13,29 +15,30 @@ public class Gripper extends SubsystemBase {
   private RelativeEncoder encoder;
 
   public enum INTAKE {
-    OPEN,
-    CUBE,
-    CONE,
-    STORE
+    CUBEIN,
+    CONEIN,
+    CUBEOUT,
+    CONEOUT,
+    STOP
   }
 
-  private double currentGripper = GripperConstants.positionStore;
+  private double currentGripper = 0;
 
   private INTAKE currentIntake;
 
   /** Create a new Gripper subsystem. */
   public Gripper() {
 
-    // gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
-    // gripperMotor.enableVoltageCompensation(12.0);
-    // gripperMotor.setSmartCurrentLimit(40);
-    // gripperMotor.burnFlash();
+   gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
+   gripperMotor.enableVoltageCompensation(12.0);
+    gripperMotor.setSmartCurrentLimit(40);
+    gripperMotor.burnFlash();
+    
+   pidController = gripperMotor.getPIDController();
+   initializePID();
 
-    // pidController = gripperMotor.getPIDController();
-    // initializePID();
-
-    // encoder = gripperMotor.getEncoder();
-    // initializeEncoder();
+    encoder = gripperMotor.getEncoder();
+    initializeEncoder();
   }
 
   private void initializePID() {
@@ -50,28 +53,33 @@ public class Gripper extends SubsystemBase {
 
   private void initializeEncoder() {
     encoder.setPosition(0);
+  
   }
 
   public void ambientGripper() {
-    // pidController.setReference(currentGripper, CANSparkMax.ControlType.kPosition);
+    gripperMotor.set(currentGripper);
   }
 
   public void setGripper(INTAKE intake) {
     currentIntake = intake;
     SmartDashboard.putString("Gripper", intake.toString());
     switch (intake) {
-      case OPEN:
-        currentGripper = GripperConstants.positionOpen;
-        break;
-      case CUBE:
+      case CUBEIN:
         currentGripper = GripperConstants.cubeInConeOut;
         break;
-      case CONE:
+      case CONEIN:
         currentGripper = GripperConstants.cubeOutConeIn;
         break;
-      case STORE:
-        currentGripper = GripperConstants.positionStore;
+        case CUBEOUT:
+        currentGripper = GripperConstants.cubeOutConeIn;
         break;
+      case CONEOUT:
+        currentGripper = GripperConstants.cubeInConeOut;
+        break;
+      case STOP:
+        currentGripper = 0;
+        break;
+ 
       default:
         throw new IllegalArgumentException("Invalid intake enum position.");
     }
