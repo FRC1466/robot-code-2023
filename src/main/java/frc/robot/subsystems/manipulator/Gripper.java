@@ -31,7 +31,7 @@ public class Gripper extends SubsystemBase {
 
    gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
    gripperMotor.enableVoltageCompensation(12.0);
-    gripperMotor.setSmartCurrentLimit(40);
+    gripperMotor.setSmartCurrentLimit(30);
     gripperMotor.burnFlash();
     
    pidController = gripperMotor.getPIDController();

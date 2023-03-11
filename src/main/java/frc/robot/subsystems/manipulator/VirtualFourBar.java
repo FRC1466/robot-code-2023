@@ -28,8 +28,8 @@ public class VirtualFourBar extends SubsystemBase {
 
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
-    // armMotor = new WPI_TalonFX(ArmConstants.armPort);
-    // configArmMotor();
+    armMotor = new WPI_TalonFX(ArmConstants.armPort);
+    configArmMotor();
 
     absoluteArmEncoder = new DutyCycleEncoder(ArmConstants.dutyCyclePort);
     absoluteArmEncoder.setDutyCycleRange(0, 1);
@@ -56,8 +56,8 @@ public class VirtualFourBar extends SubsystemBase {
 
   /** Configure arm motor. */
   private void configArmMotor() {
-    // armMotor.configFactoryDefault();
-    // armMotor.configAllSettings(ArmConstants.ArmConfig.motorConfig);
+    armMotor.configFactoryDefault();
+    armMotor.configAllSettings(ArmConstants.ArmConfig.motorConfig);
   }
 
   /**
@@ -102,7 +102,7 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("Arm PID Setpoint", setpoint.getRadians());
     SmartDashboard.putNumber("Arm PID Output", motorOutput);
     SmartDashboard.putNumber("Arm Feedforward", feedforward);
-    // armMotor.set(motorOutput + feedforward);
+    armMotor.set(motorOutput + feedforward);
   }
 
   public void setArm(ARM height) {

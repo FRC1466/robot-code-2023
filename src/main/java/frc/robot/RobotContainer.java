@@ -180,8 +180,8 @@ public class RobotContainer {
 
     driverController
         .button(2)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.ScoreArmMid))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToMid))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     driverController
         .button(3)
@@ -229,48 +229,48 @@ public class RobotContainer {
         .whileTrue(
             new GoToScoring(drivebase, POSITION.RIGHT)
                 .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+                .alongWith(autoMap.getCommandInMap(AutoMap.ArmToGround)))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     scoreController
         .button(2)
         .whileTrue(
             new GoToScoring(drivebase, POSITION.MIDDLE)
                 .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+                .alongWith(autoMap.getCommandInMap(AutoMap.ArmToGround)))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     scoreController
         .button(3)
         .whileTrue(
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+                .alongWith(autoMap.getCommandInMap(AutoMap.ArmToGround)))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     scoreController
         .button(4)
         .whileTrue(
             new GoToScoring(drivebase, POSITION.RIGHT)
                 .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+                .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     scoreController
         .button(5)
         .whileTrue(
             new GoToScoring(drivebase, POSITION.MIDDLE)
                 .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+                .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     scoreController
         .button(6)
         .whileTrue(
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+                .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
     // new Trigger(() -> drivebase.isMoving())
     //     .debounce(10, DebounceType.kBoth)

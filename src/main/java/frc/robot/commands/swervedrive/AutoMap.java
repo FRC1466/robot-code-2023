@@ -23,6 +23,7 @@ public class AutoMap {
       FreeCube = "FreeCube",
       GripperOff = "GripperOff",
       DropObjectAndStore = "DropObjectAndStore",
+      DropCubeAndStore = "DropCubeAndStore",
       EnsureGrabAndStore = "EnsureGrabAndStore",
       EnsureGrabAndVertical = "EnsureGrabAndVertical",
       ScoreArmLow = "ScoreArmLow",
@@ -74,7 +75,7 @@ public class AutoMap {
             getCommandInMap(AutoMap.FreeCone)
                 .andThen(
                     Commands.parallel(
-                        Commands.waitSeconds(0.2),
+                        Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GripperOff)),
                         getCommandInMap(AutoMap.ArmToStore))));
     eventMapGetter.put(
         "DropCubeAndStore",
@@ -82,7 +83,7 @@ public class AutoMap {
             getCommandInMap(AutoMap.FreeCube)
                 .andThen(
                     Commands.parallel(
-                         Commands.waitSeconds(0.2),
+                         Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GripperOff)),
                         getCommandInMap(AutoMap.ArmToStore))));
     eventMapGetter.put(
         "PickupGroundReady",
