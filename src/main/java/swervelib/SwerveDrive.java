@@ -321,8 +321,8 @@ public class SwerveDrive {
    * @param pose The pose to set the odometry to
    */
   public void resetOdometry(Pose3d pose) {
-    swerveDrivePoseEstimator.resetPosition(getGyroRotation3d(), getModuleStates(), pose);
     resetDriveEncoders();
+    swerveDrivePoseEstimator.resetPosition(getGyroRotation3d(), getModuleStates(), pose);
   }
 
   /**
