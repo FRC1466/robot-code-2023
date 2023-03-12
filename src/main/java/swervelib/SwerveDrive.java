@@ -254,7 +254,8 @@ public class SwerveDrive {
   }
 
   public void setModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop) {
-    setRawModuleStates(kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates)), isOpenLoop);
+    setRawModuleStates(
+        kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates)), isOpenLoop);
   }
 
   /**

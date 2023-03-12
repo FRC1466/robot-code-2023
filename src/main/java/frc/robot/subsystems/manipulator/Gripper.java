@@ -1,10 +1,9 @@
 package frc.robot.subsystems.manipulator;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GripperConstants;
@@ -29,13 +28,13 @@ public class Gripper extends SubsystemBase {
   /** Create a new Gripper subsystem. */
   public Gripper() {
 
-   gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
-   gripperMotor.enableVoltageCompensation(12.0);
+    gripperMotor = new CANSparkMax(GripperConstants.gripperID, MotorType.kBrushless);
+    gripperMotor.enableVoltageCompensation(12.0);
     gripperMotor.setSmartCurrentLimit(30);
     gripperMotor.burnFlash();
-    
-   pidController = gripperMotor.getPIDController();
-   initializePID();
+
+    pidController = gripperMotor.getPIDController();
+    initializePID();
 
     encoder = gripperMotor.getEncoder();
     initializeEncoder();
@@ -53,7 +52,6 @@ public class Gripper extends SubsystemBase {
 
   private void initializeEncoder() {
     encoder.setPosition(0);
-  
   }
 
   public void ambientGripper() {
@@ -70,7 +68,7 @@ public class Gripper extends SubsystemBase {
       case CONEIN:
         currentGripper = GripperConstants.cubeOutConeIn;
         break;
-        case CUBEOUT:
+      case CUBEOUT:
         currentGripper = GripperConstants.cubeOutConeIn;
         break;
       case CONEOUT:
@@ -79,7 +77,7 @@ public class Gripper extends SubsystemBase {
       case STOP:
         currentGripper = 0;
         break;
- 
+
       default:
         throw new IllegalArgumentException("Invalid intake enum position.");
     }

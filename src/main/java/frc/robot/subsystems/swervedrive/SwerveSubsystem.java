@@ -40,9 +40,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveBalance =
-        new SwerveBalance(
-            Auton.balanceScale, Auton.balanceScalePow);
+    swerveBalance = new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
   }
 
   /**

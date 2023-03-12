@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.function.Supplier;
 
 public class AutoMap {
-  private HashMap<String, Command> eventMap = new HashMap<>();
-  private HashMap<String, Supplier<Command>> eventMapGetter = new HashMap<>();
+  private final HashMap<String, Command> eventMap = new HashMap<>();
+  private final HashMap<String, Supplier<Command>> eventMapGetter = new HashMap<>();
   public static final String ArmToGround = "ArmToGround",
       ArmToLoadingStation = "ArmToLoadingStation",
       ArmToStore = "ArmToStore",
@@ -22,16 +22,12 @@ public class AutoMap {
       FreeCone = "FreeCone",
       FreeCube = "FreeCube",
       GripperOff = "GripperOff",
-      DropObjectAndStore = "DropObjectAndStore",
       DropCubeAndStore = "DropCubeAndStore",
-      EnsureGrabAndStore = "EnsureGrabAndStore",
-      EnsureGrabAndVertical = "EnsureGrabAndVertical",
-      ScoreArmLow = "ScoreArmLow",
-      ScoreArmMid = "ScoreArmMid",
-      PickupGroundReady = "PickupGroundReady",
-      PickupLoadingStationReady = "PickupLoadingStationReady",
-      PickupConeAndStore = "PickupConeAndStore",
-      PickupCubeAndStore = "PickupCubeAndStore";
+      DropConeAndStore = "DropConeAndStore",
+      PickupGroundCubeReady = "PickupGroundCubeReady",
+      PickupGroundConeReady = "PickupGroundConeReady",
+      PickupLoadingStationCubeReady = "PickupLoadingStationCubeReady",
+      PickupLoadingStationConeReady = "PickupLoadingStationConeReady";
 
   public AutoMap(Gripper gripper, VirtualFourBar arm) {
 
@@ -64,8 +60,10 @@ public class AutoMap {
 
     eventMapGetter.put("GrabCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONEIN)));
     eventMapGetter.put("GrabCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBEIN)));
-    eventMapGetter.put("FreeCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONEOUT)));
-    eventMapGetter.put("FreeCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBEOUT)));
+    eventMapGetter.put(
+        "FreeCone", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CONEOUT)));
+    eventMapGetter.put(
+        "FreeCube", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.CUBEOUT)));
     eventMapGetter.put("GripperOff", () -> Commands.runOnce(() -> gripper.setGripper(INTAKE.STOP)));
 
     /* Compositions */
@@ -83,33 +81,28 @@ public class AutoMap {
             getCommandInMap(AutoMap.FreeCube)
                 .andThen(
                     Commands.parallel(
-                         Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GripperOff)),
+                        Commands.waitSeconds(0.2).andThen(getCommandInMap(AutoMap.GripperOff)),
                         getCommandInMap(AutoMap.ArmToStore))));
-    eventMapGetter.put(
-        "PickupGroundReady",
-        () ->
-            getCommandInMap(AutoMap.ArmToGround)
-                .andThen(getCommandInMap(AutoMap.GripperOff)));
 
     eventMapGetter.put(
-        "PickupLoadingStationReady",
+        "PickupGroundCubeReady",
+        () -> getCommandInMap(AutoMap.ArmToGround).andThen(getCommandInMap(AutoMap.GrabCone)));
+
+    eventMapGetter.put(
+        "PickupGroundConeReady",
+        () -> getCommandInMap(AutoMap.ArmToGround).andThen(getCommandInMap(AutoMap.GrabCube)));
+
+    eventMapGetter.put(
+        "PickupLoadingStationCubeReady",
         () ->
             getCommandInMap(AutoMap.ArmToLoadingStation)
-                .andThen(getCommandInMap(AutoMap.GripperOff)));
+                .andThen(getCommandInMap(AutoMap.GrabCone)));
 
     eventMapGetter.put(
-        "PickupConeAndStore",
+        "PickupLoadingStationConeReady",
         () ->
-            getCommandInMap(AutoMap.GrabCone)
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(getCommandInMap(AutoMap.ArmToStore)));
-
-    eventMapGetter.put(
-        "PickupCubeAndStore",
-        () ->
-            getCommandInMap(AutoMap.GrabCube)
-                .andThen(Commands.waitSeconds(0.5))
-                .andThen(getCommandInMap(AutoMap.ArmToStore)));
+            getCommandInMap(AutoMap.ArmToLoadingStation)
+                .andThen(getCommandInMap(AutoMap.GrabCube)));
 
     eventMapGetter.forEach(
         (key, val) -> {

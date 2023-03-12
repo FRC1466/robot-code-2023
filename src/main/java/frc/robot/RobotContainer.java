@@ -176,7 +176,7 @@ public class RobotContainer {
                 false));
 
     new Trigger(() -> DriverStation.isTeleopEnabled())
-        .onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+        .onTrue(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
         .button(2)
@@ -185,23 +185,23 @@ public class RobotContainer {
 
     driverController
         .button(3)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundConeReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
         .button(4)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundCubeReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
         .button(5)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationConeReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
         .button(6)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationCubeReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
     driverController
         .button(13)
         .whileTrue(autoMap.getCommandInMap(AutoMap.GrabCone))
@@ -210,11 +210,11 @@ public class RobotContainer {
         .button(14)
         .whileTrue(autoMap.getCommandInMap(AutoMap.FreeCone))
         .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
-        driverController
+    driverController
         .button(12)
         .whileTrue(autoMap.getCommandInMap(AutoMap.GrabCube))
         .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
-        driverController
+    driverController
         .button(15)
         .whileTrue(autoMap.getCommandInMap(AutoMap.FreeCube))
         .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
@@ -222,7 +222,6 @@ public class RobotContainer {
         .button(11)
         .whileTrue(autoMap.getCommandInMap(AutoMap.GripperOff))
         .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
-
 
     scoreController
         .button(1)
@@ -254,7 +253,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.RIGHT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
 
     scoreController
         .button(5)
@@ -270,7 +269,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
 
     // new Trigger(() -> drivebase.isMoving())
     //     .debounce(10, DebounceType.kBoth)
