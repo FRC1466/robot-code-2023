@@ -3,7 +3,7 @@ package frc.robot.subsystems.swervedrive;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -25,8 +25,7 @@ public class PhotonCameraWrapper {
   /** Create a new PhotonCameraWrapper to interface with photonvision camera. */
   public PhotonCameraWrapper() {
     try {
-      aprilTagFieldLayout =
-          AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+      aprilTagFieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -38,14 +37,14 @@ public class PhotonCameraWrapper {
     robotToCam = new Transform3d(Auton.cameraTranslation, Auton.cameraRotation);
     photonPoseEstimator =
         new PhotonPoseEstimator(
-            aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
+            aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP, camera, robotToCam);
   }
 
   public PhotonPipelineResult getLatest() {
     return camera.getLatestResult();
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose3d prevEstimatedRobotPose) {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
     return photonPoseEstimator.update();
   }

@@ -28,6 +28,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final SwerveBalance swerveBalance;
 
+  public boolean softVisionMeasurements = true;
+
+//  private final PhotonCameraWrapper photon;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -41,6 +45,7 @@ public class SwerveSubsystem extends SubsystemBase {
       throw new RuntimeException(e);
     }
     swerveBalance = new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
+//    photon = new PhotonCameraWrapper();
   }
 
   /**
@@ -68,6 +73,14 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     swerveDrive.updateOdometry();
+//    var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
+//    pose.ifPresent(
+//        estimatedRobotPose ->
+//            swerveDrive.addVisionMeasurement(
+//                estimatedRobotPose.estimatedPose,
+//                estimatedRobotPose.timestampSeconds,
+//                softVisionMeasurements,
+//                1.0));
   }
 
   @Override
@@ -182,11 +195,6 @@ public class SwerveSubsystem extends SubsystemBase {
   public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, Rotation2d angle) {
     return swerveDrive.swerveController.getTargetSpeeds(
         xInput, yInput, angle.getRadians(), getHeading().getRadians());
-  }
-
-  public void addVisionEstimate(
-      Pose3d pose, double timestamp, boolean soft, double trustworthiness) {
-    swerveDrive.addVisionMeasurement(pose, timestamp, soft, trustworthiness);
   }
 
   public boolean isMoving() {
