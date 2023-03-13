@@ -184,6 +184,11 @@ public class SwerveSubsystem extends SubsystemBase {
         xInput, yInput, angle.getRadians(), getHeading().getRadians());
   }
 
+  public void addVisionEstimate(
+      Pose3d pose, double timestamp, boolean soft, double trustworthiness) {
+    swerveDrive.addVisionMeasurement(pose, timestamp, soft, trustworthiness);
+  }
+
   public boolean isMoving() {
     return Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1
         || Math.abs(getFieldVelocity().vxMetersPerSecond) > 0.1

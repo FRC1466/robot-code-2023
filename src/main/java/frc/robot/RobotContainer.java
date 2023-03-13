@@ -140,6 +140,8 @@ public class RobotContainer {
             () -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < Auton.balanceLimitDeg);
   }
 
+  boolean softVisionMeasurements = true;
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
@@ -154,6 +156,10 @@ public class RobotContainer {
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
+    driverController
+        .povRight()
+        .whileTrue(Commands.runOnce(() -> softVisionMeasurements = false))
+        .whileFalse(Commands.runOnce(() -> softVisionMeasurements = true));
 
     driverController
         .button(7)
@@ -177,6 +183,11 @@ public class RobotContainer {
 
     new Trigger(() -> DriverStation.isTeleopEnabled())
         .onTrue(autoMap.getCommandInMap(AutoMap.ArmToStore));
+
+    driverController
+        .button(1)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToMid))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
 
     driverController
         .button(2)
@@ -276,6 +287,7 @@ public class RobotContainer {
     //     .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh))
     //     .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
   }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
