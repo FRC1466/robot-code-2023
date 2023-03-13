@@ -105,7 +105,7 @@ public final class Constants {
     public static final Gains armPosition = new Gains(0.6, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.236903;
-    public static final double maxRadians = 4.14;
+    public static final double maxRadians = 4.11;
     public static final double minRadians = -0.52;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);

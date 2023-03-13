@@ -17,7 +17,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 public class PhotonCameraWrapper {
-  private PhotonCamera camera = new PhotonCamera("photonvision");
+  private PhotonCamera camera = new PhotonCamera("Global_Shutter_Camera");
   private AprilTagFieldLayout aprilTagFieldLayout;
   private PhotonPoseEstimator photonPoseEstimator;
   private Transform3d robotToCam;

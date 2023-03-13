@@ -183,12 +183,12 @@ public class RobotContainer {
         .onTrue(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
-        .button(1)
+        .button(9)
         .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToMid))
         .whileFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
 
     driverController
-        .button(2)
+        .button(10)
         .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToMid))
         .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
 
