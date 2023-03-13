@@ -148,7 +148,7 @@ public final class Constants {
   }
 
   public static final class GripperConstants {
-    public static final double percentIn = 0.35, percentOut = -0.35, idlePercentIn = 0.10;
+    public static final double percentIn = 0.41, percentOut = -0.09, idlePercentIn = 0.10;
 
     public static final int gripperID = 34;
   }

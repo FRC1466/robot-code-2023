@@ -616,12 +616,12 @@ public class SwerveDrive {
       resetDriveEncoders();
     }
 
-    if (!SwerveDriveTelemetry.isSimulation) {
-      imu.setOffset(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation());
-      // Yaw reset recommended by Team 1622
-    } else {
-      simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
-    }
+    // if (!SwerveDriveTelemetry.isSimulation) {
+    //   imu.setOffset(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation());
+    //   // Yaw reset recommended by Team 1622
+    // } else {
+    //   simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
+    // }
   }
 
   /** Reset the drive encoders to 0 for all swerve modules. */
