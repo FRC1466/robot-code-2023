@@ -17,12 +17,38 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreArmLow",
-          "GrabOpen"
+          "ObjectGrab",
+          "ArmToGround",
+          "ObjectDrop"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
         "waitTime": 0.02
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 5.1985003115305375,
+        "y": 4.727535608917372
+      },
+      "prevControl": {
+        "x": 4.136521423816337,
+        "y": 4.890258180421967
+      },
+      "nextControl": {
+        "x": 6.614477160578253,
+        "y": 4.510571414305222
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
       }
     },
     {
@@ -46,7 +72,7 @@
       "stopEvent": {
         "names": [
           "PickupGroundReady",
-          "GrabCube"
+          "ObjectGrab"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
@@ -70,7 +96,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreArmLow",
+          "ArmToGround",
           "DropObjectAndStore"
         ],
         "executionBehavior": "sequential",
@@ -83,25 +109,26 @@
     {
       "position": 0.047017045454545645,
       "names": [
-        "EnsureGrabAndVertical"
+        "ArmToVertical"
       ]
     },
     {
       "position": 1.8068892045454545,
       "names": [
-        "ScoreArmLow"
+        "ArmToGround"
       ]
     },
     {
-      "position": 1.2919744318181796,
+      "position": 1.2363636363636363,
       "names": [
         "ArmToVertical"
       ]
     },
     {
-      "position": 0.3578835227272727,
+      "position": 0.2472727272727341,
       "names": [
-        "PickupGroundReady"
+        "PickupGroundReady",
+        "GrabObject"
       ]
     }
   ]

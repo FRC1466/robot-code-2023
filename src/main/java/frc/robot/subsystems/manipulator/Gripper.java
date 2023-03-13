@@ -2,22 +2,16 @@ package frc.robot.subsystems.manipulator;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GripperConstants;
 
 public class Gripper extends SubsystemBase {
   private CANSparkMax gripperMotor;
-  private SparkMaxPIDController pidController;
-  private RelativeEncoder encoder;
 
   public enum INTAKE {
-    CUBEIN,
-    CONEIN,
-    CUBEOUT,
-    CONEOUT,
+    IN,
+    OUT,
     STOP
   }
 
@@ -32,26 +26,6 @@ public class Gripper extends SubsystemBase {
     gripperMotor.enableVoltageCompensation(12.0);
     gripperMotor.setSmartCurrentLimit(30);
     gripperMotor.burnFlash();
-
-    pidController = gripperMotor.getPIDController();
-    initializePID();
-
-    encoder = gripperMotor.getEncoder();
-    initializeEncoder();
-  }
-
-  private void initializePID() {
-    pidController.setP(GripperConstants.gripperPosition.P);
-    pidController.setI(GripperConstants.gripperPosition.I);
-    pidController.setD(GripperConstants.gripperPosition.D);
-    pidController.setIZone(GripperConstants.gripperPosition.integralZone);
-    pidController.setFF(GripperConstants.gripperPosition.F);
-    pidController.setOutputRange(
-        -GripperConstants.gripperPosition.peakOutput, GripperConstants.gripperPosition.peakOutput);
-  }
-
-  private void initializeEncoder() {
-    encoder.setPosition(0);
   }
 
   public void ambientGripper() {
@@ -62,17 +36,11 @@ public class Gripper extends SubsystemBase {
     currentIntake = intake;
     SmartDashboard.putString("Gripper", intake.toString());
     switch (intake) {
-      case CUBEIN:
-        currentGripper = GripperConstants.cubeInConeOut;
+      case IN:
+        currentGripper = GripperConstants.percentIn;
         break;
-      case CONEIN:
-        currentGripper = GripperConstants.cubeOutConeIn;
-        break;
-      case CUBEOUT:
-        currentGripper = GripperConstants.cubeOutConeIn;
-        break;
-      case CONEOUT:
-        currentGripper = GripperConstants.cubeInConeOut;
+      case OUT:
+        currentGripper = GripperConstants.percentOut;
         break;
       case STOP:
         currentGripper = 0;

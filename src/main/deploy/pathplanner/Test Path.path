@@ -17,7 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreArmLow",
+          "ObjectGrab",
+          "ArmToGround",
           "DropObjectAndStore"
         ],
         "executionBehavior": "sequential",
@@ -42,7 +43,7 @@
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
         "names": [],
         "executionBehavior": "parallel",
@@ -73,5 +74,18 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.014545454545457802,
+      "names": [
+        "ArmToVertical"
+      ]
+    },
+    {
+      "position": 0.2181818181818225,
+      "names": [
+        "ArmToGround"
+      ]
+    }
+  ]
 }

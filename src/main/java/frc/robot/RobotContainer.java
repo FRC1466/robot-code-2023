@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.OIConstants.InputLimits;
 import frc.robot.commands.swervedrive.AutoMap;
 import frc.robot.commands.swervedrive.auto.GoToScoring;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
@@ -56,19 +58,12 @@ public class RobotContainer {
   private final TeleopDrive closedFieldRel =
       new TeleopDrive(
           drivebase,
+          () -> MathUtil.applyDeadband(-driverController.getY(), InputLimits.vxDeadband),
+          () -> MathUtil.applyDeadband(-driverController.getX(), InputLimits.vyDeadband),
           () ->
-              (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                  ? -driverController.getY()
-                  : 0,
-          () ->
-              (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                  ? -driverController.getX()
-                  : 0,
-          () ->
-              (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                  ? -driverController.getZ() * 0.8
-                  : 0,
-          driverController.button(8).negate(), // driverController.button(3).negate(),
+              MathUtil.applyDeadband(
+                  -driverController.getZ() * InputLimits.defaultAngScale, InputLimits.angDeadband),
+          driverController.button(8).negate(),
           false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -98,6 +93,12 @@ public class RobotContainer {
         builder.getSwerveCommand(
             PathPlanner.loadPathGroup(
                 "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+
+    chooser.addOption(
+        "2 Score + Dock T1",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "2 Score + Dock T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
     chooser.addOption(
         "1 Score + Dock T2",
@@ -165,18 +166,15 @@ public class RobotContainer {
             new TeleopDrive(
                 drivebase,
                 () ->
-                    (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                        ? -driverController.getY() * OIConstants.InputLimits.reduced
-                        : 0,
+                    MathUtil.applyDeadband(
+                        -driverController.getY() * InputLimits.reduced, InputLimits.vxDeadband),
                 () ->
-                    (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                        ? -driverController.getX() * OIConstants.InputLimits.reduced
-                        : 0,
+                    MathUtil.applyDeadband(
+                        -driverController.getX() * InputLimits.reduced, InputLimits.vyDeadband),
                 () ->
-                    (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                        ? -driverController.getZ() * OIConstants.InputLimits.reduced
-                        : 0,
-                driverController.button(8).negate(), // driverController.button(3).negate(),
+                    MathUtil.applyDeadband(
+                        -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
+                driverController.button(8).negate(),
                 false));
 
     new Trigger(() -> DriverStation.isTeleopEnabled())
@@ -185,47 +183,30 @@ public class RobotContainer {
     driverController
         .button(9)
         .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToMid))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     driverController
-        .button(10)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToMid))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .button(2)
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
         .button(3)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundConeReady))
+        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
         .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
 
     driverController
         .button(4)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundCubeReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
+        .whileTrue(autoMap.getCommandInMap(AutoMap.ArmToGround))
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
-    driverController
-        .button(5)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationConeReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
-
-    driverController
-        .button(6)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationCubeReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.ArmToStore));
     driverController
         .button(13)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.GrabCone))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
-    driverController
-        .button(14)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.FreeCone))
+        .whileTrue(autoMap.getCommandInMap(AutoMap.ObjectGrab))
         .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
     driverController
         .button(12)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.GrabCube))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
-    driverController
-        .button(15)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.FreeCube))
+        .whileTrue(autoMap.getCommandInMap(AutoMap.ObjectDrop))
         .whileFalse(autoMap.getCommandInMap(AutoMap.GripperOff));
     driverController
         .button(11)
@@ -238,7 +219,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.RIGHT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToGround)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(2)
@@ -246,7 +227,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.MIDDLE)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToGround)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(3)
@@ -254,7 +235,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToGround)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(4)
@@ -262,7 +243,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.RIGHT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
+        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(5)
@@ -270,7 +251,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.MIDDLE)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropCubeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     scoreController
         .button(6)
@@ -278,7 +259,7 @@ public class RobotContainer {
             new GoToScoring(drivebase, POSITION.LEFT)
                 .getCommand()
                 .alongWith(autoMap.getCommandInMap(AutoMap.ArmToMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropConeAndStore));
+        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
 
     // new Trigger(() -> drivebase.isMoving())
     //     .debounce(10, DebounceType.kBoth)

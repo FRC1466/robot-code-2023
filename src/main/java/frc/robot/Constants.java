@@ -46,7 +46,12 @@ public final class Constants {
     public static final int driverID = 4, intakeID = 5;
 
     public static final class InputLimits {
-      public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.5;
+      public static final double vxDeadband = 0.02,
+          vyDeadband = 0.02,
+          angDeadband = 0.10,
+          reduced = 0.5;
+      public static final double defaultAngScale = 0.8;
+      public static final double vxSlew = 8.0, vySlew = 8.0, angSlew = 8.0;
     }
   }
 
@@ -104,9 +109,13 @@ public final class Constants {
     public static final int armPort = 30, dutyCyclePort = 0;
     public static final Gains armPosition = new Gains(0.6, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
-    public static final double absolutePositionOffset = 0.236903;
-    public static final double maxRadians = 4.11;
+    public static final double absolutePositionOffset = 0.557;
+    public static final double maxRadians = 4.21;
     public static final double minRadians = -0.52;
+    public static final double stationDegrees = 155.0,
+        midDegrees = 155.0,
+        highDegrees = 135.0,
+        verticalDegrees = 90.0;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
     public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
@@ -139,8 +148,7 @@ public final class Constants {
   }
 
   public static final class GripperConstants {
-    public static final Gains gripperPosition = new Gains(0.28, 0, 0, 0, 0, 0.5);
-    public static final double cubeInConeOut = 0.35, cubeOutConeIn = -0.35;
+    public static final double percentIn = 0.35, percentOut = -0.35, idlePercentIn = 0.10;
 
     public static final int gripperID = 34;
   }
