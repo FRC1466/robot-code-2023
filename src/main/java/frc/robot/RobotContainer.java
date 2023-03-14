@@ -83,34 +83,34 @@ public class RobotContainer {
             PathPlanner.loadPathGroup(
                 "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.setDefaultOption(
-        "Default Test Full",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "Test Full Path",
-                new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    // chooser.setDefaultOption(
+    //     "Default Test Full",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "Test Full Path",
+    //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.addOption(
-        "3 Score T1",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    // chooser.addOption(
+    //     "3 Score T1",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.addOption(
-        "2 Score + Dock T1",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "2 Score + Dock T1",
-                new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    // chooser.addOption(
+    //     "2 Score + Dock T1",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "2 Score + Dock T1",
+    //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.addOption(
-        "1 Score + Dock T2",
-        builder
-            .getSwerveCommand(
-                PathPlanner.loadPathGroup(
-                    "1 Score + Dock T2",
-                    new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
-            .andThen(autoBalance()));
+    // chooser.addOption(
+    //     "1 Score + Dock T2",
+    //     builder
+    //         .getSwerveCommand(
+    //             PathPlanner.loadPathGroup(
+    //                 "1 Score + Dock T2",
+    //                 new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
+    //         .andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
   }

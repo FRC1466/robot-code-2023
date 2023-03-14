@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
 
@@ -14,11 +15,11 @@ public class Superstructure {
   }
 
   public Command pickupGround() {
-    return arm.ground().andThen(effector.intake());
+    return arm.ground().andThen(Commands.parallel(effector.intake(), arm.hold()));
   }
 
   public Command pickupStation() {
-    return arm.station().andThen(effector.intake());
+    return arm.station().andThen(Commands.parallel(effector.intake(), arm.hold()));
   }
 
   public Command store() {

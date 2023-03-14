@@ -154,7 +154,7 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public Command hold() {
-    return run(this::setArmHold);
+    return run(() -> setArmHold());
   }
 
   /**
@@ -163,6 +163,7 @@ public class VirtualFourBar extends SubsystemBase {
    * @return if arm is at setpoint.
    */
   public boolean isAtSetpoint() {
+    SmartDashboard.putBoolean("Arm PID at setpoint", armPID.atSetpoint());
     return armPID.atSetpoint();
   }
 

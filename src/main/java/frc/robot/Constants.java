@@ -107,7 +107,7 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.2, 0, 0, 0, 0, 0.9);
+    public static final Gains armPosition = new Gains(0.6, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.557;
     public static final double maxRadians = 4.21;
