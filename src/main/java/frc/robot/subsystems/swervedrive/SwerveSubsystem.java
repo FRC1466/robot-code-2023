@@ -85,8 +85,8 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveDrive.addVisionMeasurement(
                 estimatedRobotPose.estimatedPose,
                 estimatedRobotPose.timestampSeconds,
-                softVisionMeasurements,
-                1.0));
+                true,
+                0.1));
   }
 
   @Override

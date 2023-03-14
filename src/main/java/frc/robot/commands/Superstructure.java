@@ -15,11 +15,11 @@ public class Superstructure {
   }
 
   public Command pickupGround() {
-    return arm.ground().andThen(Commands.parallel(effector.intake(), arm.hold()));
+    return arm.ground().andThen(effector.intake());
   }
 
   public Command pickupStation() {
-    return arm.station().andThen(Commands.parallel(effector.intake(), arm.hold()));
+    return arm.station().andThen(effector.intake());
   }
 
   public Command store() {
@@ -43,7 +43,7 @@ public class Superstructure {
   }
 
   public Command scoreMid() {
-    return arm.mid().andThen(effector.drop());
+    return arm.mid().andThen(effector.launch());
   }
 
   public Command scoreHigh() {

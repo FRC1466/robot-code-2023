@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
@@ -16,6 +17,7 @@ public class VirtualFourBar extends SubsystemBase {
   private DutyCycleEncoder absoluteArmEncoder;
   private ArmPIDController armPID;
   private VirtualFourBarSimulation sim;
+  private Rotation2d localSetpoint;
 
   public enum ARM {
     GROUND,
@@ -95,14 +97,15 @@ public class VirtualFourBar extends SubsystemBase {
    * @param setpoint setpoint in radians.
    */
   public void setGoal(Rotation2d setpoint) {
-    armPID.setSetpoint(setpoint);
+    localSetpoint = setpoint;
+    // armPID.setSetpoint(setpoint);
     SmartDashboard.putNumber("Arm PID Setpoint", setpoint.getRadians());
   }
 
   public void setArmHold() {
     var motorOutput =
         MathUtil.clamp(
-            armPID.calculate(getPosition()),
+            armPID.calculate(getPosition(), localSetpoint),
             -ArmConstants.armPosition.peakOutput,
             ArmConstants.armPosition.peakOutput);
     var feedforward = getPosition().getCos() * ArmConstants.gravityFF;
@@ -119,42 +122,40 @@ public class VirtualFourBar extends SubsystemBase {
 
   public Command ground() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.maxRadians)))
-        .andThen(hold())
-        .until(this::isAtSetpoint);
+    .andThen(holdUntilSetpoint());
   }
 
   public Command station() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.stationDegrees)))
-        .andThen(hold())
-        .until(this::isAtSetpoint);
+    .andThen(holdUntilSetpoint());
   }
 
   public Command mid() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegrees)))
-        .andThen(hold())
-        .until(this::isAtSetpoint);
+    .andThen(holdUntilSetpoint());
   }
 
   public Command high() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highDegrees)))
-        .andThen(hold())
-        .until(this::isAtSetpoint);
+    .andThen(holdUntilSetpoint());
   }
 
   public Command store() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.minRadians)))
-        .andThen(hold())
-        .until(this::isAtSetpoint);
+    .andThen(holdUntilSetpoint());
   }
 
   public Command vertical() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.verticalDegrees)))
-        .andThen(hold())
-        .until(this::isAtSetpoint);
+        .andThen(holdUntilSetpoint());
   }
 
   public Command hold() {
-    return run(() -> setArmHold());
+    return Commands.run(() -> setArmHold(), this);
+  }
+
+  public Command holdUntilSetpoint() {
+    return hold().raceWith(Commands.waitSeconds(0.3).andThen(Commands.waitUntil(this::isAtSetpoint)));
   }
 
   /**
@@ -169,6 +170,7 @@ public class VirtualFourBar extends SubsystemBase {
 
   @Override
   public void periodic() {
+    setArmHold();
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Arm Raw Absolute Encoder", absoluteArmEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("Arm Processed Absolute Encoder", getPosition().getRadians());
