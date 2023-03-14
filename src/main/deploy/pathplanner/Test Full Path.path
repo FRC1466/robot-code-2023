@@ -17,9 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ObjectGrab",
-          "ArmToGround",
-          "ObjectDrop"
+          "Intake",
+          "ScoreMid"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
@@ -70,13 +69,10 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [
-          "PickupGroundReady",
-          "ObjectGrab"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
-        "waitTime": 0.5
+        "waitTime": 0.1
       }
     },
     {
@@ -96,8 +92,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ArmToGround",
-          "DropObjectAndStore"
+          "ScoreMid"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -113,12 +108,6 @@
       ]
     },
     {
-      "position": 1.8068892045454545,
-      "names": [
-        "ArmToGround"
-      ]
-    },
-    {
       "position": 1.2363636363636363,
       "names": [
         "ArmToVertical"
@@ -127,8 +116,14 @@
     {
       "position": 0.2472727272727341,
       "names": [
-        "PickupGroundReady",
-        "GrabObject"
+        "Intake",
+        "PickupGround"
+      ]
+    },
+    {
+      "position": 2.5616122159090837,
+      "names": [
+        "Mid"
       ]
     }
   ]

@@ -17,8 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ArmToMid",
-          "ObjectDrop"
+          "Intake",
+          "ScoreMid"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -80,8 +80,7 @@
     {
       "position": 0.1945201526988637,
       "names": [
-        "ArmToStore",
-        "GripperStop"
+        "Store"
       ]
     }
   ]

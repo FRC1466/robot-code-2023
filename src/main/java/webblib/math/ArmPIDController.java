@@ -332,28 +332,6 @@ public class ArmPIDController extends PIDController {
   public void setSetpoint(Rotation2d setpoint) {
     m_setpoint = setpoint.rotateBy(new Rotation2d());
     m_haveSetpoint = true;
-    if (isSetpointWithinObstacle()) {
-      /* Check which bound is closer, so we can use that plus/minus a tolerance for our setpoint. */
-      if (m_setpoint.minus(m_minimumAvoidanceBound).getDegrees()
-          > m_maximumAvoidanceBound.minus(m_setpoint).getDegrees()) {
-        m_setpoint = m_maximumAvoidanceBound.plus(m_avoidanceTolerance);
-      } else {
-        m_setpoint = m_minimumAvoidanceBound.minus(m_avoidanceTolerance);
-      }
-    }
-
-    var initialError = m_setpoint.minus(m_measurement);
-
-    if (isObstacleInSetpointsWay()) {
-      m_positionError =
-          initialError.getDegrees() >= 0
-              ? Rotation2d.fromDegrees(-360 + initialError.getDegrees())
-              : Rotation2d.fromDegrees(360 + initialError.getDegrees());
-    } else {
-      m_positionError = initialError;
-    }
-
-    m_velocityError = (m_positionError.getRadians() - m_prevError.getRadians()) / m_period;
   }
 
   /**
@@ -441,7 +419,7 @@ public class ArmPIDController extends PIDController {
   public double calculate(Rotation2d measurement, Rotation2d setpoint) {
     m_setpoint = setpoint.rotateBy(new Rotation2d());
     m_haveSetpoint = true;
-    return calculate(measurement.rotateBy(new Rotation2d()));
+    return calculate(measurement);
   }
 
   /**
@@ -451,7 +429,7 @@ public class ArmPIDController extends PIDController {
    * @return The next controller output.
    */
   public double calculate(Rotation2d measurement) {
-    m_measurement = measurement;
+    m_measurement = measurement.rotateBy(new Rotation2d());
     m_prevError = m_positionError;
     m_haveMeasurement = true;
 

@@ -47,10 +47,10 @@ public class SwerveSubsystem extends SubsystemBase {
       throw new RuntimeException(e);
     }
     swerveBalance = new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
-    // swerveDrive.swerveController.addSlewRateLimiters(
-    //     new SlewRateLimiter(InputLimits.vxSlew),
-    //     new SlewRateLimiter(InputLimits.vySlew),
-    //     new SlewRateLimiter(InputLimits.angSlew));
+    swerveDrive.swerveController.addSlewRateLimiters(
+        new SlewRateLimiter(InputLimits.vxSlew),
+        new SlewRateLimiter(InputLimits.vySlew),
+        new SlewRateLimiter(InputLimits.angSlew));
     photon = new PhotonCameraWrapper();
   }
 

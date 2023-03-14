@@ -232,10 +232,10 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     accelerationVector.setColumn(
         0,
         0,
-        0,
-        0,
+        accelChassisSpeeds.vxMetersPerSecond,
+        accelChassisSpeeds.vyMetersPerSecond,
         chassisSpeeds.omegaRadiansPerSecond * chassisSpeeds.omegaRadiansPerSecond,
-        0);
+        accelChassisSpeeds.omegaRadiansPerSecond);
 
     var moduleAccelerationStatesMatrix = bigInverseKinematics.mult(accelerationVector);
 

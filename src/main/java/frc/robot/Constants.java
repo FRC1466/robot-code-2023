@@ -107,7 +107,7 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.6, 0, 0, 0, 0, 0.9);
+    public static final Gains armPosition = new Gains(0.2, 0, 0, 0, 0, 0.9);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.557;
     public static final double maxRadians = 4.21;
@@ -147,10 +147,14 @@ public final class Constants {
     }
   }
 
-  public static final class GripperConstants {
-    public static final double percentIn = 0.41, percentOut = -0.09, idlePercentIn = 0.10;
+  public static final class Intake {
+    public static final double intakeV = 0.41 * 12,
+        dropV = -0.06 * 12,
+        launchV = -0.20 * 12,
+        holdV = 0.10 * 12;
+    public static final double stallCurrent = 15.0;
 
-    public static final int gripperID = 34;
+    public static final int motorID = 34;
   }
 
   public static final class LEDConstants {
