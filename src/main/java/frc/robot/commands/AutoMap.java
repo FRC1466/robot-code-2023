@@ -19,6 +19,7 @@ public class AutoMap {
     eventMap.put("Vertical", arm.vertical());
     eventMap.put("Mid", arm.mid());
     eventMap.put("Intake", effector.intake());
+    eventMap.put("Launch", effector.launch());
     eventMap.put("StopIntake", effector.stop());
   }
 

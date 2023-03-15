@@ -80,13 +80,15 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() {
     swerveDrive.updateOdometry();
     var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
-    pose.ifPresent(
-        estimatedRobotPose ->
-            swerveDrive.addVisionMeasurement(
-                estimatedRobotPose.estimatedPose,
-                estimatedRobotPose.timestampSeconds,
-                true,
-                0.1));
+    // pose.ifPresent(
+    //     estimatedRobotPose -> {
+    //       var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
+    //       swerveDrive.addVisionMeasurement(
+    //             adjPose,
+    //             estimatedRobotPose.timestampSeconds,
+    //             true,
+    //             0.5);
+    //     });
   }
 
   @Override
@@ -119,6 +121,10 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return swerveDrive.getPose();
+  }
+
+  public Pose3d getPose3d() {
+    return swerveDrive.getPose3d();
   }
 
   /**

@@ -10,8 +10,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.Arrays;
 import java.util.Collections;
+
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -317,25 +320,21 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
    *     should be same as passed into the constructor of this class.
    * @return The resulting Twist2d.
    */
-  public Twist2d toTwist2d(SwerveModuleState2... wheelDeltas) {
+  public Twist2d toTwist2d(Rotation2d heading, SwerveModuleState2... wheelDeltas) {
     if (wheelDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
               + "constructor");
     }
     var moduleDeltaMatrix = new SimpleMatrix(m_numModules * 2, 1);
-    var moduleSpeedsMatrix = new SimpleMatrix(m_numModules * 2, 1);
 
     for (int i = 0; i < m_numModules; i++) {
       var module = wheelDeltas[i];
       moduleDeltaMatrix.set(i * 2, 0, module.distanceMeters * module.angle.getCos());
       moduleDeltaMatrix.set(i * 2 + 1, module.distanceMeters * module.angle.getSin());
-      moduleSpeedsMatrix.set(i * 2, 0, module.speedMetersPerSecond * module.angle.getCos());
-      moduleSpeedsMatrix.set(i * 2 + 1, module.speedMetersPerSecond * module.angle.getSin());
     }
 
     var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
-    var chassisSpeedsVector = m_forwardKinematics.mult(moduleSpeedsMatrix);
 
     var moduleAccelerationStatesMatrix = new SimpleMatrix(m_numModules * 2, 1);
 
@@ -344,13 +343,12 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
 
       double pos = module.distanceMeters;
       double vel = module.speedMetersPerSecond;
-      double accel = module.accelMetersPerSecondSq;
+      var angleAdj = module.angle.minus(heading);
       var angle = module.angle;
-      double angleVel = module.omegaRadPerSecond;
 
       var omegaVector = new SimpleMatrix(2, 1);
 
-      omegaVector.setColumn(0, 0, vel, (angleVel + chassisSpeedsVector.get(2, 0)) * pos);
+      omegaVector.setColumn(0, 0, vel, (angle.getRadians()) * pos);
 
       var trigThetaAngle = new SimpleMatrix(2, 2);
       trigThetaAngle.setColumn(0, 0, angle.getCos(), angle.getSin());
@@ -372,11 +370,23 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     // System.out.println(scale);
     // System.out.println(accelerationVector.toString());
 
+    double rx;
+    SmartDashboard.putNumber("rx", chassisDeltaVector.get(2, 0));
+    if (
+      Math.abs(chassisDeltaVector.get(2, 0)) > 0.2
+    ) {
+      rx = Math.copySign(Math.sqrt(Math.abs(accelerationVector.get(2, 0))), chassisDeltaVector.get(2, 0));
+    } else {
+      rx = chassisDeltaVector.get(2, 0);
+    }
+    var fudge = 12.0 * Math.hypot(chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0));
+    fudge = 2.0;
+
     return new Twist2d(
         chassisDeltaVector.get(0, 0),
         //                    * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
         chassisDeltaVector.get(1, 0),
         //                    * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
-        chassisDeltaVector.get(2, 0));
+        chassisDeltaVector.get(2, 0) * fudge);
   }
 }
