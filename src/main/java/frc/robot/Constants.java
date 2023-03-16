@@ -47,6 +47,8 @@ public final class Constants {
 
     public static final class InputLimits {
       public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.5;
+      public static final double defaultAngScale = 0.8;
+      public static final double vxSlew = 8.0, vySlew = 8.0, angSlew = 8.0;
     }
   }
 
