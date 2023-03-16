@@ -114,7 +114,7 @@ public class VirtualFourBar extends SubsystemBase {
         currentArm = Rotation2d.fromDegrees(155);
         break;
       case MID:
-        currentArm = Rotation2d.fromDegrees(155);
+        currentArm = Rotation2d.fromDegrees(135);
         break;
       case STORAGE:
         currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);

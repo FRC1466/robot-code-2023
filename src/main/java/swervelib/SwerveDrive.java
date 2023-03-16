@@ -613,14 +613,6 @@ public class SwerveDrive {
           robotPose, timestamp, visionMeasurementStdDevs.times(1.0 / trustWorthiness));
     } else {
       swerveDrivePoseEstimator.resetPosition(robotPose.getRotation(), getModuleStates(), robotPose);
-      resetDriveEncoders();
-    }
-
-    if (!SwerveDriveTelemetry.isSimulation) {
-      imu.setOffset(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation());
-      // Yaw reset recommended by Team 1622
-    } else {
-      simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
     }
   }
 

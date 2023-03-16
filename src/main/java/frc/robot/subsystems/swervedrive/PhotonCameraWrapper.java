@@ -38,6 +38,7 @@ public class PhotonCameraWrapper {
     photonPoseEstimator =
         new PhotonPoseEstimator(
             aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP, camera, robotToCam);
+    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
   }
 
   public PhotonPipelineResult getLatest() {
