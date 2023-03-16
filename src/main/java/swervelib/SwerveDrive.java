@@ -238,8 +238,9 @@ public class SwerveDrive {
     SwerveKinematics2.desaturateWheelSpeeds(desiredStates, swerveDriveConfiguration.maxSpeed);
 
     // Sets states
-    for (SwerveModule module : swerveModules) {
-      module.setDesiredState(desiredStates[module.moduleNumber], isOpenLoop);
+    for (SwerveModule module : swerveModules)
+    {
+      module.setDesiredState(desiredStates[module.moduleNumber], isOpenLoop, false);
 
       if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {
         SwerveDriveTelemetry.desiredStates[module.moduleNumber * 2] =
@@ -493,7 +494,8 @@ public class SwerveDrive {
         SwerveDriveTelemetry.desiredStates[(swerveModule.moduleNumber * 2) + 1] =
             desiredState.speedMetersPerSecond;
       }
-      swerveModule.setDesiredState(desiredState, false);
+      swerveModule.setDesiredState(desiredState, false, true);
+
     }
     kinematics.toSwerveModuleStates(new ChassisSpeeds());
   }
@@ -643,4 +645,17 @@ public class SwerveDrive {
   public void setGyro(Rotation3d gyro) {
     imu.setOffset(gyro);
   }
+
+  /**
+   * Reset the drive encoders on the robot, useful when manually resetting the robot without a reboot, like in
+   * autonomous.
+   */
+  public void resetEncoders()
+  {
+    for (SwerveModule module : swerveModules)
+    {
+      module.configuration.driveMotor.setPosition(0);
+    }
+  }
+
 }
