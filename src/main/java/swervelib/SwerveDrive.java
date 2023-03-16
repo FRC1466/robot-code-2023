@@ -25,6 +25,7 @@ import swervelib.imu.SwerveIMU;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveMath;
 import swervelib.math.SwerveModuleState2;
+import swervelib.math.estimator.Pose3dFix;
 import swervelib.math.estimator.SwerveDrivePoseEstimator;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -65,9 +66,9 @@ public class SwerveDrive {
 
   /**
    * Creates a new swerve drivebase subsystem. Robot is controlled via the {@link SwerveDrive#drive}
-   * method, or via the {@link SwerveDrive#setModuleStates} method. The {@link SwerveDrive#drive}
+   * method, or via the {@link SwerveDrive#setRawModuleStates} method. The {@link SwerveDrive#drive}
    * method incorporates kinematics-- it takes a translation and rotation, as well as parameters for
-   * field-centric and closed-loop velocity control. {@link SwerveDrive#setModuleStates} takes a
+   * field-centric and closed-loop velocity control. {@link SwerveDrive#setRawModuleStates} takes a
    * list of SwerveModuleStates and directly passes them to the modules. This subsystem also handles
    * odometry.
    *
@@ -100,7 +101,7 @@ public class SwerveDrive {
             kinematics,
             getGyroRotation3d(),
             getModuleStates(),
-            new Pose3d(new Translation3d(0, 0, 0), new Rotation3d()));
+            new Pose3dFix(new Translation3d(0, 0, 0), new Rotation3d()));
     // x,y,heading in radians; Vision measurement std dev, higher=less weight
 
     zeroGyro();
@@ -212,17 +213,6 @@ public class SwerveDrive {
     // Calculate required module states via kinematics
     SwerveModuleState2[] swerveModuleStates = kinematics.toSwerveModuleStates(velocity);
 
-    if (Math.abs(rotation) < 0.01) {
-      for (var moduleState : swerveModuleStates) {
-        moduleState.omegaRadPerSecond = 0;
-      }
-    }
-
-    //    swerveModuleStates[0].angle = Rotation2d.fromDegrees(0);
-    //    swerveModuleStates[1].angle = Rotation2d.fromDegrees(0);
-    //    swerveModuleStates[2].angle = Rotation2d.fromDegrees(0);
-    //    swerveModuleStates[3].angle = Rotation2d.fromDegrees(0);
-
     setRawModuleStates(swerveModuleStates, isOpenLoop);
   }
 
@@ -238,8 +228,7 @@ public class SwerveDrive {
     SwerveKinematics2.desaturateWheelSpeeds(desiredStates, swerveDriveConfiguration.maxSpeed);
 
     // Sets states
-    for (SwerveModule module : swerveModules)
-    {
+    for (SwerveModule module : swerveModules) {
       module.setDesiredState(desiredStates[module.moduleNumber], isOpenLoop, false);
 
       if (SwerveDriveTelemetry.verbosity.ordinal() >= TelemetryVerbosity.HIGH.ordinal()) {
@@ -259,6 +248,13 @@ public class SwerveDrive {
     }
   }
 
+  /**
+   * Set the module states (azimuth and velocity) directly. Used primarily for auto paths.
+   *
+   * @param desiredStates A list of SwerveModuleStates to send to the modules.
+   * @param isOpenLoop Whether to use closed-loop velocity control. Set to true to disable
+   *     closed-loop.
+   */
   public void setModuleStates(SwerveModuleState2[] desiredStates, boolean isOpenLoop) {
     setRawModuleStates(
         kinematics.toSwerveModuleStates(kinematics.toChassisSpeeds(desiredStates)), isOpenLoop);
@@ -292,7 +288,7 @@ public class SwerveDrive {
    *
    * @return The robot's pose
    */
-  public Pose3d getPose3d() {
+  public Pose3dFix getPose3d() {
     return swerveDrivePoseEstimator.getEstimatedPosition3d();
   }
 
@@ -327,7 +323,6 @@ public class SwerveDrive {
    * @param pose The pose to set the odometry to
    */
   public void resetOdometry(Pose3d pose) {
-    // resetDriveEncoders();
     swerveDrivePoseEstimator.resetPosition(getGyroRotation3d(), getModuleStates(), pose);
   }
 
@@ -495,8 +490,9 @@ public class SwerveDrive {
             desiredState.speedMetersPerSecond;
       }
       swerveModule.setDesiredState(desiredState, false, true);
-
     }
+
+    // Update kinematics because we are not using setModuleStates
     kinematics.toSwerveModuleStates(new ChassisSpeeds());
   }
 
@@ -615,47 +611,26 @@ public class SwerveDrive {
           robotPose, timestamp, visionMeasurementStdDevs.times(1.0 / trustWorthiness));
     } else {
       swerveDrivePoseEstimator.resetPosition(robotPose.getRotation(), getModuleStates(), robotPose);
-      resetDriveEncoders();
-    }
-
-    // if (!SwerveDriveTelemetry.isSimulation) {
-    //   // raw - offset = res
-    //   // raw - vision offset = vision res
-    //   imu.setOffset(
-    //       imu.getRawRotation3d()
-    //           .minus(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation()));
-    //   // Yaw reset recommended by Team 1622
-    // } else {
-    //   simIMU.setAngle(swerveDrivePoseEstimator.getEstimatedPosition3d().getRotation().getZ());
-    // }
-  }
-
-  /** Reset the drive encoders to 0 for all swerve modules. */
-  public void resetDriveEncoders() {
-    for (SwerveModule module : swerveModules) {
-      module.resetEncoder();
     }
   }
 
   /**
-   * Set the Gyroscope offset using a {@link Rotation3d} object.
+   * Set the expected gyroscope angle using a {@link Rotation3d} object. To reset gyro, set to a new
+   * {@link Rotation3d}.
    *
-   * @param gyro Gyroscope offset.
+   * @param gyro expected gyroscope angle.
    */
   public void setGyro(Rotation3d gyro) {
-    imu.setOffset(gyro);
+    imu.setOffset(imu.getRawRotation3d().minus(gyro));
   }
 
   /**
-   * Reset the drive encoders on the robot, useful when manually resetting the robot without a reboot, like in
-   * autonomous.
+   * Reset the drive encoders on the robot, useful when manually resetting the robot without a
+   * reboot, like in autonomous.
    */
-  public void resetEncoders()
-  {
-    for (SwerveModule module : swerveModules)
-    {
+  public void resetEncoders() {
+    for (SwerveModule module : swerveModules) {
       module.configuration.driveMotor.setPosition(0);
     }
   }
-
 }

@@ -80,24 +80,30 @@ public final class Constants {
                     new RectanglePoseArea(
                         new Translation2d(1.23, 3.53), new Translation2d(2.86, 5.33)),
                     // diagonal y's should not overlap
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 4.95, new Rotation2d(Math.PI)), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 4.40, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 4.95, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 4.40, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
                         new Pose2d(lineUpMid, 3.84, new Rotation2d(Math.PI)), new Rotation2d())));
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
                         new Translation2d(1.23, 1.90), new Translation2d(2.92, 3.52)),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 3.30, new Rotation2d(Math.PI)), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 2.72, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 3.30, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 2.72, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
                         new Pose2d(lineUpMid, 2.19, new Rotation2d(Math.PI)), new Rotation2d())));
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
                         new Translation2d(1.23, 0.0), new Translation2d(2.89, 1.89)),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 1.61, new Rotation2d(Math.PI)), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 1.03, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 1.61, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 1.03, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
                         new Pose2d(lineUpMid, 0.55, new Rotation2d(Math.PI)), new Rotation2d())));
           }
@@ -149,10 +155,7 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 5.0,
-        dropV = -0.65,
-        launchV = -4.2,
-        holdV = 2.0;
+    public static final double intakeV = 5.0, dropV = -0.65, launchV = -4.2, holdV = 2.0;
     public static final double stallCurrent = 15.0;
 
     public static final int motorID = 34;

@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Twist3d;
-import edu.wpi.first.wpilibj.Timer;
 import swervelib.math.SwerveKinematics2;
 import swervelib.math.SwerveModuleState2;
 
@@ -30,8 +29,6 @@ public class SwerveDriveOdometry {
   private Rotation3d m_gyroOffset;
   private Rotation3d m_previousAngle;
   private SwerveModuleState2[] m_previousModulePositions;
-  private final Timer updateTimer;
-  private double prevUpdateTime = 0;
 
   /**
    * Constructs a SwerveDriveOdometry object.
@@ -62,8 +59,6 @@ public class SwerveDriveOdometry {
               modulePositions[index].angle,
               modulePositions[index].omegaRadPerSecond);
     }
-    updateTimer = new Timer();
-    updateTimer.start();
 
     MathSharedStore.reportUsage(MathUsageId.kOdometry_SwerveDrive, 1);
   }
@@ -219,13 +214,8 @@ public class SwerveDriveOdometry {
 
     var angle = gyroAngle.plus(m_gyroOffset);
     var angle_difference = angle.minus(m_previousAngle).getQuaternion().toRotationVector();
-    var heading = Rotation2d.fromRadians(gyroAngle.getZ());
 
-    var twist2d = m_kinematics.toTwist2d(heading, moduleDeltas);
-    var speeds = m_kinematics.toChassisSpeeds(moduleDeltas);
-    var time = updateTimer.get();
-    var dt = prevUpdateTime - time;
-    prevUpdateTime = time;
+    var twist2d = m_kinematics.toTwist2d(moduleDeltas);
     var twist =
         new Twist3d(
             twist2d.dx,
@@ -233,7 +223,7 @@ public class SwerveDriveOdometry {
             0,
             angle_difference.get(0, 0),
             angle_difference.get(1, 0),
-            twist2d.dtheta);
+            angle_difference.get(2, 0) * 2);
 
     var newPose = m_poseMeters.exp(twist);
 

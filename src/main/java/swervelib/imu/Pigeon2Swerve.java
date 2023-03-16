@@ -42,6 +42,8 @@ public class Pigeon2Swerve extends SwerveIMU {
   @Override
   public void factoryDefault() {
     imu.configFactoryDefault();
+    imu.configEnableCompass(
+        false); // Compass utilization causes readings to jump dramatically in some cases.
   }
 
   /** Clear sticky faults on IMU. */

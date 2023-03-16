@@ -82,7 +82,8 @@ public class SwerveSubsystem extends SubsystemBase {
     var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
     // pose.ifPresent(
     //     estimatedRobotPose -> {
-    //       var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
+    //       var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(),
+    // getPose3d().getRotation());
     //       swerveDrive.addVisionMeasurement(
     //             adjPose,
     //             estimatedRobotPose.timestampSeconds,

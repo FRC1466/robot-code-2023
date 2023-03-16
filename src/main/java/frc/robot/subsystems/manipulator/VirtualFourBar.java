@@ -122,27 +122,27 @@ public class VirtualFourBar extends SubsystemBase {
 
   public Command ground() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.maxRadians)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command station() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.stationDegrees)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command mid() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegrees)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command high() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highDegrees)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command store() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.minRadians)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command vertical() {
@@ -155,7 +155,8 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public Command holdUntilSetpoint() {
-    return hold().raceWith(Commands.waitSeconds(0.3).andThen(Commands.waitUntil(this::isAtSetpoint)));
+    return hold()
+        .raceWith(Commands.waitSeconds(0.3).andThen(Commands.waitUntil(this::isAtSetpoint)));
   }
 
   /**

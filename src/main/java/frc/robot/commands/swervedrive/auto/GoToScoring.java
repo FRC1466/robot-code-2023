@@ -86,7 +86,6 @@ public class GoToScoring {
   }
 
   public Command getCommand() {
-    return new ProxyCommand(() -> getCommand(drive.getPose()))
-        .andThen(Commands.waitSeconds(1));
+    return new ProxyCommand(() -> getCommand(drive.getPose())).andThen(Commands.waitSeconds(1));
   }
 }
