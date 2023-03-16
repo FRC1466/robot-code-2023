@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,13 +20,15 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.swervedrive.AutoMap;
+import frc.robot.Constants.OIConstants.InputLimits;
+import frc.robot.commands.AutoMap;
+import frc.robot.commands.Superstructure;
 import frc.robot.commands.swervedrive.auto.GoToScoring;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
 import frc.robot.subsystems.PDH;
-import frc.robot.subsystems.manipulator.Gripper;
+import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
@@ -42,12 +46,12 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final VirtualFourBar arm = new VirtualFourBar();
-  private final Gripper gripper = new Gripper();
+  private final EndEffector effector = new EndEffector();
   // private final LED m_led = new LED();
   private final PDH pdh = new PDH();
-
-  private final AutoMap autoMap = new AutoMap(gripper, arm);
-  private final PathBuilder builder = new PathBuilder(drivebase, autoMap.getMap());
+  private final Superstructure superstructure = new Superstructure(effector, arm);
+  private final AutoMap autoMap = new AutoMap(superstructure, effector, arm);
+  private final PathBuilder builder = new PathBuilder(drivebase, autoMap.getEventMap());
 
   private final CommandJoystick driverController = new CommandJoystick(OIConstants.driverID);
   private final CommandJoystick scoreController = new CommandJoystick(OIConstants.intakeID);
@@ -56,19 +60,12 @@ public class RobotContainer {
   private final TeleopDrive closedFieldRel =
       new TeleopDrive(
           drivebase,
+          () -> MathUtil.applyDeadband(-driverController.getY(), InputLimits.vxDeadband),
+          () -> MathUtil.applyDeadband(-driverController.getX(), InputLimits.vyDeadband),
           () ->
-              (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                  ? -driverController.getY()
-                  : 0,
-          () ->
-              (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                  ? -driverController.getX()
-                  : 0,
-          () ->
-              (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                  ? -driverController.getZ()
-                  : 0,
-          () -> true, // driverController.button(3).negate(),
+              MathUtil.applyDeadband(
+                  -driverController.getZ() * InputLimits.defaultAngScale, InputLimits.angDeadband),
+          driverController.button(8).negate(),
           false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -86,27 +83,34 @@ public class RobotContainer {
             PathPlanner.loadPathGroup(
                 "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.setDefaultOption(
-        "Default Test Full",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "Test Full Path",
-                new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    // chooser.setDefaultOption(
+    //     "Default Test Full",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "Test Full Path",
+    //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.addOption(
-        "3 Score T1",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    // chooser.addOption(
+    //     "3 Score T1",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    chooser.addOption(
-        "1 Score + Dock T2",
-        builder
-            .getSwerveCommand(
-                PathPlanner.loadPathGroup(
-                    "1 Score + Dock T2",
-                    new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
-            .andThen(autoBalance()));
+    // chooser.addOption(
+    //     "2 Score + Dock T1",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "2 Score + Dock T1",
+    //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+
+    // chooser.addOption(
+    //     "1 Score + Dock T2",
+    //     builder
+    //         .getSwerveCommand(
+    //             PathPlanner.loadPathGroup(
+    //                 "1 Score + Dock T2",
+    //                 new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
+    //         .andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
   }
@@ -148,12 +152,14 @@ public class RobotContainer {
    */
   private void configureBindings() {
     drivebase.setDefaultCommand(closedFieldRel);
-    arm.setDefaultCommand(Commands.run(arm::ambientArm, arm));
     // m_led.setDefaultCommand(Commands.run(m_led::setColor, m_led));
-    gripper.setDefaultCommand(Commands.run(gripper::ambientGripper, gripper));
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
+    driverController
+        .povRight()
+        .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
+        .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
 
     driverController
         .button(7)
@@ -161,100 +167,72 @@ public class RobotContainer {
             new TeleopDrive(
                 drivebase,
                 () ->
-                    (Math.abs(driverController.getY()) > OIConstants.InputLimits.vyDeadband)
-                        ? -driverController.getY() * OIConstants.InputLimits.reduced
-                        : 0,
+                    MathUtil.applyDeadband(
+                        -driverController.getY() * InputLimits.reduced, InputLimits.vxDeadband),
                 () ->
-                    (Math.abs(driverController.getX()) > OIConstants.InputLimits.vxDeadband)
-                        ? -driverController.getX() * OIConstants.InputLimits.reduced
-                        : 0,
+                    MathUtil.applyDeadband(
+                        -driverController.getX() * InputLimits.reduced, InputLimits.vyDeadband),
                 () ->
-                    (Math.abs(driverController.getZ()) > OIConstants.InputLimits.radDeadband)
-                        ? -driverController.getZ() * OIConstants.InputLimits.reduced
-                        : 0,
-                () -> true, // driverController.button(3).negate(),
+                    MathUtil.applyDeadband(
+                        -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
+                driverController.button(8).negate(),
                 false));
 
-    new Trigger(() -> DriverStation.isTeleopEnabled())
-        .onTrue(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
+
+    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropStore());
+    driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
     driverController
         .button(2)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.ScoreArmMid))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(superstructure.pickupStation())
+        .whileFalse(superstructure.store());
 
     driverController
         .button(3)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
+        .whileTrue(superstructure.pickupGround())
+        .whileFalse(superstructure.store());
 
-    driverController
-        .button(4)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupGroundReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    driverController.button(4).whileTrue(arm.ground()).whileFalse(superstructure.dropStore());
 
-    driverController
-        .button(5)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupConeAndStore));
-
-    driverController
-        .button(6)
-        .whileTrue(autoMap.getCommandInMap(AutoMap.PickupLoadingStationReady))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.PickupCubeAndStore));
+    driverController.button(13).whileTrue(effector.intake()).whileFalse(effector.stop());
+    driverController.button(12).whileTrue(effector.drop()).whileFalse(effector.stop());
+    driverController.button(11).whileTrue(effector.launch()).whileFalse(effector.stop());
 
     scoreController
         .button(1)
-        .whileTrue(
-            new GoToScoring(drivebase, POSITION.RIGHT)
-                .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.ground()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(2)
-        .whileTrue(
-            new GoToScoring(drivebase, POSITION.MIDDLE)
-                .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.ground()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(3)
-        .whileTrue(
-            new GoToScoring(drivebase, POSITION.LEFT)
-                .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmLow)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.ground()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(4)
-        .whileTrue(
-            new GoToScoring(drivebase, POSITION.RIGHT)
-                .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .onFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.mid()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(5)
-        .whileTrue(
-            new GoToScoring(drivebase, POSITION.MIDDLE)
-                .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.mid()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(6)
-        .whileTrue(
-            new GoToScoring(drivebase, POSITION.LEFT)
-                .getCommand()
-                .alongWith(autoMap.getCommandInMap(AutoMap.ScoreArmMid)))
-        .whileFalse(autoMap.getCommandInMap(AutoMap.DropObjectAndStore));
+        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.mid()))
+        .whileFalse(superstructure.dropStore());
 
-    // new Trigger(() -> drivebase.isMoving())
-    //     .debounce(10, DebounceType.kBoth)
-    //     .onTrue(Commands.runOnce(() -> pdh.setSwitchableChannel(true), pdh))
-    //     .onFalse(Commands.runOnce(() -> pdh.setSwitchableChannel(false), pdh));
+    new Trigger(drivebase::isMoving)
+        .debounce(10, Debouncer.DebounceType.kBoth)
+        .onTrue(pdh.switchableOn())
+        .onFalse(pdh.switchableOff());
   }
 
   /**

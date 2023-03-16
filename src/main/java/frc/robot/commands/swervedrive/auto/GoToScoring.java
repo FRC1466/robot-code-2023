@@ -81,12 +81,12 @@ public class GoToScoring {
     } else {
       command = Commands.none();
     }
+    System.out.println(command.toString());
     return command;
   }
 
   public Command getCommand() {
     return new ProxyCommand(() -> getCommand(drive.getPose()))
-        .andThen(Commands.waitSeconds(1))
-        .repeatedly();
+        .andThen(Commands.waitSeconds(1));
   }
 }

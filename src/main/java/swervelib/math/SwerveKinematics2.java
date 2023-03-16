@@ -8,8 +8,13 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.Arrays;
 import java.util.Collections;
+
 import org.ejml.simple.SimpleMatrix;
 
 /**
@@ -25,6 +30,8 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
   private final SimpleMatrix m_forwardKinematics;
   /** Second order kinematics inverse matrix. */
   private final SimpleMatrix bigInverseKinematics;
+
+  private final SimpleMatrix m_bigForwardKinematics;
   /** Number of swerve modules. */
   private final int m_numModules;
   /** Location of each swerve module in meters. */
@@ -33,6 +40,11 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
   private final SwerveModuleState2[] m_moduleStates;
   /** Previous CoR */
   private Translation2d m_prevCoR = new Translation2d();
+
+  private ChassisSpeeds m_prevChassisSpeeds = new ChassisSpeeds();
+  private final Timer m_moduleAccelTimer = new Timer();
+  private double m_prevModuleAccelTime = 0.0;
+  private double m_lastTimeTwist = 0.0;
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of wheel locations
@@ -63,6 +75,8 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
           i * 2 + 1, 0, /* Start Data */ 0, 1, -m_modules[i].getY(), +m_modules[i].getX());
     }
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
+    m_bigForwardKinematics = bigInverseKinematics.pseudoInverse();
+    m_moduleAccelTimer.start();
 
     MathSharedStore.reportUsage(MathUsageId.kKinematics_SwerveDrive, 1);
   }
@@ -158,6 +172,17 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
   @SuppressWarnings("PMD.MethodReturnsInternalArray")
   public SwerveModuleState2[] toSwerveModuleStates(
       ChassisSpeeds chassisSpeeds, Translation2d centerOfRotationMeters) {
+    var time = m_moduleAccelTimer.get();
+    var dt = time - m_prevModuleAccelTime;
+    m_prevModuleAccelTime = time;
+
+    var accelChassisSpeeds =
+        new ChassisSpeeds(
+            (chassisSpeeds.vxMetersPerSecond - m_prevChassisSpeeds.vxMetersPerSecond) / dt,
+            (chassisSpeeds.vyMetersPerSecond - m_prevChassisSpeeds.vyMetersPerSecond) / dt,
+            (chassisSpeeds.omegaRadiansPerSecond - m_prevChassisSpeeds.omegaRadiansPerSecond) / dt);
+    m_prevChassisSpeeds = chassisSpeeds;
+
     if (chassisSpeeds.vxMetersPerSecond == 0.0
         && chassisSpeeds.vyMetersPerSecond == 0.0
         && chassisSpeeds.omegaRadiansPerSecond == 0.0) {
@@ -207,7 +232,13 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     var moduleVelocityStatesMatrix = m_inverseKinematics.mult(chassisSpeedsVector);
 
     var accelerationVector = new SimpleMatrix(4, 1);
-    accelerationVector.setColumn(0, 0, 0, 0, Math.pow(chassisSpeeds.omegaRadiansPerSecond, 2), 0);
+    accelerationVector.setColumn(
+        0,
+        0,
+        accelChassisSpeeds.vxMetersPerSecond,
+        accelChassisSpeeds.vyMetersPerSecond,
+        chassisSpeeds.omegaRadiansPerSecond * chassisSpeeds.omegaRadiansPerSecond,
+        accelChassisSpeeds.omegaRadiansPerSecond);
 
     var moduleAccelerationStatesMatrix = bigInverseKinematics.mult(accelerationVector);
 
@@ -289,7 +320,7 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
    *     should be same as passed into the constructor of this class.
    * @return The resulting Twist2d.
    */
-  public Twist2d toTwist2d(SwerveModuleState2... wheelDeltas) {
+  public Twist2d toTwist2d(Rotation2d heading, SwerveModuleState2... wheelDeltas) {
     if (wheelDeltas.length != m_numModules) {
       throw new IllegalArgumentException(
           "Number of modules is not consistent with number of wheel locations provided in "
@@ -304,7 +335,58 @@ public class SwerveKinematics2 extends SwerveDriveKinematics {
     }
 
     var chassisDeltaVector = m_forwardKinematics.mult(moduleDeltaMatrix);
+
+    var moduleAccelerationStatesMatrix = new SimpleMatrix(m_numModules * 2, 1);
+
+    for (int i = 0; i < m_numModules; i++) {
+      var module = wheelDeltas[i];
+
+      double pos = module.distanceMeters;
+      double vel = module.speedMetersPerSecond;
+      var angleAdj = module.angle.minus(heading);
+      var angle = module.angle;
+
+      var omegaVector = new SimpleMatrix(2, 1);
+
+      omegaVector.setColumn(0, 0, vel, (angle.getRadians()) * pos);
+
+      var trigThetaAngle = new SimpleMatrix(2, 2);
+      trigThetaAngle.setColumn(0, 0, angle.getCos(), angle.getSin());
+      trigThetaAngle.setColumn(1, 0, -angle.getSin(), angle.getCos());
+
+      var accelVector = trigThetaAngle.mult(omegaVector);
+      moduleAccelerationStatesMatrix.set(i * 2, 0, accelVector.get(0, 0));
+      moduleAccelerationStatesMatrix.set(i * 2 + 1, 0, accelVector.get(1, 0));
+    }
+
+    var accelerationVector = m_bigForwardKinematics.mult(moduleAccelerationStatesMatrix);
+    // System.out.println(accelerationVector.toString());
+
+    var time = WPIUtilJNI.now() * 1.0e-6;
+    var dt = time - m_lastTimeTwist;
+    m_lastTimeTwist = time;
+
+    var scale = (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.4) / 0.30);
+    // System.out.println(scale);
+    // System.out.println(accelerationVector.toString());
+
+    double rx;
+    SmartDashboard.putNumber("rx", chassisDeltaVector.get(2, 0));
+    if (
+      Math.abs(chassisDeltaVector.get(2, 0)) > 0.2
+    ) {
+      rx = Math.copySign(Math.sqrt(Math.abs(accelerationVector.get(2, 0))), chassisDeltaVector.get(2, 0));
+    } else {
+      rx = chassisDeltaVector.get(2, 0);
+    }
+    var fudge = 12.0 * Math.hypot(chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0));
+    fudge = 2.0;
+
     return new Twist2d(
-        chassisDeltaVector.get(0, 0), chassisDeltaVector.get(1, 0), chassisDeltaVector.get(2, 0));
+        chassisDeltaVector.get(0, 0),
+        //                    * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
+        chassisDeltaVector.get(1, 0),
+        //                    * (Math.pow(Math.abs(chassisDeltaVector.get(2, 0)), 0.59) / 0.40),
+        chassisDeltaVector.get(2, 0) * fudge);
   }
 }

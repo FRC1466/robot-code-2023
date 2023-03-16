@@ -46,17 +46,22 @@ public final class Constants {
     public static final int driverID = 4, intakeID = 5;
 
     public static final class InputLimits {
-      public static double vxDeadband = 0.02, vyDeadband = 0.02, radDeadband = 0.10, reduced = 0.5;
+      public static final double vxDeadband = 0.02,
+          vyDeadband = 0.02,
+          angDeadband = 0.10,
+          reduced = 0.5;
+      public static final double defaultAngScale = 0.8;
+      public static final double vxSlew = 8.0, vySlew = 8.0, angSlew = 8.0;
     }
   }
 
   public static final class Auton {
-    public static final PIDFConfig xAutoPID = new PIDFConfig(4.0, 0, 0);
-    public static final PIDFConfig yAutoPID = new PIDFConfig(4.0, 0, 0);
+    public static final PIDFConfig xAutoPID = new PIDFConfig(5.0, 0, 0);
+    public static final PIDFConfig yAutoPID = new PIDFConfig(5.0, 0, 0);
     public static final PIDFConfig angleAutoPID = new PIDFConfig(8.2, 0, 0.0);
 
-    public static final double maxSpeedMPS = 3;
-    public static final double maxAccelerationMPS = 2;
+    public static final double maxSpeedMPS = 2.5;
+    public static final double maxAccelerationMPS = 1.8;
     public static final double balanceScale = 3.0, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
@@ -66,6 +71,7 @@ public final class Constants {
             new HolonomicPose2d(new Pose2d(15.79, 7.34, new Rotation2d()), new Rotation2d()),
             new HolonomicPose2d(new Pose2d(15.75, 6.00, new Rotation2d()), new Rotation2d()));
 
+    public static final double lineUpMid = 1.73;
     public static final List<ScoringArea> scoreAreaList =
         new ArrayList<>() {
           {
@@ -74,39 +80,43 @@ public final class Constants {
                     new RectanglePoseArea(
                         new Translation2d(1.23, 3.53), new Translation2d(2.86, 5.33)),
                     // diagonal y's should not overlap
-                    new HolonomicPose2d(new Pose2d(1.62, 4.95, new Rotation2d()), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(1.62, 4.40, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(lineUpMid, 4.95, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(lineUpMid, 4.40, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
-                        new Pose2d(1.62, 3.84, new Rotation2d()), new Rotation2d())));
+                        new Pose2d(lineUpMid, 3.84, new Rotation2d(Math.PI)), new Rotation2d())));
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
                         new Translation2d(1.23, 1.90), new Translation2d(2.92, 3.52)),
-                    new HolonomicPose2d(new Pose2d(1.62, 3.30, new Rotation2d()), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(1.62, 2.72, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(lineUpMid, 3.30, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(lineUpMid, 2.72, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
-                        new Pose2d(1.62, 2.19, new Rotation2d()), new Rotation2d())));
+                        new Pose2d(lineUpMid, 2.19, new Rotation2d(Math.PI)), new Rotation2d())));
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
                         new Translation2d(1.23, 0.0), new Translation2d(2.89, 1.89)),
-                    new HolonomicPose2d(new Pose2d(1.62, 1.61, new Rotation2d()), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(1.62, 1.03, new Rotation2d()), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(lineUpMid, 1.61, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(new Pose2d(lineUpMid, 1.03, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
-                        new Pose2d(1.62, 0.55, new Rotation2d()), new Rotation2d())));
+                        new Pose2d(lineUpMid, 0.55, new Rotation2d(Math.PI)), new Rotation2d())));
           }
         };
-    public static final Translation3d cameraTranslation = new Translation3d(0.5, 0.0, 0.5);
+    public static final Translation3d cameraTranslation = new Translation3d(0.28, 0.0, 0.28);
     public static final Rotation3d cameraRotation = new Rotation3d(0, 0, 0);
   }
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.9, 0, 0, 0, 0, 0.9);
+    public static final Gains armPosition = new Gains(0.85, 0, 0, 0, 0, 1.0);
     public static final double dutyCycleResolution = 1.0;
-    public static final double absolutePositionOffset = 0.312153;
+    public static final double absolutePositionOffset = 0.557;
     public static final double maxRadians = 4.24;
     public static final double minRadians = -0.52;
+    public static final double stationDegrees = 149.0,
+        midDegrees = 149.0,
+        highDegrees = 135.0,
+        verticalDegrees = 90.0;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
     public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
@@ -138,13 +148,14 @@ public final class Constants {
     }
   }
 
-  public static final class GripperConstants {
-    public static final Gains gripperPosition = new Gains(0.28, 0, 0, 0, 0, 0.5);
-    public static final double positionOpen = 0.20,
-        positionCube = -10.0,
-        positionCone = -32.0,
-        positionStore = -12.0;
-    public static final int gripperID = 34;
+  public static final class Intake {
+    public static final double intakeV = 0.41 * 12,
+        dropV = -0.65,
+        launchV = -0.35 * 12,
+        holdV = 0.16 * 12;
+    public static final double stallCurrent = 15.0;
+
+    public static final int motorID = 34;
   }
 
   public static final class LEDConstants {

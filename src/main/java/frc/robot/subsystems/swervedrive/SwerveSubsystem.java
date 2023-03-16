@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.swervedrive;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Auton;
+import frc.robot.Constants.OIConstants.InputLimits;
 import java.io.File;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -28,6 +30,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final SwerveBalance swerveBalance;
 
+  public boolean softVisionMeasurements = true;
+
+  private final PhotonCameraWrapper photon;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -40,9 +46,12 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveBalance =
-        new SwerveBalance(
-            Auton.balanceScale, Auton.balanceScalePow, swerveDrive.getGyroRotation3d());
+    swerveBalance = new SwerveBalance(Auton.balanceScale, Auton.balanceScalePow);
+    swerveDrive.swerveController.addSlewRateLimiters(
+        new SlewRateLimiter(InputLimits.vxSlew),
+        new SlewRateLimiter(InputLimits.vySlew),
+        new SlewRateLimiter(InputLimits.angSlew));
+    photon = new PhotonCameraWrapper();
   }
 
   /**
@@ -64,12 +73,22 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, true);
+    swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, false);
   }
 
   @Override
   public void periodic() {
     swerveDrive.updateOdometry();
+    var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
+    // pose.ifPresent(
+    //     estimatedRobotPose -> {
+    //       var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
+    //       swerveDrive.addVisionMeasurement(
+    //             adjPose,
+    //             estimatedRobotPose.timestampSeconds,
+    //             true,
+    //             0.5);
+    //     });
   }
 
   @Override
@@ -102,6 +121,10 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     return swerveDrive.getPose();
+  }
+
+  public Pose3d getPose3d() {
+    return swerveDrive.getPose3d();
   }
 
   /**

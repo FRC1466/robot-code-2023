@@ -1,8 +1,5 @@
 {
   "NetworkTables": {
-    "Retained Values": {
-      "open": false
-    },
     "transitory": {
       "Shuffleboard": {
         "open": true
@@ -45,7 +42,6 @@
     }
   },
   "NetworkTables Settings": {
-    "dsClient": false,
     "mode": "Client (NT4)",
     "serverTeam": "1466"
   },
@@ -184,6 +180,24 @@
       "window": {
         "visible": false
       }
+    },
+    "Plot <6>": {
+      "plots": [
+        {
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Arm Raw Absolute Encoder"
+            }
+          ]
+        }
+      ]
     }
   }
 }
