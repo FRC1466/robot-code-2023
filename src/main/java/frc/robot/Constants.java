@@ -149,10 +149,10 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 0.41 * 12,
+    public static final double intakeV = 5.0,
         dropV = -0.65,
-        launchV = -0.35 * 12,
-        holdV = 0.16 * 12;
+        launchV = -4.2,
+        holdV = 2.0;
     public static final double stallCurrent = 15.0;
 
     public static final int motorID = 34;
