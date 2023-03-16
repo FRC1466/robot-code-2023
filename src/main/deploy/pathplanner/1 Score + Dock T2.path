@@ -18,7 +18,7 @@
       "stopEvent": {
         "names": [
           "Intake",
-          "ScoreMid"
+          "ScoreHigh"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",

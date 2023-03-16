@@ -43,10 +43,9 @@ public class RobotContainer {
   private SendableChooser<Command> chooser = new SendableChooser<>();
 
   // The robot's subsystems
-  private final SwerveSubsystem drivebase =
-      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final VirtualFourBar arm = new VirtualFourBar();
   private final EndEffector effector = new EndEffector();
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
   // private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
@@ -66,7 +65,7 @@ public class RobotContainer {
               MathUtil.applyDeadband(
                   -driverController.getZ() * InputLimits.defaultAngScale, InputLimits.angDeadband),
           driverController.button(8).negate(),
-          false);
+          false, arm.getCOM());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -177,7 +176,7 @@ public class RobotContainer {
                     MathUtil.applyDeadband(
                         -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
                 driverController.button(8).negate(),
-                false));
+                false, arm.getCOM()));
 
     new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
 
@@ -194,11 +193,13 @@ public class RobotContainer {
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
 
-    driverController.button(4).whileTrue(arm.ground()).whileFalse(superstructure.dropStore());
+    driverController.button(4).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
 
     driverController.button(13).whileTrue(effector.intake()).whileFalse(effector.stop());
     driverController.button(12).whileTrue(effector.drop()).whileFalse(effector.stop());
     driverController.button(11).whileTrue(effector.launch()).whileFalse(effector.stop());
+    driverController.button(14).whileTrue(arm.highLaunchReady())
+            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     scoreController
         .button(1)
@@ -229,6 +230,18 @@ public class RobotContainer {
         .button(6)
         .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
+    scoreController
+            .button(7)
+            .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.highLaunchReady()))
+            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+    scoreController
+        .button(8)
+        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.high()))
+        .whileFalse(superstructure.launchStore());
+    scoreController
+            .button(9)
+            .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.highLaunchReady()))
+            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     new Trigger(drivebase::isMoving)
         .debounce(10, Debouncer.DebounceType.kBoth)

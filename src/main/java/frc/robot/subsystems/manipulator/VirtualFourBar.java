@@ -3,14 +3,19 @@ package frc.robot.subsystems.manipulator;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
 import webblib.math.ArmPIDController;
+
+import java.util.function.Supplier;
 
 public class VirtualFourBar extends SubsystemBase {
   private WPI_TalonFX armMotor;
@@ -125,6 +130,11 @@ public class VirtualFourBar extends SubsystemBase {
         .andThen(holdUntilSetpoint());
   }
 
+  public Command loft() {
+    return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.loftRadians)))
+        .andThen(holdUntilSetpoint());
+  }
+
   public Command station() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.stationDegrees)))
         .andThen(holdUntilSetpoint());
@@ -140,6 +150,11 @@ public class VirtualFourBar extends SubsystemBase {
         .andThen(holdUntilSetpoint());
   }
 
+  public Command highLaunchReady() {
+    return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highLaunchDegrees)))
+        .andThen(holdUntilSetpoint());
+  }
+
   public Command store() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.minRadians)))
         .andThen(holdUntilSetpoint());
@@ -151,7 +166,7 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public Command hold() {
-    return Commands.run(() -> setArmHold(), this);
+    return Commands.run(this::setArmHold, this);
   }
 
   public Command holdUntilSetpoint() {
@@ -169,9 +184,16 @@ public class VirtualFourBar extends SubsystemBase {
     return armPID.atSetpoint();
   }
 
+  public Supplier<Translation3d> getCOM(){
+    var rest = new Translation2d(Constants.ARM_LENGTH/2, 0);
+    rest.rotateBy(getPosition());
+    return () -> Constants.INITIAL_ARM_MOUNT.plus(new Translation3d(-rest.getX(), 0, rest.getY()));
+  }
+
   @Override
   public void periodic() {
     setArmHold();
+
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Arm Raw Absolute Encoder", absoluteArmEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("Arm Processed Absolute Encoder", getPosition().getRadians());

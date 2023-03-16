@@ -34,8 +34,11 @@ import webblib.util.chargedup.ScoringArea;
  */
 public final class Constants {
 
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
-  public static final double CHASSIS_MASS = ROBOT_MASS;
+  public static final double ROBOT_MASS = (100) * 0.453592; // 32lbs * kg per pound
+  public static final double ARM_MASS = 10.0;
+  public static final Translation3d INITIAL_ARM_MOUNT = new Translation3d(0.3, 0, 0.5);
+  public static final double ARM_LENGTH = 0.2;
+  public static final double CHASSIS_MASS = ROBOT_MASS - ARM_MASS;
   public static final Matter CHASSIS =
       new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   ;
@@ -117,11 +120,12 @@ public final class Constants {
     public static final Gains armPosition = new Gains(0.85, 0, 0, 0, 0, 1.0);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.557;
-    public static final double maxRadians = 4.24;
+    public static final double maxRadians = 4.24, loftRadians = maxRadians - 0.3;
     public static final double minRadians = -0.52;
     public static final double stationDegrees = 149.0,
         midDegrees = 149.0,
         highDegrees = 135.0,
+        highLaunchDegrees = 195.0,
         verticalDegrees = 90.0;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
@@ -155,7 +159,7 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 5.0, dropV = -0.65, launchV = -4.2, holdV = 2.0;
+    public static final double intakeV = 5.0, dropV = -0.65, launchV = -4.2, powerLaunchV = -8.2, holdV = 2.0;
     public static final double stallCurrent = 15.0;
 
     public static final int motorID = 34;

@@ -52,6 +52,10 @@ public class EndEffector extends SubsystemBase {
     return runOnce(() -> setRollers(Intake.launchV)).andThen(waitSeconds(1.0)).andThen(stop());
   }
 
+  public Command powerLaunch() {
+    return runOnce(() -> setRollers(Intake.powerLaunchV)).andThen(waitSeconds(0.5)).andThen(stop());
+  }
+
   public double getFilteredCurrent() {
     return filteredCurrent;
   }

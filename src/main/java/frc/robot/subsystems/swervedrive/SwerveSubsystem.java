@@ -5,18 +5,22 @@
 package frc.robot.subsystems.swervedrive;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants.InputLimits;
 import java.io.File;
+import java.util.List;
+import java.util.function.Supplier;
+
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
+import swervelib.math.Matter;
 import swervelib.math.SwerveKinematics2;
+import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -34,12 +38,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final PhotonCameraWrapper photon;
 
+  private final Supplier<Translation3d> armCOM;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
    */
-  public SwerveSubsystem(File directory) {
+  public SwerveSubsystem(File directory, Supplier<Translation3d> armCOM) {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive();
@@ -52,6 +58,7 @@ public class SwerveSubsystem extends SubsystemBase {
         new SlewRateLimiter(InputLimits.vySlew),
         new SlewRateLimiter(InputLimits.angSlew));
     photon = new PhotonCameraWrapper();
+    this.armCOM = armCOM;
   }
 
   /**
@@ -134,6 +141,10 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param chassisSpeeds Field-relative.
    */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+    var translation = SwerveMath.limitVelocity(new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond), this.getFieldVelocity(), this.getPose(),
+            Constants.LOOP_TIME, Constants.ROBOT_MASS, List.of(Constants.CHASSIS, new Matter(armCOM.get(), Constants.ARM_MASS)),
+            this.getSwerveDriveConfiguration());
+    SmartDashboard.putString("LimitedTranslation", translation.toString());
     swerveDrive.setChassisSpeeds(chassisSpeeds);
   }
 

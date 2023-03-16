@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
 
@@ -47,5 +48,14 @@ public class Superstructure {
 
   public Command scoreHigh() {
     return arm.high().andThen(effector.launch());
+  }
+
+  public Command launchConeToHigh() {
+    return Commands.parallel(arm.high(), Commands.waitSeconds(0.5).andThen(effector.drop()));
+  }
+
+  public Command scoreConeHigh() {
+    return arm.highLaunchReady()
+        .andThen(launchConeToHigh());
   }
 }
