@@ -15,9 +15,11 @@ public class AutoMap {
     eventMap.put("ScoreHigh", superstructure.scoreHigh());
     eventMap.put("PickupGround", superstructure.pickupGround());
     eventMap.put("Store", superstructure.store());
+    eventMap.put("Ground", arm.ground());
     eventMap.put("Loft", arm.loft());
     eventMap.put("Vertical", arm.vertical());
     eventMap.put("Mid", arm.mid());
+    eventMap.put("High", arm.high());
     eventMap.put("Intake", effector.intake());
     eventMap.put("Launch", effector.launch());
     eventMap.put("PowerLaunch", effector.powerLaunch());

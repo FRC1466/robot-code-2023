@@ -186,8 +186,8 @@ public class VirtualFourBar extends SubsystemBase {
 
   public Supplier<Translation3d> getCOM(){
     var rest = new Translation2d(Constants.ARM_LENGTH/2, 0);
-    rest.rotateBy(getPosition());
-    return () -> Constants.INITIAL_ARM_MOUNT.plus(new Translation3d(-rest.getX(), 0, rest.getY()));
+    var rotatedRest = rest.rotateBy(getPosition());
+    return () -> Constants.INITIAL_ARM_MOUNT.plus(new Translation3d(-rotatedRest.getX(), 0, rotatedRest.getY()));
   }
 
   @Override
@@ -198,5 +198,6 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("Arm Raw Absolute Encoder", absoluteArmEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("Arm Processed Absolute Encoder", getPosition().getRadians());
     SmartDashboard.putNumber("Arm PID error", armPID.getPositionError());
+    SmartDashboard.putString("Arm COM", getCOM().get().toString());
   }
 }

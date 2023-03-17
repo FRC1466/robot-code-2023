@@ -334,6 +334,8 @@ public class SwerveDrivePoseEstimator {
     var record = sample.get();
 
     var odometry_backtrack = m_odometry.getPoseMeters3d().log(record);
+    // System.out.println("ODO BACKTACK " + odometry_backtrack);
+
     var odometry_fastforward =
         new Twist3d(
             -odometry_backtrack.dx,
@@ -354,16 +356,31 @@ public class SwerveDrivePoseEstimator {
     var twist_angle = twist_rvec.norm();
     var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dz, twist_angle));
 
-    // Step 4: Convert back to Twist3d.
-    var scaledTwist =
-        new Twist3d(
-            k_times_twist.get(0, 0),
-            k_times_twist.get(1, 0),
-            k_times_twist.get(2, 0),
-            twist_rvec.get(0, 0) / twist_angle * k_times_twist.get(3, 0),
-            twist_rvec.get(1, 0) / twist_angle * k_times_twist.get(3, 0),
-            twist_rvec.get(2, 0) / twist_angle * k_times_twist.get(3, 0));
+    Twist3d scaledTwist;
+    var rx = twist_rvec.get(0, 0) / twist_angle * k_times_twist.get(3, 0);
+    var ry = twist_rvec.get(1, 0) / twist_angle * k_times_twist.get(3, 0);
+    var rz = twist_rvec.get(2, 0) / twist_angle * k_times_twist.get(3, 0);
 
+    // Step 4: Convert back to Twist3d.
+    if (!((Double)rx).isNaN() || !((Double)ry).isNaN() || !((Double)rz).isNaN()) {
+      scaledTwist =         new Twist3d(
+        k_times_twist.get(0, 0),
+        k_times_twist.get(1, 0),
+        k_times_twist.get(2, 0),
+        rx,
+        ry,
+        rz);
+    } else {
+      scaledTwist = new Twist3d(
+        k_times_twist.get(0, 0),
+        k_times_twist.get(1, 0),
+        k_times_twist.get(2, 0),
+        0,
+        0,
+        0);
+    }
+
+    // System.out.println("OLD ESTIMATE" + scaledTwist);
     old_estimate = old_estimate.exp(scaledTwist);
 
     m_poseEstimate = old_estimate.exp(odometry_fastforward);

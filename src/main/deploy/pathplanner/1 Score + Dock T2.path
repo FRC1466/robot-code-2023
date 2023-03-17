@@ -17,10 +17,9 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Intake",
-          "ScoreHigh"
+          "High"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }

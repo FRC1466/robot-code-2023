@@ -81,7 +81,7 @@ public class TeleopDrive extends CommandBase {
               swerve.getSwerveDriveConfiguration());
       SmartDashboard.putString("LimitedTranslation", translation.toString());
       swerve.drive(
-          translation,
+          new Translation2d(xVelocity, yVelocity),
           angVelocity,
           driveMode.getAsBoolean(),
           isOpenLoop);

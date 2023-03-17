@@ -39,6 +39,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private final PhotonCameraWrapper photon;
 
   private final Supplier<Translation3d> armCOM;
+  private int visionReset = 0;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -85,18 +86,39 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    visionReset++;
     swerveDrive.updateOdometry();
-    var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
-    // pose.ifPresent(
-    //     estimatedRobotPose -> {
-    //       var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(),
-    // getPose3d().getRotation());
-    //       swerveDrive.addVisionMeasurement(
-    //             adjPose,
-    //             estimatedRobotPose.timestampSeconds,
-    //             true,
-    //             0.5);
-    //     });
+    if (photon.getLatest().hasTargets()) {
+      var latest = photon.getLatest().getBestTarget();
+      if (latest != null) {
+                  var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
+    var dist = latest.getBestCameraToTarget().getTranslation().getNorm();
+
+    if (dist < 2.0) {
+      pose.ifPresent(
+        estimatedRobotPose -> {
+          var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(),
+          getPose3d().getRotation());
+          if (dist < 1.0 && visionReset > 100) {
+            visionReset = 0;
+            // swerveDrive.addVisionMeasurement(
+            //   adjPose,
+            //     estimatedRobotPose.timestampSeconds,
+            //     false,
+            //     1.0);
+          } else {
+            swerveDrive.addVisionMeasurement(
+                adjPose,
+                  estimatedRobotPose.timestampSeconds,
+                  true,
+                  1.0);
+          }
+        });
+    }
+      }
+
+    }
+
   }
 
   @Override

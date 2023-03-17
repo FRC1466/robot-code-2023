@@ -51,7 +51,7 @@ public class Superstructure {
   }
 
   public Command launchConeToHigh() {
-    return Commands.parallel(arm.high(), Commands.waitSeconds(0.5).andThen(effector.drop()));
+    return Commands.parallel(arm.store(), Commands.waitSeconds(0.2).andThen(effector.drop()));
   }
 
   public Command scoreConeHigh() {

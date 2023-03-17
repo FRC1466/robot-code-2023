@@ -32,7 +32,7 @@ public class EndEffector extends SubsystemBase {
   }
 
   public Command intake() {
-    Debouncer debounce = new Debouncer(1, Debouncer.DebounceType.kBoth);
+    Debouncer debounce = new Debouncer(Intake.stallSeconds, Debouncer.DebounceType.kBoth);
     System.out.println("intake scheduled");
     return runOnce(() -> debounce.calculate(false))
         .andThen(run(() -> setRollers(Intake.intakeV)))

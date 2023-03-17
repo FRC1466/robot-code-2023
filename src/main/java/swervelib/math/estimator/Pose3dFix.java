@@ -209,15 +209,20 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
     // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
     final var u = VecBuilder.fill(twist.dx, twist.dy, twist.dz);
     final var rvec = VecBuilder.fill(twist.rx, twist.ry, twist.rz);
-    final var omega = rotationVectorToMatrix(rvec);
-    final var omegaSq = omega.times(omega);
+    // System.out.println("Exp" + rvec);
+    var omega = rotationVectorToMatrix(rvec);
+    var omegaSq = omega.times(omega);
     double theta = rvec.norm();
     double thetaSq = theta * theta;
+    if (((Double)theta).isNaN()) {
+      theta = 0.0;
+      thetaSq = 0.0;
+    }
 
     double A;
     double B;
     double C;
-    if (Math.abs(theta) < 1E-7) {
+    if (Math.abs(theta) < 1E-1) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
@@ -239,6 +244,11 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
       A = Math.sin(theta) / theta;
       B = (1 - Math.cos(theta)) / thetaSq;
       C = (1 - A) / thetaSq;
+      // System.out.println(C);
+    } if (((Double) C).isNaN() || ((Double) B).isNaN() || ((Double) A).isNaN()) {
+      A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
+      B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
+      C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     }
 
     Matrix<N3, N3> R = Matrix.eye(Nat.N3()).plus(omega.times(A)).plus(omegaSq.times(B));
@@ -269,17 +279,22 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
     // System.out.println(transform.toString());
 
     final var rvec = transform.getRotation().getQuaternion().toRotationVector();
+    // System.out.println("Log" + transform.getRotation());
 
     // System.out.println(rvec.toString());
 
     final var omega = rotationVectorToMatrix(rvec);
-    final var theta = rvec.norm();
-    final var thetaSq = theta * theta;
+    var theta = rvec.norm();
+    var thetaSq = theta * theta;
+    if (((Double)theta).isNaN()) {
+      theta = 0.0;
+      thetaSq = 0.0;
+    }
 
     // System.out.println(theta);
 
     double C;
-    if (Math.abs(theta) < 1E-7) {
+    if (Math.abs(theta) < 1E-1) {
       // Taylor Expansions around θ = 0
       // A = 1/1! - θ²/3! + θ⁴/5!
       // B = 1/2! - θ²/4! + θ⁴/6!
@@ -299,13 +314,17 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
       double A = Math.sin(theta) / theta;
       double B = (1 - Math.cos(theta)) / thetaSq;
       C = (1 - A / (2 * B)) / thetaSq;
+    } if (((Double) C).isNaN()) {
+      C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
     }
 
     final var V_inv =
         Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.times(omega).times(C));
+        // System.out.println("Log V inv " + V_inv);
 
     final var twist_translation =
         V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
+        // System.out.println(rvec);
 
     return new Twist3d(
         twist_translation.get(0, 0),

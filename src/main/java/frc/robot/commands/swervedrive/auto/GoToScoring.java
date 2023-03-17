@@ -2,6 +2,9 @@ package frc.robot.commands.swervedrive.auto;
 
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
@@ -15,6 +18,7 @@ public class GoToScoring {
   private final SwerveSubsystem drive;
   private final List<ScoringArea> scoreAreaList = Auton.scoreAreaList;
   private final POSITION selectedPosition;
+  private final double xOffset;
 
   public enum POSITION {
     LEFT,
@@ -22,9 +26,10 @@ public class GoToScoring {
     RIGHT
   }
 
-  public GoToScoring(SwerveSubsystem drive, POSITION selectedPosition) {
+  public GoToScoring(SwerveSubsystem drive, POSITION selectedPosition, double xOffset) {
     this.drive = drive;
     this.selectedPosition = selectedPosition;
+    this.xOffset = xOffset;
   }
 
   /**
@@ -54,7 +59,7 @@ public class GoToScoring {
         case LEFT:
           goToPose =
               new GoToPose(
-                  scoringArea.get().getLeftPosition().getPoseMeters(),
+                  scoringArea.get().getLeftPosition().getPoseMeters().plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
                   new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
@@ -62,7 +67,7 @@ public class GoToScoring {
         case MIDDLE:
           goToPose =
               new GoToPose(
-                  scoringArea.get().getMiddlePosition().getPoseMeters(),
+                  scoringArea.get().getMiddlePosition().getPoseMeters().plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
                   new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
@@ -70,7 +75,7 @@ public class GoToScoring {
         case RIGHT:
           goToPose =
               new GoToPose(
-                  scoringArea.get().getRightPosition().getPoseMeters(),
+                  scoringArea.get().getRightPosition().getPoseMeters().plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
                   new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();

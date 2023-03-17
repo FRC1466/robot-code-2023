@@ -96,21 +96,22 @@ public class RobotContainer {
     //             "3 Score T1", new PathConstraints(Auton.maxSpeedMPS,
     // Auton.maxAccelerationMPS))));
 
-    // chooser.addOption(
-    //     "2 Score + Dock T1",
-    //     builder.getSwerveCommand(
-    //         PathPlanner.loadPathGroup(
-    //             "2 Score + Dock T1",
-    //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    chooser.addOption(
+        "2 Score + Dock T1",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "2 Score + Dock T1",
+                new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
+                .andThen(autoBalance()).andThen(Commands.waitSeconds(1.0)).andThen(autoBalance()));
 
-    // chooser.addOption(
-    //     "1 Score + Dock T2",
-    //     builder
-    //         .getSwerveCommand(
-    //             PathPlanner.loadPathGroup(
-    //                 "1 Score + Dock T2",
-    //                 new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
-    //         .andThen(autoBalance()));
+    chooser.addOption(
+        "1 Score + Dock T2",
+        builder
+            .getSwerveCommand(
+                PathPlanner.loadPathGroup(
+                    "1 Score + Dock T2",
+                    new PathConstraints(1.5, 2)))
+            .andThen(autoBalance()).andThen(Commands.waitSeconds(1.0)).andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
   }
@@ -203,44 +204,44 @@ public class RobotContainer {
 
     scoreController
         .button(1)
-        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.ground()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(2)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.ground()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(3)
-        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.ground()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(4)
-        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.mid()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(5)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.mid()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(6)
-        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.mid()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
     scoreController
             .button(7)
-            .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.highLaunchReady()))
+            .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.highLaunchReady()))
             .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
     scoreController
         .button(8)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.high()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.high()))
         .whileFalse(superstructure.launchStore());
     scoreController
             .button(9)
-            .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.highLaunchReady()))
+            .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.highLaunchReady()))
             .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     new Trigger(drivebase::isMoving)

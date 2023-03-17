@@ -17,8 +17,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Intake",
-          "ScoreMid"
+          "Mid"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -27,16 +26,16 @@
     },
     {
       "anchorPoint": {
-        "x": 4.42199687818179,
-        "y": 4.624763095680038
+        "x": 4.501931055144162,
+        "y": 4.727535608917372
       },
       "prevControl": {
-        "x": 4.122187249543706,
-        "y": 4.670706446648458
+        "x": 4.202121426506078,
+        "y": 4.773478959885792
       },
       "nextControl": {
-        "x": 4.721806506819874,
-        "y": 4.578819744711618
+        "x": 4.801740683782246,
+        "y": 4.681592257948952
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -52,25 +51,27 @@
     },
     {
       "anchorPoint": {
-        "x": 6.43925217217839,
-        "y": 4.605614243563557
+        "x": 6.271902116453806,
+        "y": 4.613343927542556
       },
       "prevControl": {
-        "x": 5.9949194041725775,
-        "y": 4.627720342409002
+        "x": 5.827569348447993,
+        "y": 4.635450026388001
       },
       "nextControl": {
-        "x": 5.9949194041725775,
-        "y": 4.627720342409002
+        "x": 5.827569348447993,
+        "y": 4.635450026388001
       },
       "holonomicAngle": 0,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "Ground"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -102,16 +103,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8298457109734734,
-        "y": 4.4648947417552955
+        "x": 1.8755223835233994,
+        "y": 4.442056405480333
       },
       "prevControl": {
-        "x": 1.626633460520733,
-        "y": 4.568166343658604
+        "x": 1.7949516140375616,
+        "y": 4.436744047052695
       },
       "nextControl": {
-        "x": 2.844370496858983,
-        "y": 3.9493175579212236
+        "x": 2.9146666840342226,
+        "y": 4.510571414305223
       },
       "holonomicAngle": -179.91600279360023,
       "isReversal": false,
@@ -120,8 +121,33 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "ScoreMid"
+          "High"
         ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 2.6291874805971833,
+        "y": 3.8596788304687726
+      },
+      "prevControl": {
+        "x": 2.480738294809923,
+        "y": 4.556248086855148
+      },
+      "nextControl": {
+        "x": 2.842512553509963,
+        "y": 2.8586919498780388
+      },
+      "holonomicAngle": 178.83086067209268,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -133,11 +159,11 @@
         "y": 2.6121457235861523
       },
       "prevControl": {
-        "x": 1.9316158409335047,
-        "y": 2.512347532860213
+        "x": 2.948924188446668,
+        "y": 2.8890495387828383
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": -179.05576502827577,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -155,33 +181,21 @@
   "isReversed": null,
   "markers": [
     {
-      "position": 0.13090909090908967,
-      "names": [
-        "ArmToVertical"
-      ]
-    },
-    {
       "position": 0.39272727272725044,
       "names": [
-        "PickupGround"
+        "Ground"
       ]
     },
     {
-      "position": 1.6993963068181817,
+      "position": 2.3999999999999524,
       "names": [
-        "ArmToVertical"
+        "High"
       ]
     },
     {
       "position": 4.220703124999993,
       "names": [
         "Store"
-      ]
-    },
-    {
-      "position": 2.9021661931818175,
-      "names": [
-        "Mid"
       ]
     }
   ]
