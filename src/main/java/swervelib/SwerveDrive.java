@@ -52,7 +52,7 @@ public class SwerveDrive {
    * Trustworthiness of the vision system Measured in expected standard deviation (meters of
    * position and degrees of rotation)
    */
-  public Matrix<N4, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 0.9);
+  public Matrix<N4, N1> visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9, 2.9);
   /** Invert odometry readings of drive motor positions, used as a patch for debugging currently. */
   public boolean invertOdometry = false;
   /** Swerve IMU device for sensing the heading of the robot. */

@@ -214,7 +214,7 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
     var omegaSq = omega.times(omega);
     double theta = rvec.norm();
     double thetaSq = theta * theta;
-    if (((Double)theta).isNaN()) {
+    if (((Double) theta).isNaN()) {
       theta = 0.0;
       thetaSq = 0.0;
     }
@@ -245,7 +245,8 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
       B = (1 - Math.cos(theta)) / thetaSq;
       C = (1 - A) / thetaSq;
       // System.out.println(C);
-    } if (((Double) C).isNaN() || ((Double) B).isNaN() || ((Double) A).isNaN()) {
+    }
+    if (((Double) C).isNaN() || ((Double) B).isNaN() || ((Double) A).isNaN()) {
       A = 1 - thetaSq / 6 + thetaSq * thetaSq / 120;
       B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
       C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
@@ -286,7 +287,7 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
     final var omega = rotationVectorToMatrix(rvec);
     var theta = rvec.norm();
     var thetaSq = theta * theta;
-    if (((Double)theta).isNaN()) {
+    if (((Double) theta).isNaN()) {
       theta = 0.0;
       thetaSq = 0.0;
     }
@@ -314,17 +315,18 @@ public class Pose3dFix extends edu.wpi.first.math.geometry.Pose3d {
       double A = Math.sin(theta) / theta;
       double B = (1 - Math.cos(theta)) / thetaSq;
       C = (1 - A / (2 * B)) / thetaSq;
-    } if (((Double) C).isNaN()) {
+    }
+    if (((Double) C).isNaN()) {
       C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
     }
 
     final var V_inv =
         Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omega.times(omega).times(C));
-        // System.out.println("Log V inv " + V_inv);
+    // System.out.println("Log V inv " + V_inv);
 
     final var twist_translation =
         V_inv.times(VecBuilder.fill(transform.getX(), transform.getY(), transform.getZ()));
-        // System.out.println(rvec);
+    // System.out.println(rvec);
 
     return new Twist3d(
         twist_translation.get(0, 0),

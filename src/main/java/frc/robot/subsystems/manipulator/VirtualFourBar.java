@@ -13,9 +13,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
-import webblib.math.ArmPIDController;
-
 import java.util.function.Supplier;
+import webblib.math.ArmPIDController;
 
 public class VirtualFourBar extends SubsystemBase {
   private WPI_TalonFX armMotor;
@@ -184,10 +183,12 @@ public class VirtualFourBar extends SubsystemBase {
     return armPID.atSetpoint();
   }
 
-  public Supplier<Translation3d> getCOM(){
-    var rest = new Translation2d(Constants.ARM_LENGTH/2, 0);
+  public Supplier<Translation3d> getCOM() {
+    var rest = new Translation2d(Constants.ARM_LENGTH / 2, 0);
     var rotatedRest = rest.rotateBy(getPosition());
-    return () -> Constants.INITIAL_ARM_MOUNT.plus(new Translation3d(-rotatedRest.getX(), 0, rotatedRest.getY()));
+    return () ->
+        Constants.INITIAL_ARM_MOUNT.plus(
+            new Translation3d(-rotatedRest.getX(), 0, rotatedRest.getY()));
   }
 
   @Override

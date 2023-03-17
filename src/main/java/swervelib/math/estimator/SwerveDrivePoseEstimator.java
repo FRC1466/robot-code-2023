@@ -95,7 +95,7 @@ public class SwerveDrivePoseEstimator {
         modulePositions,
         initialPoseMeters,
         VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
-        VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
+        VecBuilder.fill(1.0, 1.0, 1.0, 2.0));
   }
 
   /**
@@ -362,22 +362,19 @@ public class SwerveDrivePoseEstimator {
     var rz = twist_rvec.get(2, 0) / twist_angle * k_times_twist.get(3, 0);
 
     // Step 4: Convert back to Twist3d.
-    if (!((Double)rx).isNaN() || !((Double)ry).isNaN() || !((Double)rz).isNaN()) {
-      scaledTwist =         new Twist3d(
-        k_times_twist.get(0, 0),
-        k_times_twist.get(1, 0),
-        k_times_twist.get(2, 0),
-        rx,
-        ry,
-        rz);
+    if (!((Double) rx).isNaN() || !((Double) ry).isNaN() || !((Double) rz).isNaN()) {
+      scaledTwist =
+          new Twist3d(
+              k_times_twist.get(0, 0),
+              k_times_twist.get(1, 0),
+              k_times_twist.get(2, 0),
+              rx,
+              ry,
+              rz);
     } else {
-      scaledTwist = new Twist3d(
-        k_times_twist.get(0, 0),
-        k_times_twist.get(1, 0),
-        k_times_twist.get(2, 0),
-        0,
-        0,
-        0);
+      scaledTwist =
+          new Twist3d(
+              k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0), 0, 0, 0);
     }
 
     // System.out.println("OLD ESTIMATE" + scaledTwist);

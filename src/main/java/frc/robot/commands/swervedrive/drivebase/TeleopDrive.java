@@ -11,12 +11,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
 import swervelib.SwerveController;
 import swervelib.math.Matter;
 import swervelib.math.SwerveMath;
@@ -76,8 +74,14 @@ public class TeleopDrive extends CommandBase {
     if (Math.abs(xVelocity) > 0 || Math.abs(yVelocity) > 0 || Math.abs(angVelocity) > 0) {
       lastTime = Timer.getFPGATimestamp();
       // Limit velocity to prevent tippy
-      var translation = SwerveMath.limitVelocity(new Translation2d(xVelocity, yVelocity), swerve.getFieldVelocity(), swerve.getPose(),
-              Constants.LOOP_TIME, Constants.ROBOT_MASS, List.of(Constants.CHASSIS, new Matter(armCOM.get(), Constants.ARM_MASS)),
+      var translation =
+          SwerveMath.limitVelocity(
+              new Translation2d(xVelocity, yVelocity),
+              swerve.getFieldVelocity(),
+              swerve.getPose(),
+              Constants.LOOP_TIME,
+              Constants.ROBOT_MASS,
+              List.of(Constants.CHASSIS, new Matter(armCOM.get(), Constants.ARM_MASS)),
               swerve.getSwerveDriveConfiguration());
       SmartDashboard.putString("LimitedTranslation", translation.toString());
       swerve.drive(

@@ -55,7 +55,6 @@ public class Superstructure {
   }
 
   public Command scoreConeHigh() {
-    return arm.highLaunchReady()
-        .andThen(launchConeToHigh());
+    return arm.highLaunchReady().andThen(launchConeToHigh());
   }
 }

@@ -45,7 +45,8 @@ public class RobotContainer {
   // The robot's subsystems
   private final VirtualFourBar arm = new VirtualFourBar();
   private final EndEffector effector = new EndEffector();
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
+  private final SwerveSubsystem drivebase =
+      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
   // private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
@@ -65,7 +66,8 @@ public class RobotContainer {
               MathUtil.applyDeadband(
                   -driverController.getZ() * InputLimits.defaultAngScale, InputLimits.angDeadband),
           driverController.button(8).negate(),
-          false, arm.getCOM());
+          false,
+          arm.getCOM());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -98,20 +100,23 @@ public class RobotContainer {
 
     chooser.addOption(
         "2 Score + Dock T1",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "2 Score + Dock T1",
-                new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
-                .andThen(autoBalance()).andThen(Commands.waitSeconds(1.0)).andThen(autoBalance()));
+        builder
+            .getSwerveCommand(
+                PathPlanner.loadPathGroup(
+                    "2 Score + Dock T1",
+                    new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
+            .andThen(autoBalance())
+            .andThen(Commands.waitSeconds(1.0))
+            .andThen(autoBalance()));
 
     chooser.addOption(
         "1 Score + Dock T2",
         builder
             .getSwerveCommand(
-                PathPlanner.loadPathGroup(
-                    "1 Score + Dock T2",
-                    new PathConstraints(1.5, 2)))
-            .andThen(autoBalance()).andThen(Commands.waitSeconds(1.0)).andThen(autoBalance()));
+                PathPlanner.loadPathGroup("1 Score + Dock T2", new PathConstraints(1.5, 2)))
+            .andThen(autoBalance())
+            .andThen(Commands.waitSeconds(1.0))
+            .andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
   }
@@ -177,7 +182,8 @@ public class RobotContainer {
                     MathUtil.applyDeadband(
                         -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
                 driverController.button(8).negate(),
-                false, arm.getCOM()));
+                false,
+                arm.getCOM()));
 
     new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
 
@@ -199,32 +205,39 @@ public class RobotContainer {
     driverController.button(13).whileTrue(effector.intake()).whileFalse(effector.stop());
     driverController.button(12).whileTrue(effector.drop()).whileFalse(effector.stop());
     driverController.button(11).whileTrue(effector.launch()).whileFalse(effector.stop());
-    driverController.button(14).whileTrue(arm.highLaunchReady())
-            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+    driverController
+        .button(14)
+        .whileTrue(arm.highLaunchReady())
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     scoreController
         .button(1)
-        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT, -0.5).getCommand().alongWith(arm.ground()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(2)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE, -0.5).getCommand().alongWith(arm.ground()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(3)
-        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, -0.5).getCommand().alongWith(arm.ground()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(4)
-        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.mid()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(5)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.mid()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
@@ -232,17 +245,24 @@ public class RobotContainer {
         .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
     scoreController
-            .button(7)
-            .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.highLaunchReady()))
-            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+        .button(7)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, 0.0)
+                .getCommand()
+                .alongWith(arm.highLaunchReady()))
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
     scoreController
         .button(8)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.high()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.high()))
         .whileFalse(superstructure.launchStore());
     scoreController
-            .button(9)
-            .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.highLaunchReady()))
-            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+        .button(9)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT, 0.0)
+                .getCommand()
+                .alongWith(arm.highLaunchReady()))
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     new Trigger(drivebase::isMoving)
         .debounce(10, Debouncer.DebounceType.kBoth)
@@ -256,6 +276,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAuto() {
-    return chooser.getSelected();
+    return Commands.runOnce(drivebase::setAlliance).andThen(chooser.getSelected());
   }
 }

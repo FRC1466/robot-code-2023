@@ -111,8 +111,8 @@ public final class Constants {
                         new Pose2d(lineUpMid, 0.55, new Rotation2d(Math.PI)), new Rotation2d())));
           }
         };
-    public static final Translation3d cameraTranslation = new Translation3d(0.28, 0.0, 0.28);
-    public static final Rotation3d cameraRotation = new Rotation3d(0, 0, 0);
+    public static final Translation3d cameraTranslation = new Translation3d(0.28, 0.0, 0.23);
+    public static final Rotation3d cameraRotation = new Rotation3d(0, Math.toRadians(15), 0);
   }
 
   public static final class ArmConstants {
@@ -159,11 +159,38 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 5.0, dropV = -0.65, launchV = -4.2, powerLaunchV = -5.2, holdV = 2.0;
+    public static final double intakeV = 5.0,
+        dropV = -0.65,
+        launchV = -4.2,
+        powerLaunchV = -5.2,
+        holdV = 2.0;
     public static final double stallCurrent = 17.0;
     public static final double stallSeconds = 0.8;
 
     public static final int motorID = 34;
+  }
+
+  public static final class PoseEstimator {
+    /** THANK YOU IRON PANTHERS */
+    public static final double NOISY_DISTANCE_METERS = 2.5;
+
+    /**
+     * The number to multiply by the smallest of the distance minus the above constant, clamped
+     * above 1 to be the numerator of the fraction.
+     */
+    public static final double DISTANCE_WEIGHT = 7;
+
+    /**
+     * The number to multiply by the number of tags beyond the first to get the denominator of the
+     * deviations matrix.
+     */
+    public static final double TAG_PRESENCE_WEIGHT = 10;
+
+    /** The amount to shift the pose ambiguity by before multiplying it. */
+    public static final double POSE_AMBIGUITY_SHIFTER = .2;
+
+    /** The amount to multiply the pose ambiguity by if there is only one tag. */
+    public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
   }
 
   public static final class LEDConstants {

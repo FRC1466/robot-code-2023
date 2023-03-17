@@ -59,7 +59,11 @@ public class GoToScoring {
         case LEFT:
           goToPose =
               new GoToPose(
-                  scoringArea.get().getLeftPosition().getPoseMeters().plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
+                  scoringArea
+                      .get()
+                      .getLeftPosition()
+                      .getPoseMeters()
+                      .plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
                   new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
@@ -67,7 +71,11 @@ public class GoToScoring {
         case MIDDLE:
           goToPose =
               new GoToPose(
-                  scoringArea.get().getMiddlePosition().getPoseMeters().plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
+                  scoringArea
+                      .get()
+                      .getMiddlePosition()
+                      .getPoseMeters()
+                      .plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
                   new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
@@ -75,7 +83,11 @@ public class GoToScoring {
         case RIGHT:
           goToPose =
               new GoToPose(
-                  scoringArea.get().getRightPosition().getPoseMeters().plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
+                  scoringArea
+                      .get()
+                      .getRightPosition()
+                      .getPoseMeters()
+                      .plus(new Transform2d(new Translation2d(xOffset, 0), new Rotation2d())),
                   new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS),
                   drive);
           command = goToPose.getCommand();
