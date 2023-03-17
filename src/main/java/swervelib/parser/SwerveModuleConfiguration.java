@@ -148,11 +148,12 @@ public class SwerveModuleConfiguration {
   public SimpleMotorFeedforward createDriveFeedforward() {
     double kv = physicalCharacteristics.optimalVoltage / maxSpeed;
     /// ^ Volt-seconds per meter (max voltage divided by max speed)
-    double ks =
+    double ka =
         physicalCharacteristics.optimalVoltage
             / calculateMaxAcceleration(physicalCharacteristics.wheelGripCoefficientOfFriction);
     /// ^ Volt-seconds^2 per meter (max voltage divided by max accel)
-    return new SimpleMotorFeedforward(ks, kv, 0);
+    double ks = 0.5;
+    return new SimpleMotorFeedforward(ks, kv, ka);
   }
 
   /**
