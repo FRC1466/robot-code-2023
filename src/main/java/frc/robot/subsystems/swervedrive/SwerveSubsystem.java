@@ -95,7 +95,7 @@ public class SwerveSubsystem extends SubsystemBase {
     var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
     pose.ifPresent(
         estimatedRobotPose -> {
-          if (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity() > 0.15) {
+          if (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity() > 0.15 && estimatedRobotPose.targetsUsed.size() != 1) {
             return;
           }
           var smallestDist =
