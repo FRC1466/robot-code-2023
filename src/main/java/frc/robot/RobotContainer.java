@@ -101,10 +101,10 @@ public class RobotContainer {
     if (isReconfigureUpdate) {
       isReconfigureUpdate = false;
       if (isSingleController) {
-        configureBindingsSplit();
-      } else {
         DriverStation.silenceJoystickConnectionWarning(true);
         configureBindingsFull();
+      } else {
+        configureBindingsSplit();
       }
     }
   }
