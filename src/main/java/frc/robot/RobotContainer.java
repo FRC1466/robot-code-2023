@@ -91,6 +91,12 @@ public class RobotContainer {
         isSingleController = false;
         isReconfigureUpdate = true;
       }
+    } else if (DriverStation.isJoystickConnected(OIConstants.driverID)
+        && !DriverStation.isJoystickConnected(OIConstants.assistantID)) {
+      if (!isSingleController) {
+        isSingleController = true;
+        isReconfigureUpdate = true;
+      }
     }
     if (isReconfigureUpdate) {
       isReconfigureUpdate = false;
