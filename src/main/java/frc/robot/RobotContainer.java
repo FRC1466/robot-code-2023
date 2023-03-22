@@ -58,7 +58,8 @@ public class RobotContainer {
 
   private final CommandJoystick scoreController = new CommandJoystick(OIConstants.intakeID);
 
-  private final CommandXboxController altController = new CommandXboxController(OIConstants.assistantID);
+  private final CommandXboxController altController =
+      new CommandXboxController(OIConstants.assistantID);
   private boolean isSingleController = true;
   private boolean isReconfigureUpdate = true;
 
@@ -84,7 +85,8 @@ public class RobotContainer {
   }
 
   public void reconfigureBindings() {
-    if (DriverStation.isJoystickConnected(OIConstants.driverID) && DriverStation.isJoystickConnected(OIConstants.assistantID)) {
+    if (DriverStation.isJoystickConnected(OIConstants.driverID)
+        && DriverStation.isJoystickConnected(OIConstants.assistantID)) {
       if (isSingleController) {
         isSingleController = false;
         isReconfigureUpdate = true;
@@ -182,50 +184,50 @@ public class RobotContainer {
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
     driverController
-            .povRight()
-            .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
-            .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
+        .povRight()
+        .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
+        .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
 
     driverController
-            .button(7)
-            .whileTrue(
-                    new TeleopDrive(
-                            drivebase,
-                            () ->
-                                    MathUtil.applyDeadband(
-                                            -driverController.getY() * InputLimits.reduced, InputLimits.vxDeadband),
-                            () ->
-                                    MathUtil.applyDeadband(
-                                            -driverController.getX() * InputLimits.reduced, InputLimits.vyDeadband),
-                            () ->
-                                    MathUtil.applyDeadband(
-                                            -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
-                            driverController.button(8).negate(),
-                            false,
-                            arm.getCOM()));
+        .button(7)
+        .whileTrue(
+            new TeleopDrive(
+                drivebase,
+                () ->
+                    MathUtil.applyDeadband(
+                        -driverController.getY() * InputLimits.reduced, InputLimits.vxDeadband),
+                () ->
+                    MathUtil.applyDeadband(
+                        -driverController.getX() * InputLimits.reduced, InputLimits.vyDeadband),
+                () ->
+                    MathUtil.applyDeadband(
+                        -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
+                driverController.button(8).negate(),
+                false,
+                arm.getCOM()));
 
     altController.x().whileTrue(arm.mid()).whileFalse(superstructure.dropStore());
     altController.a().whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
     altController
-            .leftBumper()
-            .whileTrue(superstructure.pickupStation())
-            .whileFalse(superstructure.store());
+        .leftBumper()
+        .whileTrue(superstructure.pickupStation())
+        .whileFalse(superstructure.store());
 
     altController
-            .rightBumper()
-            .whileTrue(superstructure.pickupGround())
-            .whileFalse(superstructure.store());
+        .rightBumper()
+        .whileTrue(superstructure.pickupGround())
+        .whileFalse(superstructure.store());
 
     altController.b().whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
 
-    altController.povDown() .whileTrue(effector.intake()).whileFalse(effector.stop());
+    altController.povDown().whileTrue(effector.intake()).whileFalse(effector.stop());
     altController.povRight().whileTrue(effector.drop()).whileFalse(effector.stop());
     altController.povLeft().whileTrue(effector.launch()).whileFalse(effector.stop());
     altController
-            .y()
-            .whileTrue(arm.highLaunchReady())
-            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+        .y()
+        .whileTrue(arm.highLaunchReady())
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
   }
 
   /**
@@ -291,63 +293,63 @@ public class RobotContainer {
 
   private void configureBindingsScore() {
     scoreController
-            .button(1)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.RIGHT, -0.5).getCommand().alongWith(arm.ground()))
-            .whileFalse(superstructure.dropStore());
+        .button(1)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, -0.5).getCommand().alongWith(arm.ground()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
-            .button(2)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.MIDDLE, -0.5).getCommand().alongWith(arm.ground()))
-            .whileFalse(superstructure.dropStore());
+        .button(2)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, -0.5).getCommand().alongWith(arm.ground()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
-            .button(3)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.LEFT, -0.5).getCommand().alongWith(arm.ground()))
-            .whileFalse(superstructure.dropStore());
+        .button(3)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT, -0.5).getCommand().alongWith(arm.ground()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
-            .button(4)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.mid()))
-            .whileFalse(superstructure.dropStore());
+        .button(4)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.mid()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
-            .button(5)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.mid()))
-            .whileFalse(superstructure.dropStore());
+        .button(5)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.mid()))
+        .whileFalse(superstructure.dropStore());
 
     scoreController
-            .button(6)
-            .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.mid()))
-            .whileFalse(superstructure.dropStore());
+        .button(6)
+        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.mid()))
+        .whileFalse(superstructure.dropStore());
     scoreController
-            .button(7)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.RIGHT, 0.0)
-                            .getCommand()
-                            .alongWith(arm.highLaunchReady()))
-            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+        .button(7)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, 0.0)
+                .getCommand()
+                .alongWith(arm.highLaunchReady()))
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
     scoreController
-            .button(8)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.high()))
-            .whileFalse(superstructure.launchStore());
+        .button(8)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.high()))
+        .whileFalse(superstructure.launchStore());
     scoreController
-            .button(9)
-            .whileTrue(
-                    new GoToScoring(drivebase, POSITION.LEFT, 0.0)
-                            .getCommand()
-                            .alongWith(arm.highLaunchReady()))
-            .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+        .button(9)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT, 0.0)
+                .getCommand()
+                .alongWith(arm.highLaunchReady()))
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     new Trigger(drivebase::isMoving)
-            .debounce(10, Debouncer.DebounceType.kBoth)
-            .onTrue(pdh.switchableOn())
-            .onFalse(pdh.switchableOff());
+        .debounce(10, Debouncer.DebounceType.kBoth)
+        .onTrue(pdh.switchableOn())
+        .onFalse(pdh.switchableOff());
   }
 
   public void periodic() {
