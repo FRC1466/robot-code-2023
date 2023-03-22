@@ -10,11 +10,11 @@
   },
   "currentLimit": {
     "drive": 40,
-    "angle": 20
+    "angle": 30
   },
   "rampRate": {
     "drive": 0.25,
-    "angle": 0.25
+    "angle": 0.10
   },
   "wheelGripCoefficientOfFriction": 1.19,
   "angleMotorFreeSpeedRPM": 6800
