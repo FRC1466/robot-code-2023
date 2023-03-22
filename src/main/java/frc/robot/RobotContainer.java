@@ -99,6 +99,7 @@ public class RobotContainer {
       }
     }
     if (isReconfigureUpdate) {
+      System.out.println("ReconfigureUpdate");
       isReconfigureUpdate = false;
       if (isSingleController) {
         DriverStation.silenceJoystickConnectionWarning(true);
