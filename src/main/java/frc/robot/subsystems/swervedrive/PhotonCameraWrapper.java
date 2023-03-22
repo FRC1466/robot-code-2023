@@ -41,9 +41,9 @@ public class PhotonCameraWrapper {
 
   public void setAlliance() {
     aprilTagFieldLayout.setOrigin(
-            DriverStation.getAlliance() == Alliance.Blue
-                    ? OriginPosition.kBlueAllianceWallRightSide
-                    : OriginPosition.kRedAllianceWallRightSide);
+        DriverStation.getAlliance() == Alliance.Blue
+            ? OriginPosition.kBlueAllianceWallRightSide
+            : OriginPosition.kRedAllianceWallRightSide);
     photonPoseEstimator.setFieldTags(aprilTagFieldLayout);
   }
 
