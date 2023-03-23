@@ -1,0 +1,20 @@
+<dashboard-tab
+    tab-name="TeleOperated"
+    slot="tab"
+    source-provider="NetworkTables"
+></dashboard-tab>
+<dashboard-tab
+    slot="tab"
+    tab-name="Autonomous"
+    source-provider="NetworkTables"
+    selected=""
+    source-key="/SmartDashboard/CHOOSE"
+>
+    <frc-sendable-chooser
+        source-key="/SmartDashboard/CHOOSE"
+        source-provider="NetworkTables"
+        style="transform: translate(88px, 43.6px);"
+        options="[]"
+        selected="Default Test"
+    ></frc-sendable-chooser>
+</dashboard-tab>
