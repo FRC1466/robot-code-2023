@@ -112,7 +112,7 @@ public final class Constants {
           }
         };
     public static final Translation3d cameraTranslation = new Translation3d(0.28, 0.0, 0.23);
-    public static final Rotation3d cameraRotation = new Rotation3d(0, Math.toRadians(15), 0);
+    public static final Rotation3d cameraRotation = new Rotation3d(0, Math.toRadians(-15), 0);
   }
 
   public static final class ArmConstants {
