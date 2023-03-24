@@ -160,11 +160,11 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 5.0,
+    public static final double intakeV = 5.5,
         dropV = -0.85,
         launchV = -4.2,
         powerLaunchV = -5.2,
-        holdV = 2.4;
+        holdV = 2.3;
     public static final double stallCurrent = 17.0;
     public static final double stallSeconds = 0.8;
 
