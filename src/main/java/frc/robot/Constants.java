@@ -119,10 +119,10 @@ public final class Constants {
     public static final int armPort = 30, dutyCyclePort = 0;
     public static final Gains armPosition = new Gains(0.85, 0, 0, 0, 0, 1.0);
     public static final double dutyCycleResolution = 1.0;
-    public static final double absolutePositionOffset = 0.557;
-    public static final double maxRadians = 4.24, loftRadians = maxRadians - 0.3;
+    public static final double absolutePositionOffset = 0.231143;
+    public static final double maxRadians = 4.29, loftRadians = maxRadians - 0.3;
     public static final double minRadians = -0.52;
-    public static final double stationDegrees = 149.0,
+    public static final double stationDegrees = 153.0,
         midDegrees = 149.0,
         highDegrees = 135.0,
         highLaunchDegrees = 195.0,
@@ -160,10 +160,10 @@ public final class Constants {
 
   public static final class Intake {
     public static final double intakeV = 5.0,
-        dropV = -0.65,
+        dropV = -0.85,
         launchV = -4.2,
         powerLaunchV = -5.2,
-        holdV = 2.0;
+        holdV = 2.4;
     public static final double stallCurrent = 17.0;
     public static final double stallSeconds = 0.8;
 

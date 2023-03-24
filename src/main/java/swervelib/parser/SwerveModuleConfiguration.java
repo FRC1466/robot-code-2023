@@ -152,7 +152,7 @@ public class SwerveModuleConfiguration {
         physicalCharacteristics.optimalVoltage
             / calculateMaxAcceleration(physicalCharacteristics.wheelGripCoefficientOfFriction);
     /// ^ Volt-seconds^2 per meter (max voltage divided by max accel)
-    double ks = 0.5;
+    double ks = 0.0;
     return new SimpleMotorFeedforward(ks, kv, ka);
   }
 

@@ -72,7 +72,7 @@ public class RobotContainer {
           () ->
               MathUtil.applyDeadband(
                   -driverController.getZ() * InputLimits.defaultAngScale, InputLimits.angDeadband),
-          driverController.button(8).negate(),
+          driverController.button(6).negate(),
           false,
           arm.getCOM());
 
@@ -80,8 +80,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureBindingsScore();
+    configureBindingsFull();
     initializeChooser();
-    reconfigureBindings();
+    // reconfigureBindings();
   }
 
   public void reconfigureBindings() {
@@ -209,7 +210,7 @@ public class RobotContainer {
                 () ->
                     MathUtil.applyDeadband(
                         -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
-                driverController.button(8).negate(),
+                driverController.button(6).negate(),
                 false,
                 arm.getCOM()));
 
@@ -268,7 +269,7 @@ public class RobotContainer {
                 () ->
                     MathUtil.applyDeadband(
                         -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
-                driverController.button(8).negate(),
+                driverController.button(6).negate(),
                 false,
                 arm.getCOM()));
 
@@ -278,7 +279,7 @@ public class RobotContainer {
     driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
     driverController
-        .button(2)
+        .button(4)
         .whileTrue(superstructure.pickupStation())
         .whileFalse(superstructure.store());
 
@@ -287,7 +288,7 @@ public class RobotContainer {
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
 
-    driverController.button(4).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
+    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
 
     driverController.button(13).whileTrue(effector.intake()).whileFalse(effector.stop());
     driverController.button(12).whileTrue(effector.drop()).whileFalse(effector.stop());
