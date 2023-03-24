@@ -77,9 +77,9 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureBindingsScore();
-    configureBindingsFull();
+    // configureBindingsFull();
     initializeChooser();
-    // reconfigureBindings();
+    reconfigureBindings();
   }
 
   public void reconfigureBindings() {
@@ -188,10 +188,10 @@ public class RobotContainer {
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
-    driverController
-        .povRight()
-        .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
-        .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
+    // driverController
+    //     .povRight()
+    //     .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
+    //     .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
 
     driverController
         .button(7)
@@ -274,6 +274,7 @@ public class RobotContainer {
 
     new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
 
+    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
     driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
     driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
@@ -286,13 +287,12 @@ public class RobotContainer {
         .button(3)
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
-
-    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
-
-    driverController.button(13).onTrue(effector.intake());
-    driverController.button(12).onTrue(effector.drop());
+        
     driverController.button(11).onTrue(effector.launch());
+    driverController.button(12).onTrue(effector.drop());
+    driverController.button(13).onTrue(effector.intake());
     driverController.button(14).onTrue(effector.stop());
+    
     driverController
         .button(15)
         .whileTrue(arm.highLaunchReady())
