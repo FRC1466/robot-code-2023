@@ -15,10 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.*;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.InputLimits;
@@ -214,7 +211,7 @@ public class RobotContainer {
                 false,
                 arm.getCOM()));
 
-    altController.x().whileTrue(arm.mid()).whileFalse(superstructure.dropStore());
+    altController.x().whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
     altController.a().whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
     altController
@@ -229,9 +226,11 @@ public class RobotContainer {
 
     altController.b().whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
 
-    altController.povDown().whileTrue(effector.intake()).whileFalse(effector.stop());
-    altController.povRight().whileTrue(effector.drop()).whileFalse(effector.stop());
-    altController.povLeft().whileTrue(effector.launch()).whileFalse(effector.stop());
+    altController.povDown().onTrue(effector.intake());
+    altController.povRight().onTrue(effector.drop());
+    altController.povLeft().onTrue(effector.launch());
+    altController.povUp().onTrue(effector.stop());
+
     altController
         .y()
         .whileTrue(arm.highLaunchReady())
@@ -275,7 +274,7 @@ public class RobotContainer {
 
     new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
 
-    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropStore());
+    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
     driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
     driverController
@@ -290,11 +289,12 @@ public class RobotContainer {
 
     driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
 
-    driverController.button(13).whileTrue(effector.intake()).whileFalse(effector.stop());
-    driverController.button(12).whileTrue(effector.drop()).whileFalse(effector.stop());
-    driverController.button(11).whileTrue(effector.launch()).whileFalse(effector.stop());
+    driverController.button(13).onTrue(effector.intake());
+    driverController.button(12).onTrue(effector.drop());
+    driverController.button(11).onTrue(effector.launch());
+    driverController.button(14).onTrue(effector.stop());
     driverController
-        .button(14)
+        .button(15)
         .whileTrue(arm.highLaunchReady())
         .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
   }

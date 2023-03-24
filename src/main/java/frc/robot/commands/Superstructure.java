@@ -34,6 +34,10 @@ public class Superstructure {
     return effector.drop().andThen(arm.store());
   }
 
+  public Command dropMidStore() {
+    return arm.midScore().andThen(effector.drop().andThen(arm.store()));
+  }
+
   public Command launchStore() {
     return effector.launch().andThen(arm.store());
   }

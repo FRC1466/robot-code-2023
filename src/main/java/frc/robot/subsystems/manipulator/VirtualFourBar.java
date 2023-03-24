@@ -144,6 +144,11 @@ public class VirtualFourBar extends SubsystemBase {
         .andThen(holdUntilSetpoint());
   }
 
+  public Command midScore() {
+    return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegreesScore)))
+        .andThen(holdUntilSetpoint());
+  }
+
   public Command high() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highDegrees)))
         .andThen(holdUntilSetpoint());
