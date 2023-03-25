@@ -8,11 +8,14 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
+
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import webblib.math.ArmPIDController;
 
@@ -22,6 +25,8 @@ public class VirtualFourBar extends SubsystemBase {
   private ArmPIDController armPID;
   private VirtualFourBarSimulation sim;
   private Rotation2d localSetpoint;
+  private DoubleSupplier overrideFeedforward = () -> 0.0;
+  private boolean disabled = false;
 
   public enum ARM {
     GROUND,
@@ -114,14 +119,19 @@ public class VirtualFourBar extends SubsystemBase {
             ArmConstants.armPosition.peakOutput);
     var feedforward = getPosition().getCos() * ArmConstants.gravityFF;
 
-    setMotor(motorOutput + feedforward);
+    setMotor(motorOutput + feedforward + overrideFeedforward.getAsDouble());
 
     SmartDashboard.putNumber("Arm PID Output", motorOutput);
     SmartDashboard.putNumber("Arm Feedforward", feedforward);
+    SmartDashboard.putNumber("Arm Feedforward", overrideFeedforward.getAsDouble());
   }
 
   public void setMotor(double percent) {
     armMotor.set(percent);
+  }
+
+  public Command setFeedforward(DoubleSupplier ff) {
+    return runOnce(() -> {overrideFeedforward = ff;});
   }
 
   public Command ground() {
@@ -178,6 +188,10 @@ public class VirtualFourBar extends SubsystemBase {
         .raceWith(Commands.waitSeconds(0.3).andThen(Commands.waitUntil(this::isAtSetpoint)));
   }
 
+  public CommandBase toggleDisable() {
+    return runOnce(() -> {disabled = !disabled;});
+  }
+
   /**
    * If the arm is at setpoint.
    *
@@ -205,5 +219,6 @@ public class VirtualFourBar extends SubsystemBase {
     SmartDashboard.putNumber("Arm Processed Absolute Encoder", getPosition().getRadians());
     SmartDashboard.putNumber("Arm PID error", armPID.getPositionError());
     SmartDashboard.putString("Arm COM", getCOM().get().toString());
+    SmartDashboard.putBoolean("Arm Disabled", disabled);
   }
 }

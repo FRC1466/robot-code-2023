@@ -9,6 +9,7 @@ import frc.robot.Constants.LEDConstants;
 public class LED extends SubsystemBase {
   // https://github.com/WHS-FRC-3467/Skip-5.12/blob/master/src/main/java/frc/robot/Feedback/LED/BlinkinLedDriver.java
   private PWM pwm;
+  private BlinkinLedMode currentMode = BlinkinLedMode.SOLID_BLACK;
 
   public LED() {
     pwm = new PWM(LEDConstants.PWMPort);
@@ -16,14 +17,19 @@ public class LED extends SubsystemBase {
     pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
   }
 
-  public void setColor() {
+  public void setAllianceColor() {
     setMode(
         DriverStation.getAlliance() == Alliance.Blue
             ? BlinkinLedMode.SOLID_BLUE
             : BlinkinLedMode.SOLID_RED);
   }
 
+  public BlinkinLedMode getMode() {
+    return currentMode;
+  }
+
   public void setMode(BlinkinLedMode mode) {
+    currentMode = mode;
     pwm.setSpeed(mode.value);
   }
 

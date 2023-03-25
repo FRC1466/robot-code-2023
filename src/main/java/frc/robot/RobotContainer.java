@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.*;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.InputLimits;
@@ -25,6 +26,8 @@ import frc.robot.commands.swervedrive.auto.GoToScoring;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.BlinkinLedMode;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
@@ -45,7 +48,7 @@ public class RobotContainer {
   private final EndEffector effector = new EndEffector();
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
-  // private final LED m_led = new LED();
+//   private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
   private final AutoMap autoMap = new AutoMap(superstructure, effector, arm);
@@ -77,7 +80,6 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureBindingsScore();
-    // configureBindingsFull();
     initializeChooser();
     reconfigureBindings();
   }
@@ -102,6 +104,7 @@ public class RobotContainer {
       if (isSingleController) {
         DriverStation.silenceJoystickConnectionWarning(true);
         configureBindingsFull();
+        arm.setFeedforward(() -> 0.0);
       } else {
         configureBindingsSplit();
       }
@@ -184,7 +187,7 @@ public class RobotContainer {
 
   private void configureBindingsSplit() {
     drivebase.setDefaultCommand(closedFieldRel);
-    // m_led.setDefaultCommand(Commands.run(m_led::setColor, m_led));
+    // m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
@@ -230,6 +233,8 @@ public class RobotContainer {
     altController.povRight().onTrue(effector.drop());
     altController.povLeft().onTrue(effector.launch());
     altController.povUp().onTrue(effector.stop());
+
+    arm.setFeedforward(() -> {return ArmConstants.overrideFFScale*(altController.getRightY());});
 
     altController
         .y()
@@ -287,12 +292,20 @@ public class RobotContainer {
         .button(3)
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
-        
-    driverController.button(11).onTrue(effector.launch());
+
+    // driverController
+    //     .button(2)
+    //     .onTrue(
+    //         Commands.either(
+    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+    //             () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
+
+    driverController.button(1).onTrue(effector.launch());
     driverController.button(12).onTrue(effector.drop());
     driverController.button(13).onTrue(effector.intake());
     driverController.button(14).onTrue(effector.stop());
-    
+
     driverController
         .button(15)
         .whileTrue(arm.highLaunchReady())
@@ -358,6 +371,7 @@ public class RobotContainer {
         .debounce(10, Debouncer.DebounceType.kBoth)
         .onTrue(pdh.switchableOn())
         .onFalse(pdh.switchableOff());
+    SmartDashboard.putData(arm.toggleDisable());
   }
 
   public void periodic() {
