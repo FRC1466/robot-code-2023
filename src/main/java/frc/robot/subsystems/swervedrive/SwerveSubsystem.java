@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Auton;
+import frc.robot.Constants.PoseEstimator;
 import frc.robot.Constants.OIConstants.InputLimits;
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 import swervelib.SwerveController;
@@ -90,48 +92,48 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     swerveDrive.updateOdometry();
-    // var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
-    // pose.ifPresent(
-    //     estimatedRobotPose -> {
-    //       if (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity() > 0.15
-    //           && estimatedRobotPose.targetsUsed.size() != 1) {
-    //         return;
-    //       }
-    //       var smallestDist =
-    //           estimatedRobotPose.targetsUsed.stream()
-    //               .min(
-    //                   Comparator.comparing(
-    //                       target -> target.getBestCameraToTarget().getTranslation().getNorm()))
-    //               .get()
-    //               .getBestCameraToTarget()
-    //               .getTranslation()
-    //               .getNorm();
-    //       double poseAmbiguityFactor =
-    //           estimatedRobotPose.targetsUsed.size() != 1
-    //               ? 1
-    //               : Math.max(
-    //                   1,
-    //                   (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity()
-    //                           + PoseEstimator.POSE_AMBIGUITY_SHIFTER)
-    //                       * PoseEstimator.POSE_AMBIGUITY_MULTIPLIER);
-    //       double confidenceMultiplier =
-    //           Math.max(
-    //               1,
-    //               (Math.max(
-    //                           1,
-    //                           Math.max(0, smallestDist - PoseEstimator.NOISY_DISTANCE_METERS)
-    //                               * PoseEstimator.DISTANCE_WEIGHT)
-    //                       * poseAmbiguityFactor)
-    //                   / (1
-    //                       + ((estimatedRobotPose.targetsUsed.size() - 1)
-    //                           * PoseEstimator.TAG_PRESENCE_WEIGHT)));
-    //       var adjPose =
-    //           new Pose3d(
-    //               estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
+     var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
+     pose.ifPresent(
+         estimatedRobotPose -> {
+           if (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity() > 0.15
+               && estimatedRobotPose.targetsUsed.size() != 1) {
+             return;
+           }
+           var smallestDist =
+               estimatedRobotPose.targetsUsed.stream()
+                   .min(
+                       Comparator.comparing(
+                           target -> target.getBestCameraToTarget().getTranslation().getNorm()))
+                   .get()
+                   .getBestCameraToTarget()
+                   .getTranslation()
+                   .getNorm();
+           double poseAmbiguityFactor =
+               estimatedRobotPose.targetsUsed.size() != 1
+                   ? 1
+                   : Math.max(
+                       1,
+                       (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity()
+                               + PoseEstimator.POSE_AMBIGUITY_SHIFTER)
+                           * Constants.PoseEstimator.POSE_AMBIGUITY_MULTIPLIER);
+           double confidenceMultiplier =
+               Math.max(
+                   1,
+                   (Math.max(
+                               1,
+                               Math.max(0, smallestDist - Constants.PoseEstimator.NOISY_DISTANCE_METERS)
+                                   * PoseEstimator.DISTANCE_WEIGHT)
+                           * poseAmbiguityFactor)
+                       / (1
+                           + ((estimatedRobotPose.targetsUsed.size() - 1)
+                               * PoseEstimator.TAG_PRESENCE_WEIGHT)));
+           var adjPose =
+               new Pose3d(
+                   estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
 
-    //       swerveDrive.addVisionMeasurement(
-    //           adjPose, estimatedRobotPose.timestampSeconds, true, 1.0 / confidenceMultiplier);
-    //     });
+           swerveDrive.addVisionMeasurement(
+               adjPose, estimatedRobotPose.timestampSeconds, true, 1.0 / confidenceMultiplier);
+         });
   }
 
   @Override
