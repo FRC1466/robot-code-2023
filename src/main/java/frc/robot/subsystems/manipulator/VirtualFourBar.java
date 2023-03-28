@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import webblib.math.ArmPIDController;
@@ -123,15 +122,16 @@ public class VirtualFourBar extends SubsystemBase {
 
     SmartDashboard.putNumber("Arm PID Output", motorOutput);
     SmartDashboard.putNumber("Arm Feedforward", feedforward);
-    SmartDashboard.putNumber("Arm Feedforward", overrideFeedforward.getAsDouble());
+    SmartDashboard.putNumber("Arm Feedforward Override", overrideFeedforward.getAsDouble());
   }
 
   public void setMotor(double percent) {
     armMotor.set(percent);
   }
 
-  public Command setFeedforward(DoubleSupplier ff) {
-    return runOnce(() -> {overrideFeedforward = ff;});
+  public void setFeedforward(DoubleSupplier ff) {
+    System.out.println("ff: " + ff.toString());
+    overrideFeedforward = ff;
   }
 
   public Command ground() {
@@ -164,6 +164,11 @@ public class VirtualFourBar extends SubsystemBase {
         .andThen(holdUntilSetpoint());
   }
 
+  public Command storeLaunchReady() {
+    return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.launchRadians)))
+        .andThen(holdUntilSetpoint());
+  }
+
   public Command highLaunchReady() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highLaunchDegrees)))
         .andThen(holdUntilSetpoint());
@@ -189,7 +194,10 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public CommandBase toggleDisable() {
-    return runOnce(() -> {disabled = !disabled;});
+    return runOnce(
+        () -> {
+          disabled = !disabled;
+        });
   }
 
   /**

@@ -214,32 +214,36 @@ public class RobotContainer {
                 false,
                 arm.getCOM()));
 
-    altController.x().whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
-    altController.a().whileTrue(arm.high()).whileFalse(superstructure.launchStore());
+    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
+    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
+    driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
-    altController
-        .leftBumper()
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
+
+    driverController
+        .button(4)
         .whileTrue(superstructure.pickupStation())
         .whileFalse(superstructure.store());
 
-    altController
-        .rightBumper()
+    driverController
+        .button(3)
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
-
-    altController.b().whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
 
     altController.povDown().onTrue(effector.intake());
     altController.povRight().onTrue(effector.drop());
     altController.povLeft().onTrue(effector.launch());
     altController.povUp().onTrue(effector.stop());
 
-    arm.setFeedforward(() -> {return ArmConstants.overrideFFScale*(altController.getRightY());});
+    driverController
+    .button(15)
+    .whileTrue(arm.highLaunchReady())
+    .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
-    altController
-        .y()
-        .whileTrue(arm.highLaunchReady())
-        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+    arm.setFeedforward(() -> ArmConstants.overrideFFScale*(altController.getRightY()));
+
+        // .whileTrue(arm.highLaunchReady())
+        // .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
   }
 
   /**
@@ -301,7 +305,7 @@ public class RobotContainer {
     //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
     //             () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
-    driverController.button(1).onTrue(effector.launch());
+    driverController.button(1).whileTrue(arm.storeLaunchReady()).onFalse(effector.launch().andThen(Commands.waitSeconds(0.1)).andThen(arm.store()));
     driverController.button(12).onTrue(effector.drop());
     driverController.button(13).onTrue(effector.intake());
     driverController.button(14).onTrue(effector.stop());

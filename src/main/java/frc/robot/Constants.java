@@ -117,11 +117,12 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 1.0);
+    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 0.8);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.231143;
     public static final double maxRadians = 4.29, loftRadians = maxRadians - 0.3;
-    public static final double minRadians = -0.65;
+    public static final double minRadians = -0.75;
+    public static final double launchRadians = -0.52;
     public static final double stationDegrees = 148.0,
         midDegrees = 149.0,
         midDegreesScore = 165.0,
