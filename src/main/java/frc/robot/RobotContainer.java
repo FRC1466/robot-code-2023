@@ -26,8 +26,6 @@ import frc.robot.commands.swervedrive.auto.GoToScoring;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.LED.BlinkinLedMode;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
@@ -48,7 +46,7 @@ public class RobotContainer {
   private final EndEffector effector = new EndEffector();
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
-//   private final LED m_led = new LED();
+  //   private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
   private final AutoMap autoMap = new AutoMap(superstructure, effector, arm);
@@ -236,14 +234,14 @@ public class RobotContainer {
     altController.povUp().onTrue(effector.stop());
 
     driverController
-    .button(15)
-    .whileTrue(arm.highLaunchReady())
-    .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+        .button(15)
+        .whileTrue(arm.highLaunchReady())
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
-    arm.setFeedforward(() -> ArmConstants.overrideFFScale*(altController.getRightY()));
+    arm.setFeedforward(() -> ArmConstants.overrideFFScale * (altController.getRightY()));
 
-        // .whileTrue(arm.highLaunchReady())
-        // .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+    // .whileTrue(arm.highLaunchReady())
+    // .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
   }
 
   /**
@@ -305,10 +303,15 @@ public class RobotContainer {
     //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
     //             () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
-    driverController.button(1).whileTrue(arm.storeLaunchReady()).onFalse(effector.launch().andThen(Commands.waitSeconds(0.1)).andThen(arm.store()));
+    driverController
+        .button(1)
+        .whileTrue(arm.storeLaunchReady())
+        .onFalse(effector.launch().andThen(Commands.waitSeconds(0.1)).andThen(arm.store()));
     driverController.button(12).onTrue(effector.drop());
     driverController.button(13).onTrue(effector.intake());
     driverController.button(14).onTrue(effector.stop());
+
+    arm.setFeedforward(() -> 0.0);
 
     driverController
         .button(15)
