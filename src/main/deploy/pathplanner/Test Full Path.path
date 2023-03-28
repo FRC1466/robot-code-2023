@@ -22,7 +22,7 @@
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
-        "waitTime": 0.02
+        "waitTime": 0
       }
     },
     {
@@ -42,7 +42,7 @@
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
         "names": [],
         "executionBehavior": "parallel",
@@ -69,7 +69,9 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "PickupGround"
+        ],
         "executionBehavior": "sequential",
         "waitBehavior": "after",
         "waitTime": 0.1
@@ -92,7 +94,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreMid"
+          "ScoreHigh",
+          "Store"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -102,28 +105,15 @@
   ],
   "markers": [
     {
-      "position": 0.047017045454545645,
-      "names": [
-        "ArmToVertical"
-      ]
-    },
-    {
       "position": 1.2363636363636363,
       "names": [
-        "ArmToVertical"
+        "High"
       ]
     },
     {
-      "position": 0.2472727272727341,
+      "position": 0.1916548295454545,
       "names": [
-        "Intake",
         "PickupGround"
-      ]
-    },
-    {
-      "position": 2.5616122159090837,
-      "names": [
-        "Mid"
       ]
     }
   ]

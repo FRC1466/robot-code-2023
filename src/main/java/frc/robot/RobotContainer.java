@@ -15,9 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.*;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OIConstants.InputLimits;
@@ -43,18 +42,24 @@ public class RobotContainer {
   private SendableChooser<Command> chooser = new SendableChooser<>();
 
   // The robot's subsystems
-  private final SwerveSubsystem drivebase =
-      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final VirtualFourBar arm = new VirtualFourBar();
   private final EndEffector effector = new EndEffector();
-  // private final LED m_led = new LED();
+  private final SwerveSubsystem drivebase =
+      new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
+  //   private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
   private final AutoMap autoMap = new AutoMap(superstructure, effector, arm);
   private final PathBuilder builder = new PathBuilder(drivebase, autoMap.getEventMap());
 
   private final CommandJoystick driverController = new CommandJoystick(OIConstants.driverID);
+
   private final CommandJoystick scoreController = new CommandJoystick(OIConstants.intakeID);
+
+  private final CommandXboxController altController =
+      new CommandXboxController(OIConstants.assistantID);
+  private boolean isSingleController = true;
+  private boolean isReconfigureUpdate = true;
 
   // the default commands
   private final TeleopDrive closedFieldRel =
@@ -65,14 +70,43 @@ public class RobotContainer {
           () ->
               MathUtil.applyDeadband(
                   -driverController.getZ() * InputLimits.defaultAngScale, InputLimits.angDeadband),
-          driverController.button(8).negate(),
-          false);
+          driverController.button(6).negate(),
+          false,
+          arm.getCOM());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
-    configureBindings();
+    configureBindingsScore();
     initializeChooser();
+    reconfigureBindings();
+  }
+
+  public void reconfigureBindings() {
+    if (DriverStation.isJoystickConnected(OIConstants.driverID)
+        && DriverStation.isJoystickConnected(OIConstants.assistantID)) {
+      if (isSingleController) {
+        isSingleController = false;
+        isReconfigureUpdate = true;
+      }
+    } else if (DriverStation.isJoystickConnected(OIConstants.driverID)
+        && !DriverStation.isJoystickConnected(OIConstants.assistantID)) {
+      if (!isSingleController) {
+        isSingleController = true;
+        isReconfigureUpdate = true;
+      }
+    }
+    if (isReconfigureUpdate) {
+      System.out.println("ReconfigureUpdate");
+      isReconfigureUpdate = false;
+      if (isSingleController) {
+        DriverStation.silenceJoystickConnectionWarning(true);
+        configureBindingsFull();
+        arm.setFeedforward(() -> 0.0);
+      } else {
+        configureBindingsSplit();
+      }
+    }
   }
 
   private void initializeChooser() {
@@ -94,23 +128,28 @@ public class RobotContainer {
     //     "3 Score T1",
     //     builder.getSwerveCommand(
     //         PathPlanner.loadPathGroup(
-    //             "3 Score T1", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    //             "3 Score T1", new PathConstraints(Auton.maxSpeedMPS,
+    // Auton.maxAccelerationMPS))));
 
-    // chooser.addOption(
-    //     "2 Score + Dock T1",
-    //     builder.getSwerveCommand(
-    //         PathPlanner.loadPathGroup(
-    //             "2 Score + Dock T1",
-    //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    chooser.addOption(
+        "2 Score + Dock T1",
+        builder
+            .getSwerveCommand(
+                PathPlanner.loadPathGroup(
+                    "2 Score + Dock T1",
+                    new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
+            .andThen(autoBalance())
+            .andThen(Commands.waitSeconds(1.0))
+            .andThen(autoBalance()));
 
-    // chooser.addOption(
-    //     "1 Score + Dock T2",
-    //     builder
-    //         .getSwerveCommand(
-    //             PathPlanner.loadPathGroup(
-    //                 "1 Score + Dock T2",
-    //                 new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS)))
-    //         .andThen(autoBalance()));
+    chooser.addOption(
+        "1 Score + Dock T2",
+        builder
+            .getSwerveCommand(
+                PathPlanner.loadPathGroup("1 Score + Dock T2", new PathConstraints(1.5, 2)))
+            .andThen(autoBalance())
+            .andThen(Commands.waitSeconds(1.0))
+            .andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
   }
@@ -144,13 +183,74 @@ public class RobotContainer {
             () -> Math.abs(drivebase.getPlaneInclination().getDegrees()) < Auton.balanceLimitDeg);
   }
 
+  private void configureBindingsSplit() {
+    drivebase.setDefaultCommand(closedFieldRel);
+    // m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
+
+    driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverController.povUp().whileTrue(autoBalance());
+    // driverController
+    //     .povRight()
+    //     .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
+    //     .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
+
+    driverController
+        .button(7)
+        .whileTrue(
+            new TeleopDrive(
+                drivebase,
+                () ->
+                    MathUtil.applyDeadband(
+                        -driverController.getY() * InputLimits.reduced, InputLimits.vxDeadband),
+                () ->
+                    MathUtil.applyDeadband(
+                        -driverController.getX() * InputLimits.reduced, InputLimits.vyDeadband),
+                () ->
+                    MathUtil.applyDeadband(
+                        -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
+                driverController.button(6).negate(),
+                false,
+                arm.getCOM()));
+
+    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
+    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
+    driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
+
+    new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
+
+    driverController
+        .button(4)
+        .whileTrue(superstructure.pickupStation())
+        .whileFalse(superstructure.store());
+
+    driverController
+        .button(3)
+        .whileTrue(superstructure.pickupGround())
+        .whileFalse(superstructure.store());
+
+    altController.povDown().onTrue(effector.intake());
+    altController.povRight().onTrue(effector.drop());
+    altController.povLeft().onTrue(effector.launch());
+    altController.povUp().onTrue(effector.stop());
+
+    driverController
+        .button(15)
+        .whileTrue(arm.highLaunchReady())
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+
+    arm.setFeedforward(() -> ArmConstants.overrideFFScale * (altController.getRightY()));
+
+    // .whileTrue(arm.highLaunchReady())
+    // .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureBindings() {
+  private void configureBindingsFull() {
     drivebase.setDefaultCommand(closedFieldRel);
     // m_led.setDefaultCommand(Commands.run(m_led::setColor, m_led));
 
@@ -175,16 +275,18 @@ public class RobotContainer {
                 () ->
                     MathUtil.applyDeadband(
                         -driverController.getZ() * InputLimits.reduced, InputLimits.angDeadband),
-                driverController.button(8).negate(),
-                false));
+                driverController.button(6).negate(),
+                false,
+                arm.getCOM()));
 
     new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
 
-    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropStore());
+    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
+    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
     driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
 
     driverController
-        .button(2)
+        .button(4)
         .whileTrue(superstructure.pickupStation())
         .whileFalse(superstructure.store());
 
@@ -193,46 +295,94 @@ public class RobotContainer {
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
 
-    driverController.button(4).whileTrue(arm.ground()).whileFalse(superstructure.dropStore());
+    // driverController
+    //     .button(2)
+    //     .onTrue(
+    //         Commands.either(
+    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+    //             () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
-    driverController.button(13).whileTrue(effector.intake()).whileFalse(effector.stop());
-    driverController.button(12).whileTrue(effector.drop()).whileFalse(effector.stop());
-    driverController.button(11).whileTrue(effector.launch()).whileFalse(effector.stop());
+    driverController
+        .button(1)
+        .whileTrue(arm.storeLaunchReady())
+        .onFalse(effector.launch().andThen(Commands.waitSeconds(0.1)).andThen(arm.store()));
+    driverController.button(12).onTrue(effector.drop());
+    driverController.button(13).onTrue(effector.intake());
+    driverController.button(14).onTrue(effector.stop());
 
+    arm.setFeedforward(() -> 0.0);
+
+    driverController
+        .button(15)
+        .whileTrue(arm.highLaunchReady())
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+  }
+
+  private void configureBindingsScore() {
     scoreController
         .button(1)
-        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.ground()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(2)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.ground()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(3)
-        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.ground()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT, -0.5).getCommand().alongWith(arm.ground()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(4)
-        .whileTrue(new GoToScoring(drivebase, POSITION.RIGHT).getCommand().alongWith(arm.mid()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(5)
-        .whileTrue(new GoToScoring(drivebase, POSITION.MIDDLE).getCommand().alongWith(arm.mid()))
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
 
     scoreController
         .button(6)
-        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT).getCommand().alongWith(arm.mid()))
+        .whileTrue(new GoToScoring(drivebase, POSITION.LEFT, 0.0).getCommand().alongWith(arm.mid()))
         .whileFalse(superstructure.dropStore());
+    scoreController
+        .button(7)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.RIGHT, 0.0)
+                .getCommand()
+                .alongWith(arm.highLaunchReady()))
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
+    scoreController
+        .button(8)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.MIDDLE, 0.0).getCommand().alongWith(arm.high()))
+        .whileFalse(superstructure.launchStore());
+    scoreController
+        .button(9)
+        .whileTrue(
+            new GoToScoring(drivebase, POSITION.LEFT, 0.0)
+                .getCommand()
+                .alongWith(arm.highLaunchReady()))
+        .whileFalse(superstructure.launchConeToHigh().andThen(arm.store()));
 
     new Trigger(drivebase::isMoving)
         .debounce(10, Debouncer.DebounceType.kBoth)
         .onTrue(pdh.switchableOn())
         .onFalse(pdh.switchableOff());
+    SmartDashboard.putData(arm.toggleDisable());
+  }
+
+  public void periodic() {
+    reconfigureBindings();
   }
 
   /**
@@ -241,6 +391,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAuto() {
-    return chooser.getSelected();
+    return Commands.runOnce(drivebase::setAlliance).andThen(chooser.getSelected());
   }
 }

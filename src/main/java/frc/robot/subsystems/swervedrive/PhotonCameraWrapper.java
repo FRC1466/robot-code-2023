@@ -14,13 +14,11 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 public class PhotonCameraWrapper {
-  private PhotonCamera camera = new PhotonCamera("Global_Shutter_Camera");
+  private final PhotonCamera camera = new PhotonCamera("Global_Shutter_Camera");
   private AprilTagFieldLayout aprilTagFieldLayout;
-  private PhotonPoseEstimator photonPoseEstimator;
-  private Transform3d robotToCam;
+  private final PhotonPoseEstimator photonPoseEstimator;
 
   /** Create a new PhotonCameraWrapper to interface with photonvision camera. */
   public PhotonCameraWrapper() {
@@ -34,15 +32,19 @@ public class PhotonCameraWrapper {
             ? OriginPosition.kBlueAllianceWallRightSide
             : OriginPosition.kRedAllianceWallRightSide);
 
-    robotToCam = new Transform3d(Auton.cameraTranslation, Auton.cameraRotation);
+    var robotToCam = new Transform3d(Auton.cameraTranslation, Auton.cameraRotation);
     photonPoseEstimator =
         new PhotonPoseEstimator(
             aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP, camera, robotToCam);
-    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
   }
 
-  public PhotonPipelineResult getLatest() {
-    return camera.getLatestResult();
+  public void setAlliance() {
+    aprilTagFieldLayout.setOrigin(
+        DriverStation.getAlliance() == Alliance.Blue
+            ? OriginPosition.kBlueAllianceWallRightSide
+            : OriginPosition.kRedAllianceWallRightSide);
+    photonPoseEstimator.setFieldTags(aprilTagFieldLayout);
   }
 
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose3d prevEstimatedRobotPose) {

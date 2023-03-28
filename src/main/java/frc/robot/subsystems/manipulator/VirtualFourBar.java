@@ -3,13 +3,19 @@ package frc.robot.subsystems.manipulator;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Robot;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import webblib.math.ArmPIDController;
 
 public class VirtualFourBar extends SubsystemBase {
@@ -18,6 +24,8 @@ public class VirtualFourBar extends SubsystemBase {
   private ArmPIDController armPID;
   private VirtualFourBarSimulation sim;
   private Rotation2d localSetpoint;
+  private DoubleSupplier overrideFeedforward = () -> 0.0;
+  private boolean disabled = false;
 
   public enum ARM {
     GROUND,
@@ -110,39 +118,65 @@ public class VirtualFourBar extends SubsystemBase {
             ArmConstants.armPosition.peakOutput);
     var feedforward = getPosition().getCos() * ArmConstants.gravityFF;
 
-    setMotor(motorOutput + feedforward);
+    setMotor(motorOutput + feedforward + overrideFeedforward.getAsDouble());
 
     SmartDashboard.putNumber("Arm PID Output", motorOutput);
     SmartDashboard.putNumber("Arm Feedforward", feedforward);
+    SmartDashboard.putNumber("Arm Feedforward Override", overrideFeedforward.getAsDouble());
   }
 
   public void setMotor(double percent) {
     armMotor.set(percent);
   }
 
+  public void setFeedforward(DoubleSupplier ff) {
+    System.out.println("ff: " + ff.toString());
+    overrideFeedforward = ff;
+  }
+
   public Command ground() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.maxRadians)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
+  }
+
+  public Command loft() {
+    return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.loftRadians)))
+        .andThen(holdUntilSetpoint());
   }
 
   public Command station() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.stationDegrees)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command mid() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegrees)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
+  }
+
+  public Command midScore() {
+    return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegreesScore)))
+        .andThen(holdUntilSetpoint());
   }
 
   public Command high() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highDegrees)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
+  }
+
+  public Command storeLaunchReady() {
+    return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.launchRadians)))
+        .andThen(holdUntilSetpoint());
+  }
+
+  public Command highLaunchReady() {
+    return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highLaunchDegrees)))
+        .andThen(holdUntilSetpoint());
   }
 
   public Command store() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.minRadians)))
-    .andThen(holdUntilSetpoint());
+        .andThen(holdUntilSetpoint());
   }
 
   public Command vertical() {
@@ -151,11 +185,19 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public Command hold() {
-    return Commands.run(() -> setArmHold(), this);
+    return Commands.run(this::setArmHold, this);
   }
 
   public Command holdUntilSetpoint() {
-    return hold().raceWith(Commands.waitSeconds(0.3).andThen(Commands.waitUntil(this::isAtSetpoint)));
+    return hold()
+        .raceWith(Commands.waitSeconds(0.3).andThen(Commands.waitUntil(this::isAtSetpoint)));
+  }
+
+  public CommandBase toggleDisable() {
+    return runOnce(
+        () -> {
+          disabled = !disabled;
+        });
   }
 
   /**
@@ -168,12 +210,23 @@ public class VirtualFourBar extends SubsystemBase {
     return armPID.atSetpoint();
   }
 
+  public Supplier<Translation3d> getCOM() {
+    var rest = new Translation2d(Constants.ARM_LENGTH / 2, 0);
+    var rotatedRest = rest.rotateBy(getPosition());
+    return () ->
+        Constants.INITIAL_ARM_MOUNT.plus(
+            new Translation3d(-rotatedRest.getX(), 0, rotatedRest.getY()));
+  }
+
   @Override
   public void periodic() {
     setArmHold();
+
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Arm Raw Absolute Encoder", absoluteArmEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("Arm Processed Absolute Encoder", getPosition().getRadians());
     SmartDashboard.putNumber("Arm PID error", armPID.getPositionError());
+    SmartDashboard.putString("Arm COM", getCOM().get().toString());
+    SmartDashboard.putBoolean("Arm Disabled", disabled);
   }
 }

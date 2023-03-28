@@ -34,16 +34,19 @@ import webblib.util.chargedup.ScoringArea;
  */
 public final class Constants {
 
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
-  public static final double CHASSIS_MASS = ROBOT_MASS;
+  public static final double ROBOT_MASS = (1000) * 0.453592; // 32lbs * kg per pound
+  public static final double ARM_MASS = 100.0;
+  public static final Translation3d INITIAL_ARM_MOUNT = new Translation3d(0.3, 0, 0.7);
+  public static final double ARM_LENGTH = 0.7;
+  public static final double CHASSIS_MASS = ROBOT_MASS - ARM_MASS;
   public static final Matter CHASSIS =
-      new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+      new Matter(new Translation3d(0, 0, Units.inchesToMeters(0.0)), ROBOT_MASS);
   ;
   public static final double LOOP_TIME = 0.02; // s, 20ms + 110ms sprk max velocity lag
   public static final double STOP_SECONDS = 3.0;
 
   public static final class OIConstants {
-    public static final int driverID = 4, intakeID = 5;
+    public static final int driverID = 4, intakeID = 5, assistantID = 2;
 
     public static final class InputLimits {
       public static final double vxDeadband = 0.02,
@@ -58,11 +61,11 @@ public final class Constants {
   public static final class Auton {
     public static final PIDFConfig xAutoPID = new PIDFConfig(5.0, 0, 0);
     public static final PIDFConfig yAutoPID = new PIDFConfig(5.0, 0, 0);
-    public static final PIDFConfig angleAutoPID = new PIDFConfig(8.2, 0, 0.0);
+    public static final PIDFConfig angleAutoPID = new PIDFConfig(4.2, 0, 0.0);
 
     public static final double maxSpeedMPS = 2.5;
     public static final double maxAccelerationMPS = 1.8;
-    public static final double balanceScale = 3.0, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
+    public static final double balanceScale = 2.8, balanceScalePow = 1.5, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -80,48 +83,58 @@ public final class Constants {
                     new RectanglePoseArea(
                         new Translation2d(1.23, 3.53), new Translation2d(2.86, 5.33)),
                     // diagonal y's should not overlap
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 4.95, new Rotation2d(Math.PI)), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 4.40, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 4.95, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 4.40, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
                         new Pose2d(lineUpMid, 3.84, new Rotation2d(Math.PI)), new Rotation2d())));
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
                         new Translation2d(1.23, 1.90), new Translation2d(2.92, 3.52)),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 3.30, new Rotation2d(Math.PI)), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 2.72, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
-                        new Pose2d(lineUpMid, 2.19, new Rotation2d(Math.PI)), new Rotation2d())));
+                        new Pose2d(1.73, 3.30, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(1.73, 2.72, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(1.73, 2.19, new Rotation2d(Math.PI)), new Rotation2d())));
             add(
                 new ScoringArea(
                     new RectanglePoseArea(
                         new Translation2d(1.23, 0.0), new Translation2d(2.89, 1.89)),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 1.61, new Rotation2d(Math.PI)), new Rotation2d()),
-                    new HolonomicPose2d(new Pose2d(lineUpMid, 1.03, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 1.61, new Rotation2d(Math.PI)), new Rotation2d()),
+                    new HolonomicPose2d(
+                        new Pose2d(lineUpMid, 1.03, new Rotation2d(Math.PI)), new Rotation2d()),
                     new HolonomicPose2d(
                         new Pose2d(lineUpMid, 0.55, new Rotation2d(Math.PI)), new Rotation2d())));
           }
         };
-    public static final Translation3d cameraTranslation = new Translation3d(0.28, 0.0, 0.28);
-    public static final Rotation3d cameraRotation = new Rotation3d(0, 0, 0);
+    public static final Translation3d cameraTranslation = new Translation3d(0.28, 0.0, 0.23);
+    public static final Rotation3d cameraRotation = new Rotation3d(0, Math.toRadians(-15), 0);
   }
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.85, 0, 0, 0, 0, 1.0);
+    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 0.8);
     public static final double dutyCycleResolution = 1.0;
-    public static final double absolutePositionOffset = 0.557;
-    public static final double maxRadians = 4.24;
-    public static final double minRadians = -0.52;
-    public static final double stationDegrees = 149.0,
+    public static final double absolutePositionOffset = 0.231143;
+    public static final double maxRadians = 4.29, loftRadians = maxRadians - 0.3;
+    public static final double minRadians = -0.75;
+    public static final double launchRadians = -0.52;
+    public static final double stationDegrees = 148.0,
         midDegrees = 149.0,
+        midDegreesScore = 165.0,
         highDegrees = 135.0,
+        highLaunchDegrees = 195.0,
         verticalDegrees = 90.0;
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
     public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
     public static final double gravityFF = 0.05;
     public static final boolean encoderInverted = true;
+    public static final double overrideFFScale = 0.05;
 
     public static final class ArmConfig {
       public static final SupplyCurrentLimitConfiguration supplyCurrent;
@@ -149,17 +162,42 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 0.41 * 12,
-        dropV = -0.65,
-        launchV = -0.35 * 12,
-        holdV = 0.16 * 12;
-    public static final double stallCurrent = 15.0;
+    public static final double intakeV = 5.5,
+        dropV = -0.85,
+        launchV = -4.2,
+        powerLaunchV = -5.2,
+        holdV = 2.3;
+    public static final double stallCurrent = 19.0;
+    public static final double stallSeconds = 0.8;
 
     public static final int motorID = 34;
   }
 
+  public static final class PoseEstimator {
+    /** THANK YOU IRON PANTHERS */
+    public static final double NOISY_DISTANCE_METERS = 2.5;
+
+    /**
+     * The number to multiply by the smallest of the distance minus the above constant, clamped
+     * above 1 to be the numerator of the fraction.
+     */
+    public static final double DISTANCE_WEIGHT = 7;
+
+    /**
+     * The number to multiply by the number of tags beyond the first to get the denominator of the
+     * deviations matrix.
+     */
+    public static final double TAG_PRESENCE_WEIGHT = 10;
+
+    /** The amount to shift the pose ambiguity by before multiplying it. */
+    public static final double POSE_AMBIGUITY_SHIFTER = .2;
+
+    /** The amount to multiply the pose ambiguity by if there is only one tag. */
+    public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
+  }
+
   public static final class LEDConstants {
-    public static final int PWMPort = 9, length = 10;
+    public static final int PWMPort = 0;
   }
 
   public static final class PDHConstants {

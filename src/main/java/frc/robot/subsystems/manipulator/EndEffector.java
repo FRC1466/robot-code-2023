@@ -32,7 +32,7 @@ public class EndEffector extends SubsystemBase {
   }
 
   public Command intake() {
-    Debouncer debounce = new Debouncer(1, Debouncer.DebounceType.kBoth);
+    Debouncer debounce = new Debouncer(Intake.stallSeconds, Debouncer.DebounceType.kBoth);
     System.out.println("intake scheduled");
     return runOnce(() -> debounce.calculate(false))
         .andThen(run(() -> setRollers(Intake.intakeV)))
@@ -50,6 +50,10 @@ public class EndEffector extends SubsystemBase {
 
   public Command launch() {
     return runOnce(() -> setRollers(Intake.launchV)).andThen(waitSeconds(1.0)).andThen(stop());
+  }
+
+  public Command powerLaunch() {
+    return runOnce(() -> setRollers(Intake.powerLaunchV)).andThen(waitSeconds(0.5)).andThen(stop());
   }
 
   public double getFilteredCurrent() {

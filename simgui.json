@@ -80,6 +80,7 @@
       "/SmartDashboard/Arm Sim": "Mechanism2d",
       "/SmartDashboard/CHOOSE": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/InstantCommand": "Command",
       "/SmartDashboard/Pigeon 2 [20]": "Gyro"
     },
     "windows": {
@@ -116,6 +117,9 @@
       },
       "SmartDashboard": {
         "Field": {
+          "open": true
+        },
+        "InstantCommand": {
           "open": true
         },
         "Pigeon 2 [20]": {

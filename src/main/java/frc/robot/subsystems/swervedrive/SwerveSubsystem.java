@@ -5,18 +5,21 @@
 package frc.robot.subsystems.swervedrive;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Auton;
 import frc.robot.Constants.OIConstants.InputLimits;
 import java.io.File;
+import java.util.List;
+import java.util.function.Supplier;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
+import swervelib.math.Matter;
 import swervelib.math.SwerveKinematics2;
+import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -34,12 +37,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final PhotonCameraWrapper photon;
 
+  private final Supplier<Translation3d> armCOM;
+  private int visionReset = 0;
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
    */
-  public SwerveSubsystem(File directory) {
+  public SwerveSubsystem(File directory, Supplier<Translation3d> armCOM) {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive();
@@ -52,6 +58,7 @@ public class SwerveSubsystem extends SubsystemBase {
         new SlewRateLimiter(InputLimits.vySlew),
         new SlewRateLimiter(InputLimits.angSlew));
     photon = new PhotonCameraWrapper();
+    this.armCOM = armCOM;
   }
 
   /**
@@ -76,18 +83,54 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop, false);
   }
 
+  public void setAlliance() {
+    photon.setAlliance();
+  }
+
   @Override
   public void periodic() {
     swerveDrive.updateOdometry();
-    var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
+    // var pose = photon.getEstimatedGlobalPose(swerveDrive.getPose3d());
     // pose.ifPresent(
     //     estimatedRobotPose -> {
-    //       var adjPose = new Pose3d(estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
+    //       if (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity() > 0.15
+    //           && estimatedRobotPose.targetsUsed.size() != 1) {
+    //         return;
+    //       }
+    //       var smallestDist =
+    //           estimatedRobotPose.targetsUsed.stream()
+    //               .min(
+    //                   Comparator.comparing(
+    //                       target -> target.getBestCameraToTarget().getTranslation().getNorm()))
+    //               .get()
+    //               .getBestCameraToTarget()
+    //               .getTranslation()
+    //               .getNorm();
+    //       double poseAmbiguityFactor =
+    //           estimatedRobotPose.targetsUsed.size() != 1
+    //               ? 1
+    //               : Math.max(
+    //                   1,
+    //                   (estimatedRobotPose.targetsUsed.get(0).getPoseAmbiguity()
+    //                           + PoseEstimator.POSE_AMBIGUITY_SHIFTER)
+    //                       * PoseEstimator.POSE_AMBIGUITY_MULTIPLIER);
+    //       double confidenceMultiplier =
+    //           Math.max(
+    //               1,
+    //               (Math.max(
+    //                           1,
+    //                           Math.max(0, smallestDist - PoseEstimator.NOISY_DISTANCE_METERS)
+    //                               * PoseEstimator.DISTANCE_WEIGHT)
+    //                       * poseAmbiguityFactor)
+    //                   / (1
+    //                       + ((estimatedRobotPose.targetsUsed.size() - 1)
+    //                           * PoseEstimator.TAG_PRESENCE_WEIGHT)));
+    //       var adjPose =
+    //           new Pose3d(
+    //               estimatedRobotPose.estimatedPose.getTranslation(), getPose3d().getRotation());
+
     //       swerveDrive.addVisionMeasurement(
-    //             adjPose,
-    //             estimatedRobotPose.timestampSeconds,
-    //             true,
-    //             0.5);
+    //           adjPose, estimatedRobotPose.timestampSeconds, true, 1.0 / confidenceMultiplier);
     //     });
   }
 
@@ -133,6 +176,16 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param chassisSpeeds Field-relative.
    */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+    var translation =
+        SwerveMath.limitVelocity(
+            new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond),
+            this.getFieldVelocity(),
+            this.getPose(),
+            Constants.LOOP_TIME,
+            Constants.ROBOT_MASS,
+            List.of(Constants.CHASSIS, new Matter(armCOM.get(), Constants.ARM_MASS)),
+            this.getSwerveDriveConfiguration());
+    SmartDashboard.putString("LimitedTranslation", translation.toString());
     swerveDrive.setChassisSpeeds(chassisSpeeds);
   }
 

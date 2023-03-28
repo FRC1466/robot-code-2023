@@ -5,14 +5,19 @@
 package frc.robot.commands.swervedrive.drivebase;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import swervelib.SwerveController;
+import swervelib.math.Matter;
+import swervelib.math.SwerveMath;
 
 /** An example command that uses an example subsystem. */
 public class TeleopDrive extends CommandBase {
@@ -23,6 +28,7 @@ public class TeleopDrive extends CommandBase {
   private final DoubleSupplier omega;
   private final BooleanSupplier driveMode;
   private final boolean isOpenLoop;
+  private final Supplier<Translation3d> armCOM;
   private final SwerveController controller;
   private double lastTime;
 
@@ -37,13 +43,15 @@ public class TeleopDrive extends CommandBase {
       DoubleSupplier vY,
       DoubleSupplier omega,
       BooleanSupplier driveMode,
-      boolean isOpenLoop) {
+      boolean isOpenLoop,
+      Supplier<Translation3d> armCOM) {
     this.swerve = swerve;
     this.vX = vX;
     this.vY = vY;
     this.omega = omega;
     this.driveMode = driveMode;
     this.isOpenLoop = isOpenLoop;
+    this.armCOM = armCOM;
     this.controller = swerve.getSwerveController();
     this.lastTime = Timer.getFPGATimestamp();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -65,6 +73,17 @@ public class TeleopDrive extends CommandBase {
     SmartDashboard.putNumber("omega", angVelocity);
     if (Math.abs(xVelocity) > 0 || Math.abs(yVelocity) > 0 || Math.abs(angVelocity) > 0) {
       lastTime = Timer.getFPGATimestamp();
+      // Limit velocity to prevent tippy
+      var translation =
+          SwerveMath.limitVelocity(
+              new Translation2d(xVelocity, yVelocity),
+              swerve.getFieldVelocity(),
+              swerve.getPose(),
+              Constants.LOOP_TIME,
+              Constants.ROBOT_MASS,
+              List.of(Constants.CHASSIS, new Matter(armCOM.get(), Constants.ARM_MASS)),
+              swerve.getSwerveDriveConfiguration());
+      SmartDashboard.putString("LimitedTranslation", translation.toString());
       swerve.drive(
           new Translation2d(xVelocity, yVelocity),
           angVelocity,

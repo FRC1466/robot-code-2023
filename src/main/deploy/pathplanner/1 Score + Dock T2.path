@@ -17,10 +17,9 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Intake",
-          "ScoreMid"
+          "High"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -52,12 +51,12 @@
     },
     {
       "anchorPoint": {
-        "x": 3.857889221900851,
-        "y": 2.7281833242051907
+        "x": 3.8801618106708435,
+        "y": 2.7262461017977593
       },
       "prevControl": {
-        "x": 3.860665116524151,
-        "y": 2.7154557478292785
+        "x": 3.882937705294143,
+        "y": 2.713518525421847
       },
       "nextControl": null,
       "holonomicAngle": 180.0,

@@ -34,6 +34,10 @@ public class Superstructure {
     return effector.drop().andThen(arm.store());
   }
 
+  public Command dropMidStore() {
+    return arm.midScore().andThen(effector.drop().andThen(arm.store()));
+  }
+
   public Command launchStore() {
     return effector.launch().andThen(arm.store());
   }
@@ -48,5 +52,13 @@ public class Superstructure {
 
   public Command scoreHigh() {
     return arm.high().andThen(effector.launch());
+  }
+
+  public Command launchConeToHigh() {
+    return Commands.parallel(arm.store(), Commands.waitSeconds(0.2).andThen(effector.drop()));
+  }
+
+  public Command scoreConeHigh() {
+    return arm.highLaunchReady().andThen(launchConeToHigh());
   }
 }
