@@ -195,6 +195,13 @@ public class RobotContainer {
     //     .povRight()
     //     .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
     //     .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
+    driverController
+        .button(2)
+        .onTrue(
+            Commands.either(
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD), m_led),
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_VIOLET), m_led),
+                () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
     driverController
         .button(7)
@@ -301,8 +308,8 @@ public class RobotContainer {
         .button(2)
         .onTrue(
             Commands.either(
-                Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
-                Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD), m_led),
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_VIOLET), m_led),
                 () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
     driverController
