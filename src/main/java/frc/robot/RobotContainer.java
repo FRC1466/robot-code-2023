@@ -26,6 +26,8 @@ import frc.robot.commands.swervedrive.auto.GoToScoring;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.BlinkinLedMode;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
@@ -46,7 +48,7 @@ public class RobotContainer {
   private final EndEffector effector = new EndEffector();
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
-  //   private final LED m_led = new LED();
+  private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
   private final AutoMap autoMap = new AutoMap(superstructure, effector, arm);
@@ -185,7 +187,7 @@ public class RobotContainer {
 
   private void configureBindingsSplit() {
     drivebase.setDefaultCommand(closedFieldRel);
-    // m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
+    m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
@@ -252,7 +254,7 @@ public class RobotContainer {
    */
   private void configureBindingsFull() {
     drivebase.setDefaultCommand(closedFieldRel);
-    // m_led.setDefaultCommand(Commands.run(m_led::setColor, m_led));
+    m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
@@ -295,13 +297,13 @@ public class RobotContainer {
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
 
-    // driverController
-    //     .button(2)
-    //     .onTrue(
-    //         Commands.either(
-    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
-    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
-    //             () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
+    driverController
+        .button(2)
+        .onTrue(
+            Commands.either(
+                Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+                Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
+                () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
     driverController
         .button(1)

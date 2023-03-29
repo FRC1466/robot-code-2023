@@ -117,7 +117,7 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 0.8);
+    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 1.0);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.231143;
     public static final double maxRadians = 4.29, loftRadians = maxRadians - 0.3;
@@ -134,7 +134,7 @@ public final class Constants {
     public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
     public static final double gravityFF = 0.05;
     public static final boolean encoderInverted = true;
-    public static final double overrideFFScale = 0.05;
+    public static final double overrideFFScale = 0.15;
 
     public static final class ArmConfig {
       public static final SupplyCurrentLimitConfiguration supplyCurrent;
@@ -197,7 +197,7 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final int PWMPort = 0;
+    public static final int PWMPort = 9;
   }
 
   public static final class PDHConstants {
