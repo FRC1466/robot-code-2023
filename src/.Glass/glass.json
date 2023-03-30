@@ -1,0 +1,11 @@
+{
+  "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "1466"
+  }
+}

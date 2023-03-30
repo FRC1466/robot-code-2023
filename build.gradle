@@ -4,10 +4,6 @@ buildscript {
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2023.4.3"
-    id 'com.diffplug.spotless' version '6.12.0'
-    id 'checkstyle'
-    id 'pmd'
-    id 'com.github.spotbugs' version '5.0.8'
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -78,17 +74,6 @@ dependencies {
 }
 
 build {
-    if (project.hasProperty('javaFormat')) {
-        pmdMain.enabled = true;
-        checkstyleMain.enabled = true;
-        spotbugsMain.enabled = true;
-        spotlessCheck.enabled = true;
-    } else {
-        pmdMain.enabled = false;
-        checkstyleMain.enabled = false;
-        spotbugsMain.enabled = false;
-        spotlessCheck.enabled = false;
-    }
 }
 
 test {
@@ -119,67 +104,3 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
-checkstyle {
-    toolVersion = "10.1"
-    configDirectory = file("${project.rootDir}/styleguide")
-    config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
-}
-
-
-
-pmd {
-    toolVersion = '6.44.0'
-    consoleOutput = true
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
-    ruleSets = []
-}
-
-spotbugs {
-    ignoreFailures = false
-    effort = 'max'
-    excludeFilter = file("${project.rootDir}/styleguide/spotbugs-exclude.xml")
-}
-
-spotless {
-    java {
-        target fileTree('.') {
-            include '**/*.java'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    groovyGradle {
-        target fileTree('.') {
-            include '**/*.gradle'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    format 'xml', {
-        target fileTree('.') {
-            include '**/*.xml'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        eclipseWtp('xml')
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-    format 'misc', {
-        target fileTree('.') {
-            include '**/*.md', '**/.gitignore'
-            exclude '**/build/**', '**/build-*/**'
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-}

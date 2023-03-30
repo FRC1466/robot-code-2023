@@ -42,6 +42,10 @@ public class Superstructure {
     return effector.launch().andThen(arm.store());
   }
 
+  public Command scoreLowLaunch() {
+    return arm.storeLaunchReady().andThen(launchStore());
+  }
+
   public Command scoreLow() {
     return arm.ground().andThen(effector.launch());
   }

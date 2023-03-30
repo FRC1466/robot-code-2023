@@ -11,6 +11,7 @@ public class AutoMap {
   public AutoMap(Superstructure superstructure, EndEffector effector, VirtualFourBar arm) {
 
     eventMap.put("ScoreLow", superstructure.scoreLow());
+    eventMap.put("ScoreLowLaunch", superstructure.scoreLowLaunch());
     eventMap.put("ScoreMid", superstructure.scoreMid());
     eventMap.put("ScoreHigh", superstructure.scoreHigh());
     eventMap.put("PickupGround", superstructure.pickupGround());
