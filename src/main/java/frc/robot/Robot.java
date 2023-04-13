@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.ArmConstants.ArmConfig;
@@ -38,11 +39,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    try {
-      TimeUnit.SECONDS.sleep(1);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+    Timer.delay(1.0);
     robotContainer = new RobotContainer();
     PathPlannerServer.startServer(5811);
   }

@@ -2,15 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.7360976792106233,
-        "y": 2.7336487305856862
+        "x": 2.069648241860586,
+        "y": 1.0505634686483054
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7360976792106237,
-        "y": 2.7336487305856862
+        "x": 3.6569126129705247,
+        "y": 1.0962401411982325
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": -179.0959459257272,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -27,40 +27,40 @@
     },
     {
       "anchorPoint": {
-        "x": 5.963584576741804,
-        "y": 2.694923680445652
+        "x": 4.2392901879820855,
+        "y": 0.8450184421736366
       },
       "prevControl": {
-        "x": 4.796125288986641,
-        "y": 2.678979704866773
+        "x": 3.428529250220893,
+        "y": 0.8221801058986732
       },
       "nextControl": {
-        "x": 7.1569316407915,
-        "y": 2.7112212050325013
+        "x": 5.016240742798737,
+        "y": 0.8669043732952328
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
         "names": [],
         "executionBehavior": "parallel",
-        "waitBehavior": "after",
-        "waitTime": 0.5
+        "waitBehavior": "none",
+        "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 3.8801618106708435,
-        "y": 2.7262461017977593
+        "x": 6.271902116453806,
+        "y": 0.9363717872734894
       },
       "prevControl": {
-        "x": 3.882937705294143,
-        "y": 2.713518525421847
+        "x": 5.289853656630391,
+        "y": 0.9135334509985259
       },
       "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -73,12 +73,9 @@
       }
     }
   ],
-  "maxVelocity": 3.5,
-  "maxAcceleration": 2.5,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.1945201526988637,
+      "position": 0.1163636363636339,
       "names": [
         "Store"
       ]

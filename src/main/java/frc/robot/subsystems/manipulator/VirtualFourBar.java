@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ArmConstants.ArmConfig;
 import frc.robot.Robot;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -26,16 +27,8 @@ public class VirtualFourBar extends SubsystemBase {
   private Rotation2d localSetpoint;
   private DoubleSupplier overrideFeedforward = () -> 0.0;
   private boolean disabled = false;
-
-  public enum ARM {
-    GROUND,
-    VERTICAL,
-    STORAGE,
-    STATION,
-    MID
-  }
-
-  private Rotation2d currentArm = Rotation2d.fromRadians(ArmConstants.minRadians);
+  private Rotation2d storedPosRad = Rotation2d.fromRadians(ArmConstants.minRadians);
+  private boolean storedInPerimeter = false;
 
   /** Create a new VirtualFourBar subsystem. */
   public VirtualFourBar() {
@@ -51,7 +44,7 @@ public class VirtualFourBar extends SubsystemBase {
             ArmConstants.armPosition.P, ArmConstants.armPosition.I, ArmConstants.armPosition.D);
     armPID.setAvoidanceRange(
         Rotation2d.fromRadians(ArmConstants.maxRadians),
-        Rotation2d.fromRadians(ArmConstants.minRadians));
+        Rotation2d.fromRadians(ArmConstants.inFrameRadians));
     armPID.setTolerance(0.15);
 
     if (Robot.isSimulation()) {
@@ -175,8 +168,19 @@ public class VirtualFourBar extends SubsystemBase {
   }
 
   public Command store() {
-    return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.minRadians)))
+    return runOnce(() -> setGoal(storedPosRad))
         .andThen(holdUntilSetpoint());
+  }
+
+  public void setStoreSetpoint() {
+    if (storedInPerimeter) {
+      storedPosRad = Rotation2d.fromRadians(ArmConstants.inFrameRadians);
+    } else {
+      storedPosRad = Rotation2d.fromRadians(ArmConstants.minRadians);
+    }
+    System.out.println("Override changed.");
+    SmartDashboard.putBoolean("In Frame Perimeter", storedInPerimeter);
+    storedInPerimeter = !storedInPerimeter;
   }
 
   public Command vertical() {

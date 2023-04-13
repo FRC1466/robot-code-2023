@@ -65,7 +65,7 @@ public final class Constants {
 
     public static final double maxSpeedMPS = 2.5;
     public static final double maxAccelerationMPS = 1.8;
-    public static final double balanceScale = 2.8, balanceScalePow = 1.5, balanceLimitDeg = 2.0;
+    public static final double balanceScale = 1.5, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
     public static final LoadingArea loadingArea =
         new LoadingArea(
@@ -117,13 +117,14 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 0.8);
+    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 1.0);
     public static final double dutyCycleResolution = 1.0;
     public static final double absolutePositionOffset = 0.231143;
     public static final double maxRadians = 4.29, loftRadians = maxRadians - 0.3;
-    public static final double minRadians = -0.75;
-    public static final double launchRadians = -0.52;
-    public static final double stationDegrees = 148.0,
+    public static final double minRadians = -0.60;
+    public static final double inFrameRadians = -0.80;
+    public static final double launchRadians = -0.45;
+    public static final double stationDegrees = 150.0,
         midDegrees = 149.0,
         midDegreesScore = 165.0,
         highDegrees = 135.0,
@@ -134,7 +135,7 @@ public final class Constants {
     public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
     public static final double gravityFF = 0.05;
     public static final boolean encoderInverted = true;
-    public static final double overrideFFScale = 0.05;
+    public static final double overrideFFScale = 0.15;
 
     public static final class ArmConfig {
       public static final SupplyCurrentLimitConfiguration supplyCurrent;
@@ -162,11 +163,11 @@ public final class Constants {
   }
 
   public static final class Intake {
-    public static final double intakeV = 5.5,
+    public static final double intakeV = 5.6,
         dropV = -0.85,
-        launchV = -4.2,
+        launchV = -4.7,
         powerLaunchV = -5.2,
-        holdV = 2.3;
+        holdV = 3.3;
     public static final double stallCurrent = 19.0;
     public static final double stallSeconds = 0.8;
 
@@ -197,7 +198,7 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final int PWMPort = 0;
+    public static final int PWMPort = 9;
   }
 
   public static final class PDHConstants {

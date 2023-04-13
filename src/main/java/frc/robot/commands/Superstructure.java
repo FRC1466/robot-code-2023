@@ -30,7 +30,8 @@ public class Superstructure {
     return arm.vertical();
   }
 
-  public Command dropStore() {
+  public Command 
+  dropStore() {
     return effector.drop().andThen(arm.store());
   }
 
@@ -40,6 +41,10 @@ public class Superstructure {
 
   public Command launchStore() {
     return effector.launch().andThen(arm.store());
+  }
+
+  public Command scoreLowLaunch() {
+    return arm.storeLaunchReady().andThen(launchStore());
   }
 
   public Command scoreLow() {

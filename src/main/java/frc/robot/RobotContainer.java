@@ -8,6 +8,8 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.*;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.Auton;
@@ -26,6 +29,8 @@ import frc.robot.commands.swervedrive.auto.GoToScoring;
 import frc.robot.commands.swervedrive.auto.GoToScoring.POSITION;
 import frc.robot.commands.swervedrive.auto.PathBuilder;
 import frc.robot.commands.swervedrive.drivebase.TeleopDrive;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.BlinkinLedMode;
 import frc.robot.subsystems.PDH;
 import frc.robot.subsystems.manipulator.EndEffector;
 import frc.robot.subsystems.manipulator.VirtualFourBar;
@@ -46,7 +51,7 @@ public class RobotContainer {
   private final EndEffector effector = new EndEffector();
   private final SwerveSubsystem drivebase =
       new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"), arm.getCOM());
-  //   private final LED m_led = new LED();
+  private final LED m_led = new LED();
   private final PDH pdh = new PDH();
   private final Superstructure superstructure = new Superstructure(effector, arm);
   private final AutoMap autoMap = new AutoMap(superstructure, effector, arm);
@@ -80,6 +85,7 @@ public class RobotContainer {
     configureBindingsScore();
     initializeChooser();
     reconfigureBindings();
+    SmartDashboard.putBoolean("Using Vision", true);
   }
 
   public void reconfigureBindings() {
@@ -111,12 +117,14 @@ public class RobotContainer {
 
   private void initializeChooser() {
 
-    chooser.addOption(
-        "Default Test",
-        builder.getSwerveCommand(
-            PathPlanner.loadPathGroup(
-                "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
+    // chooser.addOption(
+    //     "Default Test",
+    //     builder.getSwerveCommand(
+    //         PathPlanner.loadPathGroup(
+    //             "Test Path", new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
+    chooser.setDefaultOption("None", new InstantCommand());
+    chooser.addOption("drive 1 sec", Commands.run(() -> drivebase.drive(new Translation2d(3.0, 0), 0, true, false)).withTimeout(1));
     // chooser.setDefaultOption(
     //     "Default Test Full",
     //     builder.getSwerveCommand(
@@ -124,12 +132,33 @@ public class RobotContainer {
     //             "Test Full Path",
     //             new PathConstraints(Auton.maxSpeedMPS, Auton.maxAccelerationMPS))));
 
-    // chooser.addOption(
-    //     "3 Score T1",
-    //     builder.getSwerveCommand(
-    //         PathPlanner.loadPathGroup(
-    //             "3 Score T1", new PathConstraints(Auton.maxSpeedMPS,
-    // Auton.maxAccelerationMPS))));
+    chooser.addOption(
+        "3 Score T1",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "3 Score T1", new PathConstraints(Auton.maxSpeedMPS,
+    Auton.maxAccelerationMPS))));
+
+    chooser.addOption(
+        "1 Score T1",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "1 Score T1", new PathConstraints(Auton.maxSpeedMPS,
+    Auton.maxAccelerationMPS))));
+
+    chooser.addOption(
+        "3 Score T3",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "3 Score T3", new PathConstraints(Auton.maxSpeedMPS,
+    Auton.maxAccelerationMPS))));
+
+    chooser.addOption(
+        "1 Score T3",
+        builder.getSwerveCommand(
+            PathPlanner.loadPathGroup(
+                "1 Score T3", new PathConstraints(Auton.maxSpeedMPS,
+    Auton.maxAccelerationMPS))));
 
     chooser.addOption(
         "2 Score + Dock T1",
@@ -142,13 +171,14 @@ public class RobotContainer {
             .andThen(Commands.waitSeconds(1.0))
             .andThen(autoBalance()));
 
+
+
     chooser.addOption(
         "1 Score + Dock T2",
         builder
             .getSwerveCommand(
                 PathPlanner.loadPathGroup("1 Score + Dock T2", new PathConstraints(1.5, 2)))
-            .andThen(autoBalance())
-            .andThen(Commands.waitSeconds(1.0))
+            .andThen(Commands.waitSeconds(0.9))
             .andThen(autoBalance()));
 
     SmartDashboard.putData("CHOOSE", chooser);
@@ -185,7 +215,7 @@ public class RobotContainer {
 
   private void configureBindingsSplit() {
     drivebase.setDefaultCommand(closedFieldRel);
-    // m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
+    m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
@@ -193,6 +223,13 @@ public class RobotContainer {
     //     .povRight()
     //     .whileTrue(Commands.runOnce(() -> drivebase.softVisionMeasurements = false))
     //     .whileFalse(Commands.runOnce(() -> drivebase.softVisionMeasurements = true));
+    driverController
+        .button(2)
+        .onTrue(
+            Commands.either(
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD), m_led),
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_VIOLET), m_led),
+                () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
     driverController
         .button(7)
@@ -212,9 +249,9 @@ public class RobotContainer {
                 false,
                 arm.getCOM()));
 
-    driverController.button(8).whileTrue(arm.loft()).whileFalse(superstructure.launchStore());
-    driverController.button(9).whileTrue(arm.mid()).whileFalse(superstructure.dropMidStore());
-    driverController.button(10).whileTrue(arm.high()).whileFalse(superstructure.launchStore());
+    driverController.button(8).whileTrue(effector.intake().andThen(arm.loft())).whileFalse(superstructure.launchStore());
+    driverController.button(9).whileTrue(effector.intake().andThen(arm.mid())).whileFalse(superstructure.dropMidStore());
+    driverController.button(10).whileTrue(effector.intake().andThen(arm.high())).whileFalse(superstructure.launchStore());
 
     new Trigger(DriverStation::isTeleopEnabled).onTrue(superstructure.store());
 
@@ -252,7 +289,7 @@ public class RobotContainer {
    */
   private void configureBindingsFull() {
     drivebase.setDefaultCommand(closedFieldRel);
-    // m_led.setDefaultCommand(Commands.run(m_led::setColor, m_led));
+    m_led.setDefaultCommand(Commands.run(m_led::setAllianceColor, m_led));
 
     driverController.povDown().onTrue(Commands.runOnce(drivebase::zeroGyro));
     driverController.povUp().whileTrue(autoBalance());
@@ -295,13 +332,13 @@ public class RobotContainer {
         .whileTrue(superstructure.pickupGround())
         .whileFalse(superstructure.store());
 
-    // driverController
-    //     .button(2)
-    //     .onTrue(
-    //         Commands.either(
-    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
-    //             Commands.runOnce(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD)),
-    //             () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
+    driverController
+        .button(2)
+        .onTrue(
+            Commands.either(
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_GOLD), m_led),
+                Commands.run(() -> m_led.setMode(BlinkinLedMode.SOLID_VIOLET), m_led),
+                () -> m_led.getMode() == BlinkinLedMode.SOLID_VIOLET));
 
     driverController
         .button(1)
@@ -309,9 +346,11 @@ public class RobotContainer {
         .onFalse(effector.launch().andThen(Commands.waitSeconds(0.1)).andThen(arm.store()));
     driverController.button(12).onTrue(effector.drop());
     driverController.button(13).onTrue(effector.intake());
-    driverController.button(14).onTrue(effector.stop());
+    driverController.button(11).onTrue(effector.stop());
 
     arm.setFeedforward(() -> 0.0);
+
+    driverController.button(14).onTrue(Commands.runOnce(() -> arm.setStoreSetpoint()));
 
     driverController
         .button(15)
@@ -391,6 +430,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAuto() {
-    return Commands.runOnce(drivebase::setAlliance).andThen(chooser.getSelected());
+    drivebase.setAlliance();
+    drivebase.setVision(SmartDashboard.getBoolean("Using Vision", true));
+    return chooser.getSelected();
   }
 }

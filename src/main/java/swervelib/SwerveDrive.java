@@ -323,6 +323,7 @@ public class SwerveDrive {
    * @param pose The pose to set the odometry to
    */
   public void resetOdometry(Pose3d pose) {
+    setGyro(new Rotation3d(0.0, 0.0, pose.getRotation().getZ()));
     swerveDrivePoseEstimator.resetPosition(getGyroRotation3d(), getModuleStates(), pose);
   }
 
@@ -621,7 +622,11 @@ public class SwerveDrive {
    * @param gyro expected gyroscope angle.
    */
   public void setGyro(Rotation3d gyro) {
-    imu.setOffset(imu.getRawRotation3d().minus(gyro));
+    if (SwerveDriveTelemetry.isSimulation) {
+      simIMU.setAngle(gyro.getZ());
+    } else {
+      imu.setOffset(imu.getRawRotation3d().minus(gyro));
+    }
   }
 
   /**

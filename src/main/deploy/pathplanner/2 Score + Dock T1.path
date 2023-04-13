@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.7718141522573194,
-        "y": 5.024967337328881
+        "x": 2.0011332330356972,
+        "y": 4.373541396655443
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.771814152257318,
-        "y": 5.024967337328881
+        "x": 3.001133233035695,
+        "y": 4.373541396655443
       },
       "holonomicAngle": 179.3237534214551,
       "isReversal": false,
@@ -17,7 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "Mid"
+          "Intake",
+          "ScoreHigh"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -103,16 +104,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8755223835233994,
-        "y": 4.442056405480333
+        "x": 1.9897140648982155,
+        "y": 4.362122228517961
       },
       "prevControl": {
-        "x": 1.7949516140375616,
-        "y": 4.436744047052695
+        "x": 1.9091432954123777,
+        "y": 4.3568098700903235
       },
       "nextControl": {
-        "x": 2.9146666840342226,
-        "y": 4.510571414305223
+        "x": 3.0288583654090395,
+        "y": 4.430637237342851
       },
       "holonomicAngle": -179.91600279360023,
       "isReversal": false,
@@ -121,7 +122,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "High"
+          "ScoreHigh"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -189,7 +190,7 @@
     {
       "position": 2.3999999999999524,
       "names": [
-        "High"
+        "Mid"
       ]
     },
     {

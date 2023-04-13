@@ -2,15 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.7360976792106233,
-        "y": 2.7336487305856862
+        "x": 1.966875728623252,
+        "y": 4.990176476079449
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7360976792106237,
-        "y": 2.7336487305856862
+        "x": 1.986127732405037,
+        "y": 4.972954051009598
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": -179.92154254434402,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -27,40 +27,18 @@
     },
     {
       "anchorPoint": {
-        "x": 5.963584576741804,
-        "y": 2.694923680445652
+        "x": 3.782523462482822,
+        "y": 4.818888954017225
       },
       "prevControl": {
-        "x": 4.796125288986641,
-        "y": 2.678979704866773
+        "x": 2.44607487465509,
+        "y": 4.872643795901908
       },
       "nextControl": {
-        "x": 7.1569316407915,
-        "y": 2.7112212050325013
+        "x": 5.624958532267015,
+        "y": 4.744782245565369
       },
-      "holonomicAngle": 180.0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "after",
-        "waitTime": 0.5
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 3.8801618106708435,
-        "y": 2.7262461017977593
-      },
-      "prevControl": {
-        "x": 3.882937705294143,
-        "y": 2.713518525421847
-      },
-      "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 140.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -71,14 +49,35 @@
         "waitBehavior": "none",
         "waitTime": 0
       }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.294740452728768,
+        "y": 4.579086423130112
+      },
+      "prevControl": {
+        "x": 4.558522846613001,
+        "y": 4.757979289596401
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "PickupGround"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
     }
   ],
-  "maxVelocity": 3.5,
-  "maxAcceleration": 2.5,
-  "isReversed": null,
   "markers": [
     {
-      "position": 0.1945201526988637,
+      "position": 0.349090909090885,
       "names": [
         "Store"
       ]
