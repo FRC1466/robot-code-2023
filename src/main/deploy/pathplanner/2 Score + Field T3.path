@@ -7,8 +7,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.796320552261057,
-        "y": 1.0377338569403984
+        "x": 4.570446063969051,
+        "y": 0.9820484598234163
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -27,16 +27,16 @@
     },
     {
       "anchorPoint": {
-        "x": 4.72863273517521,
-        "y": 0.9234879277359507
+        "x": 4.570446063969051,
+        "y": 0.9820484598234163
       },
       "prevControl": {
-        "x": 4.038554554038808,
-        "y": 0.9234879277359507
+        "x": 3.8282001350327484,
+        "y": 0.9592101235484528
       },
       "nextControl": {
-        "x": 5.418710916311611,
-        "y": 0.9234879277359507
+        "x": 5.26019781264578,
+        "y": 1.0032715905519314
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -52,16 +52,16 @@
     },
     {
       "anchorPoint": {
-        "x": 6.328997957141214,
-        "y": 0.9363717872734894
+        "x": 6.089195426254101,
+        "y": 0.9249526191360088
       },
       "prevControl": {
-        "x": 4.684280935051772,
-        "y": 0.9363717872734894
+        "x": 5.700943709579722,
+        "y": 0.9249526191360088
       },
       "nextControl": {
-        "x": 8.749888534137826,
-        "y": 0.9363717872734894
+        "x": 8.260759749047882,
+        "y": 0.9249526191360088
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -69,20 +69,22 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "PickupGround"
+        ],
         "executionBehavior": "sequential",
         "waitBehavior": "deadline",
-        "waitTime": 0.8
+        "waitTime": 1.9
       }
     },
     {
       "anchorPoint": {
-        "x": 2.65,
+        "x": 2.06,
         "y": 1.04
       },
       "prevControl": {
-        "x": 2.5410357569599893,
-        "y": 1.04
+        "x": 4.697827839758244,
+        "y": 0.7088441240130344
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -92,7 +94,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreLow"
+          "ScoreMid"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -111,13 +113,13 @@
       ]
     },
     {
-      "position": 2.1,
+      "position": 2.2,
       "names": [
         "Store"
       ]
     },
     {
-      "position": 1.3963636363636374,
+      "position": 1.5490909090908156,
       "names": [
         "PickupGround"
       ]
