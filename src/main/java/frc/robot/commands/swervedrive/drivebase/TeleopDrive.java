@@ -67,7 +67,7 @@ public class TeleopDrive extends CommandBase {
   public void execute() {
     double xVelocity = Math.pow(vX.getAsDouble(), 3) * controller.config.maxSpeed;
     double yVelocity = Math.pow(vY.getAsDouble(), 3) * controller.config.maxSpeed;
-    double angVelocity = Math.pow(omega.getAsDouble(), 3) * controller.config.maxAngularVelocity;
+    double angVelocity = Math.pow(omega.getAsDouble(), 2) * controller.config.maxAngularVelocity;
     SmartDashboard.putNumber("vX", xVelocity);
     SmartDashboard.putNumber("vY", yVelocity);
     SmartDashboard.putNumber("omega", angVelocity);

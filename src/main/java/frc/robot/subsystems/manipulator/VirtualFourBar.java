@@ -27,7 +27,7 @@ public class VirtualFourBar extends SubsystemBase {
   private Rotation2d localSetpoint;
   private DoubleSupplier overrideFeedforward = () -> 0.0;
   private boolean disabled = false;
-  private Rotation2d storedPosRad = Rotation2d.fromRadians(ArmConstants.minRadians);
+  private Rotation2d storedPosRad = Rotation2d.fromRadians(ArmConstants.launchRadians);
   private boolean storedInPerimeter = false;
 
   /** Create a new VirtualFourBar subsystem. */
@@ -52,8 +52,8 @@ public class VirtualFourBar extends SubsystemBase {
       SmartDashboard.putData("Arm Sim", sim.getMech2d());
     }
 
-    setGoal(Rotation2d.fromRadians(ArmConstants.minRadians));
-    setDefaultCommand(hold());
+  setGoal(Rotation2d.fromRadians(ArmConstants.launchRadians));
+  setDefaultCommand(hold());
   }
 
   @Override
@@ -76,7 +76,7 @@ public class VirtualFourBar extends SubsystemBase {
   private Rotation2d getShiftedAbsoluteDistance() {
     var initialPosition =
         absoluteArmEncoder.getAbsolutePosition() / ArmConstants.dutyCycleResolution;
-    return Rotation2d.fromRotations(initialPosition)
+     return Rotation2d.fromRotations(initialPosition)
         .minus(Rotation2d.fromRotations(ArmConstants.absolutePositionOffset));
   }
 
@@ -99,7 +99,7 @@ public class VirtualFourBar extends SubsystemBase {
    */
   public void setGoal(Rotation2d setpoint) {
     localSetpoint = setpoint;
-    // armPID.setSetpoint(setpoint);
+    armPID.setSetpoint(setpoint);
     SmartDashboard.putNumber("Arm PID Setpoint", setpoint.getRadians());
   }
 
@@ -110,7 +110,6 @@ public class VirtualFourBar extends SubsystemBase {
             -ArmConstants.armPosition.peakOutput,
             ArmConstants.armPosition.peakOutput);
     var feedforward = getPosition().getCos() * ArmConstants.gravityFF;
-
     setMotor(motorOutput + feedforward + overrideFeedforward.getAsDouble());
 
     SmartDashboard.putNumber("Arm PID Output", motorOutput);
@@ -129,47 +128,47 @@ public class VirtualFourBar extends SubsystemBase {
 
   public Command ground() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.maxRadians)))
-        .andThen(holdUntilSetpoint());
+       .andThen(holdUntilSetpoint());
   }
 
   public Command loft() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.loftRadians)))
-        .andThen(holdUntilSetpoint());
+      .andThen(holdUntilSetpoint());
   }
 
   public Command station() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.stationDegrees)))
-        .andThen(holdUntilSetpoint());
+      .andThen(holdUntilSetpoint());
   }
 
   public Command mid() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegrees)))
-        .andThen(holdUntilSetpoint());
+       .andThen(holdUntilSetpoint());
   }
 
   public Command midScore() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.midDegreesScore)))
-        .andThen(holdUntilSetpoint());
+       .andThen(holdUntilSetpoint());
   }
 
   public Command high() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highDegrees)))
-        .andThen(holdUntilSetpoint());
+       .andThen(holdUntilSetpoint());
   }
 
   public Command storeLaunchReady() {
     return runOnce(() -> setGoal(Rotation2d.fromRadians(ArmConstants.launchRadians)))
-        .andThen(holdUntilSetpoint());
+      .andThen(holdUntilSetpoint());
   }
 
   public Command highLaunchReady() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.highLaunchDegrees)))
-        .andThen(holdUntilSetpoint());
+      .andThen(holdUntilSetpoint());
   }
 
   public Command store() {
     return runOnce(() -> setGoal(storedPosRad))
-        .andThen(holdUntilSetpoint());
+       .andThen(holdUntilSetpoint());
   }
 
   public void setStoreSetpoint() {
@@ -185,7 +184,7 @@ public class VirtualFourBar extends SubsystemBase {
 
   public Command vertical() {
     return runOnce(() -> setGoal(Rotation2d.fromDegrees(ArmConstants.verticalDegrees)))
-        .andThen(holdUntilSetpoint());
+      .andThen(holdUntilSetpoint());
   }
 
   public Command hold() {
@@ -224,7 +223,7 @@ public class VirtualFourBar extends SubsystemBase {
 
   @Override
   public void periodic() {
-    setArmHold();
+   setArmHold();
 
     SmartDashboard.putData(absoluteArmEncoder);
     SmartDashboard.putNumber("Arm Raw Absolute Encoder", absoluteArmEncoder.getAbsolutePosition());

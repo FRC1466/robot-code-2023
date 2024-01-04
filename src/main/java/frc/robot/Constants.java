@@ -63,7 +63,7 @@ public final class Constants {
     public static final PIDFConfig yAutoPID = new PIDFConfig(5.0, 0, 0);
     public static final PIDFConfig angleAutoPID = new PIDFConfig(4.2, 0, 0.0);
 
-    public static final double maxSpeedMPS = 2.5;
+    public static final double maxSpeedMPS = 3.5;
     public static final double maxAccelerationMPS = 1.8;
     public static final double balanceScale = 1.5, balanceScalePow = 1.0, balanceLimitDeg = 2.0;
 
@@ -117,13 +117,13 @@ public final class Constants {
 
   public static final class ArmConstants {
     public static final int armPort = 30, dutyCyclePort = 0;
-    public static final Gains armPosition = new Gains(0.95, 0, 0, 0, 0, 1.0);
+    public static final Gains armPosition = new Gains(0.94, 0.001, 0, 0, 0, 1.0);
     public static final double dutyCycleResolution = 1.0;
-    public static final double absolutePositionOffset = 0.231143;
-    public static final double maxRadians = 4.29, loftRadians = maxRadians - 0.3;
-    public static final double minRadians = -0.60;
-    public static final double inFrameRadians = -0.80;
-    public static final double launchRadians = -0.45;
+    public static final double absolutePositionOffset = 0.81169;
+    public static final double maxRadians = -1.5, loftRadians = maxRadians - 0.3;
+    public static final double minRadians = .02;
+    public static final double inFrameRadians = -.15;
+    public static final double launchRadians = 0.15;
     public static final double stationDegrees = 150.0,
         midDegrees = 149.0,
         midDegreesScore = 165.0,
@@ -133,7 +133,7 @@ public final class Constants {
     public static final double toleranceRadians = 0.10;
     public static final double armInputScale = 2 * Math.PI / (maxRadians - minRadians);
     public static final double armOffset = minRadians + (maxRadians - minRadians) / 2;
-    public static final double gravityFF = 0.05;
+    public static final double gravityFF = 0.02;
     public static final boolean encoderInverted = true;
     public static final double overrideFFScale = 0.15;
 
